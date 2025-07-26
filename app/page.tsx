@@ -25,8 +25,6 @@ function AchievementCard({
   ctaHoverBg,
   ctaText,
 }: AchievementCardProps) {
-  // Compose Tailwind classes for hover bg and text color dynamically
-  // Since bg colors are inline styles, only transition, shadow, and rounded-full via classes
   return (
     <div className="rounded-xl bg-white/60 backdrop-blur-md border border-teal-300/30 p-6 flex flex-col items-center shadow-md text-center">
       <Image src={imgSrc} alt={alt} width={56} height={56} className="mb-4" />
@@ -36,8 +34,6 @@ function AchievementCard({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        // Tailwind hover for bg and text is tricky with inline styles,
-        // so keep bg-color inline, add hover:bg-opacity and smooth transition
         className={`rounded-full px-5 py-2 font-semibold shadow transition-colors`}
         style={{
           backgroundColor: ctaBg,
@@ -197,7 +193,7 @@ export default function HomePage() {
       {/* NEWSLETTER & INDUSTRY NEWS */}
       <section className="flex flex-col items-center bg-gradient-to-tr from-[#F8FAFC] to-[#CBD5E1] py-12 px-6 sm:px-0">
         <h2 className="text-xl font-bold text-[#2D334A] mb-4">Stay Ahead — Get News & Hot Tips</h2>
-        <form className="flex w-full max-w-md gap-4" onSubmit={(e) => e.preventDefault()}>
+        <form className="flex w-full max-w-md gap-4">
           <input
             aria-label="Email address"
             type="email"
