@@ -585,7 +585,7 @@ export default function Example() {
           <div className="xl:grid xl:grid-cols-3 xl:gap-8">
             <img
               alt="Company name"
-              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+              src="/logo.png?color=indigo&shade=600"
               className="h-9"
             />
             <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
