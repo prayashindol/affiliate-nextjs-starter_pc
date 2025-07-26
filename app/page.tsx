@@ -1,136 +1,128 @@
+// app/page.tsx
+
 import Image from "next/image";
 
 export default function HomePage() {
   return (
-    <main className="bg-gradient-to-br from-[#F8FAFC] to-[#CBD5E1] min-h-screen text-[#2D334A]">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center pt-16 pb-12">
-        <h1 className="text-5xl font-extrabold mb-4 text-[#14B8A6] drop-shadow-lg">
+    <main className="min-h-screen bg-gradient-to-br from-[#F8FAFC] to-[#CBD5E1] text-[#2D334A] font-sans">
+      {/* HERO */}
+      <section className="flex flex-col items-center justify-center text-center py-16 px-4 sm:px-6 lg:px-8">
+        <h1 className="text-teal-600 text-5xl font-extrabold drop-shadow-md max-w-4xl">
           #1 Resource Hub for Airbnb Hosts
         </h1>
-        <p className="max-w-xl text-lg text-[#334155] opacity-70">
-          Tools, templates, guidance & real results—helping you grow, automate, and thrive as an Airbnb host.
+        <p className="mt-4 max-w-xl text-lg text-slate-700 opacity-80">
+          Tools, templates, guidance & real results — helping you grow, automate, and thrive as an Airbnb host.
         </p>
         <a
           href="#tools"
-          className="mt-8 px-8 py-3 rounded-full bg-[#14B8A6] text-white font-semibold shadow-lg hover:bg-[#FF7E5F] transition"
+          className="mt-8 inline-block rounded-full bg-teal-600 px-10 py-3 text-white font-semibold shadow-lg hover:bg-coral-500 transition-colors"
+          style={{ backgroundColor: "#14B8A6", transition: "background-color 0.3s" }}
         >
           Browse Top Hosting Tools
         </a>
       </section>
 
-      {/* About Prayas */}
-      <section className="flex flex-col md:flex-row items-center justify-center mb-10 gap-8 mx-4">
-        <div className="backdrop-blur-md bg-white/70 rounded-xl shadow-lg px-8 py-6 flex items-center w-full md:w-2/3">
+      {/* ABOUT PRAYAS */}
+      <section className="mx-auto mb-14 max-w-4xl px-6 sm:px-0">
+        <div className="flex flex-col md:flex-row items-center gap-6 bg-white/70 backdrop-blur-md rounded-xl p-8 shadow-lg border border-teal-300/40">
           <Image
             src="/prayas.jpg"
             alt="Prayas Choudhary"
-            width={90}
-            height={90}
-            className="rounded-full border-4 border-[#14B8A6] mr-6"
+            width={96}
+            height={96}
+            className="rounded-full border-4 border-teal-600"
+            priority
           />
           <div>
-            <h2 className="text-2xl font-bold mb-1 text-[#2D334A]">Meet Prayas Choudhary</h2>
-            <p className="text-[#334155] opacity-80 mb-2">
-              Started hosting in 2016—now managing 200+ properties across multiple countries. My journey from host to Airbnb Ambassador lets me help you shortcut your path to success.
+            <h2 className="text-2xl font-bold text-[#2D334A] mb-1">Meet Prayas Choudhary</h2>
+            <p className="mb-2 text-slate-700 opacity-80 max-w-xl">
+              Started hosting in 2016 — now managing 200+ properties across multiple countries.
+              My journey from host to Airbnb Ambassador lets me help you shortcut your path to success.
             </p>
-            <a href="https://your-airbnb-story-link" className="text-[#14B8A6] underline font-medium">
+            <a href="https://your-airbnb-story-link" className="font-medium text-teal-600 underline">
               Discover My Full Story
             </a>
           </div>
         </div>
       </section>
 
-      {/* Achievements / Connect With Me */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 mb-14">
-        <div className="rounded-xl bg-white/60 backdrop-blur-md p-6 flex flex-col items-center shadow-md border border-[#14B8A6]/20">
-          <Image src="/airbnb-ambassador.svg" alt="Airbnb Ambassador" width={56} height={56} />
-          <h3 className="font-semibold mt-4 text-[#2D334A]">Airbnb Ambassador</h3>
-          <p className="text-sm text-[#334155] opacity-80 mt-2 text-center">
-            1:1 strategic coaching, exclusive resources, & real results.
-          </p>
-          <a
-            href="https://airbnb.com/affiliate-link"
-            target="_blank"
-            className="mt-3 px-5 py-2 bg-[#14B8A6] text-white rounded-full shadow hover:bg-[#FF7E5F] transition"
-          >
-            Connect on Airbnb
-          </a>
-        </div>
-        <div className="rounded-xl bg-white/60 backdrop-blur-md p-6 flex flex-col items-center shadow-md border border-[#14B8A6]/20">
-          <Image src="/fiverr.svg" alt="Fiverr Pro Seller" width={56} height={56} />
-          <h3 className="font-semibold mt-4 text-[#2D334A]">Fiverr Pro Consultant</h3>
-          <p className="text-sm text-[#334155] opacity-80 mt-2 text-center">
-            Top-rated, 100+ reviews. Expert Airbnb consultations for growth.
-          </p>
-          <a
-            href="https://fiverr.com/yourprofile"
-            target="_blank"
-            className="mt-3 px-5 py-2 bg-[#14B8A6] text-white rounded-full shadow hover:bg-[#6EE7B7] transition"
-          >
-            Book on Fiverr Pro
-          </a>
-        </div>
-        <div className="rounded-xl bg-white/60 backdrop-blur-md p-6 flex flex-col items-center shadow-md border border-[#14B8A6]/20">
-          <Image src="/webinar-icon.svg" alt="Weekly Webinar" width={56} height={56} />
-          <h3 className="font-semibold mt-4 text-[#2D334A]">Weekly Airbnb Webinar</h3>
-          <p className="text-sm text-[#334155] opacity-80 mt-2 text-center">
-            Live Q&A and fresh strategies—join over 5,000 hosts!
-          </p>
-          <a
-            href="https://webinar-link"
-            target="_blank"
-            className="mt-3 px-5 py-2 bg-[#FF7E5F] text-white rounded-full shadow hover:bg-[#14B8A6] transition"
-          >
-            Reserve Your Spot
-          </a>
-        </div>
-        <div className="rounded-xl bg-white/60 backdrop-blur-md p-6 flex flex-col items-center shadow-md border border-[#14B8A6]/20">
-          <Image src="/youtube.svg" alt="YouTube No-Nonsense Airbnb" width={56} height={56} />
-          <h3 className="font-semibold mt-4 text-[#2D334A]">No-Nonsense Airbnb</h3>
-          <p className="text-sm text-[#334155] opacity-80 mt-2 text-center">
-            Free tips, reviews & hosting stories. Subscribe for weekly uploads!
-          </p>
-          <a
-            href="https://youtube.com/yourchannel"
-            target="_blank"
-            className="mt-3 px-5 py-2 bg-[#6EE7B7] text-[#2D334A] rounded-full shadow hover:bg-[#FF7E5F] transition"
-          >
-            Watch & Subscribe
-          </a>
-        </div>
+      {/* ACHIEVEMENTS / CONNECT WITH ME */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-6 sm:px-0 mb-16">
+        {/* Airbnb Ambassador */}
+        <AchievementCard
+          imgSrc="/airbnb-ambassador.svg"
+          alt="Airbnb Ambassador"
+          title="Airbnb Ambassador"
+          description="1:1 strategic coaching, exclusive resources, & real results."
+          href="https://airbnb.com/affiliate-link"
+          cta="Connect on Airbnb"
+          ctaBg="#14B8A6"
+          ctaHoverBg="#FF7E5F"
+          ctaText="white"
+        />
+        {/* Fiverr Pro */}
+        <AchievementCard
+          imgSrc="/fiverr.svg"
+          alt="Fiverr Pro Seller"
+          title="Fiverr Pro Consultant"
+          description="Top-rated, 100+ reviews. Expert Airbnb consultations for growth."
+          href="https://fiverr.com/yourprofile"
+          cta="Book on Fiverr Pro"
+          ctaBg="#14B8A6"
+          ctaHoverBg="#6EE7B7"
+          ctaText="white"
+        />
+        {/* Weekly Webinar */}
+        <AchievementCard
+          imgSrc="/webinar-icon.svg"
+          alt="Weekly Webinar"
+          title="Weekly Airbnb Webinar"
+          description="Live Q&A and fresh strategies—join over 5,000 hosts!"
+          href="https://webinar-link"
+          cta="Reserve Your Spot"
+          ctaBg="#FF7E5F"
+          ctaHoverBg="#14B8A6"
+          ctaText="white"
+        />
+        {/* YouTube */}
+        <AchievementCard
+          imgSrc="/youtube.svg"
+          alt="YouTube Channel"
+          title="No-Nonsense Airbnb"
+          description="Free tips, reviews & hosting stories. Subscribe for weekly uploads!"
+          href="https://youtube.com/yourchannel"
+          cta="Watch & Subscribe"
+          ctaBg="#6EE7B7"
+          ctaHoverBg="#FF7E5F"
+          ctaText="#2D334A"
+        />
       </section>
 
-      {/* Affiliate Tools Directory */}
-      <section id="tools" className="max-w-7xl mx-auto py-10 px-4">
-        <h2 className="text-3xl font-extrabold text-[#14B8A6] mb-6">
-          Top Tools & Software for Hosts
-        </h2>
+      {/* AFFILIATE TOOLS DIRECTORY */}
+      <section id="tools" className="max-w-7xl mx-auto px-6 sm:px-0 py-10">
+        <h2 className="text-3xl font-extrabold text-teal-600 mb-6">Top Tools & Software for Hosts</h2>
         <div className="text-gray-500">[Software directory cards go here]</div>
       </section>
 
-      {/* Templates & Merch */}
-      <section className="max-w-7xl mx-auto pt-16 pb-10 px-4">
-        <h2 className="text-2xl font-extrabold text-[#2D334A] mb-4">
-          Digital Templates & Airbnb Merch
-        </h2>
+      {/* TEMPLATES & MERCH */}
+      <section className="max-w-7xl mx-auto pt-16 pb-10 px-6 sm:px-0">
+        <h2 className="text-2xl font-extrabold text-[#2D334A] mb-4">Digital Templates & Airbnb Merch</h2>
         <div className="text-gray-500">[Templates and merch cards go here]</div>
       </section>
 
-      {/* Training Program */}
-      <section className="max-w-5xl mx-auto px-4 py-12 mb-12">
+      {/* TRAINING PROGRAM */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-0 py-12 mb-12">
         <div className="rounded-xl bg-[#2D334A] text-white p-8 flex flex-col md:flex-row gap-8 items-center shadow-lg">
           <div>
-            <h3 className="text-2xl font-extrabold mb-2">
-              No-Nonsense Airbnb Hosting Masterclass
-            </h3>
+            <h3 className="text-2xl font-extrabold mb-2">No-Nonsense Airbnb Hosting Masterclass</h3>
             <p className="mb-4 opacity-90">
               Kickstart your hosting journey or unlock pro-level strategies. Enroll today and access actionable step-by-step training direct from an Airbnb veteran.
             </p>
             <a
               href="https://your-masterclass-link"
               target="_blank"
-              className="px-6 py-3 rounded-full bg-[#FF7E5F] font-bold shadow hover:bg-[#14B8A6] transition"
+              className="px-6 py-3 rounded-full bg-coral-500 font-bold shadow hover:bg-teal-600 transition-colors"
+              style={{ backgroundColor: "#FF7E5F" }}
             >
               Join the Masterclass
             </a>
@@ -138,47 +130,86 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Latest Posts (WordPress feed) */}
-      <section className="max-w-7xl mx-auto px-4 py-8">
+      {/* LATEST POSTS */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-0 py-8">
         <h2 className="text-2xl font-extrabold text-[#2D334A] mb-4">Latest Posts</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-xl bg-white/80 p-5 shadow">
-            <div className="h-36 bg-[#CBD5E1] rounded mb-3" />
-            <h4 className="font-semibold text-[#14B8A6] mb-1">
-              How to Automate Your Airbnb in 2025
-            </h4>
-            <p className="text-sm text-[#334155] opacity-80">
+          <article className="rounded-xl bg-white/80 p-6 shadow backdrop-blur-sm">
+            <div className="h-36 rounded bg-[#CBD5E1] mb-4" />
+            <h3 className="text-teal-600 font-semibold mb-2">How to Automate Your Airbnb in 2025</h3>
+            <p className="text-sm text-slate-700 opacity-80">
               Discover the latest tools and tips for hands-free hosting, boosting bookings and revenue.
             </p>
-          </div>
+          </article>
+          {/* Additional posts can go here */}
         </div>
       </section>
 
-      {/* Newsletter/Industry News */}
-      <section className="px-4 py-12 flex flex-col items-center bg-gradient-to-tl from-[#F8FAFC] to-[#CBD5E1]">
-        <h2 className="text-xl font-bold text-[#2D334A] mb-3">
-          Stay Ahead—Get News & Hot Tips
-        </h2>
-        <form className="flex flex-col sm:flex-row gap-3">
+      {/* NEWSLETTER & INDUSTRY NEWS */}
+      <section className="flex flex-col items-center bg-gradient-to-tr from-[#F8FAFC] to-[#CBD5E1] py-12 px-6 sm:px-0">
+        <h2 className="text-xl font-bold text-[#2D334A] mb-4">Stay Ahead — Get News & Hot Tips</h2>
+        <form className="flex w-full max-w-md gap-4" onSubmit={e => e.preventDefault()}>
           <input
+            aria-label="Email address"
             type="email"
+            required
             placeholder="Your email"
-            className="rounded-full px-5 py-2 outline-none bg-white/70 border border-[#CBD5E1] shadow"
+            className="rounded-full px-5 py-2 outline-none border border-[#CBD5E1] bg-white/70 shadow-sm placeholder:text-slate-400 focus:ring-2 focus:ring-teal-600"
           />
           <button
             type="submit"
-            className="px-6 py-2 rounded-full bg-[#14B8A6] text-white font-semibold shadow hover:bg-[#FF7E5F] transition"
+            className="rounded-full bg-teal-600 px-6 py-2 font-semibold text-white shadow hover:bg-coral-500 transition-colors"
+            style={{ backgroundColor: "#14B8A6" }}
           >
             Subscribe
           </button>
         </form>
       </section>
 
-      {/* Footer */}
-      <footer className="py-6 text-center text-[#334155] bg-[#F1F5F9] mt-8">
-        © {new Date().getFullYear()} Prayas Choudhary · All rights reserved ·{" "}
-        <span className="text-[#14B8A6] font-semibold">strspecialist.com</span>
+      {/* FOOTER */}
+      <footer className="py-6 bg-[#F1F5F9] text-center text-[#334155] mt-10">
+        © {new Date().getFullYear()} Prayas Choudhary · All Rights Reserved ·{" "}
+        <a className="font-semibold text-teal-600 underline" href="https://strspecialist.com">
+          strspecialist.com
+        </a>
       </footer>
     </main>
   );
 }
+
+// Achievement card component used above
+function AchievementCard({
+  imgSrc,
+  alt,
+  title,
+  description,
+  href,
+  cta,
+  ctaBg,
+  ctaHoverBg,
+  ctaText,
+}) {
+  return (
+    <div className="rounded-xl bg-white/60 backdrop-blur-md border border-teal-300/30 p-6 flex flex-col items-center shadow-md text-center">
+      <Image src={imgSrc} alt={alt} width={56} height={56} className="mb-4" />
+      <h3 className="font-semibold text-[#2D334A]">{title}</h3>
+      <p className="text-sm text-slate-700 opacity-80 mt-2 mb-3">{description}</p>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-full px-5 py-2 font-semibold shadow"
+        style={{
+          backgroundColor: ctaBg,
+          color: ctaText,
+          transition: "background-color 0.3s",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.backgroundColor = ctaHoverBg)}
+        onMouseLeave={e => (e.currentTarget.style.backgroundColor = ctaBg)}
+      >
+        {cta}
+      </a>
+    </div>
+  );
+}
+
