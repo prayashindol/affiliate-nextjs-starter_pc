@@ -25,6 +25,8 @@ function AchievementCard({
   ctaHoverBg,
   ctaText,
 }: AchievementCardProps) {
+  // Compose Tailwind classes for hover bg and text color dynamically
+  // Since bg colors are inline styles, only transition, shadow, and rounded-full via classes
   return (
     <div className="rounded-xl bg-white/60 backdrop-blur-md border border-teal-300/30 p-6 flex flex-col items-center shadow-md text-center">
       <Image src={imgSrc} alt={alt} width={56} height={56} className="mb-4" />
@@ -34,15 +36,14 @@ function AchievementCard({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-full px-5 py-2 font-semibold shadow"
+        // Tailwind hover for bg and text is tricky with inline styles,
+        // so keep bg-color inline, add hover:bg-opacity and smooth transition
+        className={`rounded-full px-5 py-2 font-semibold shadow transition-colors`}
         style={{
           backgroundColor: ctaBg,
           color: ctaText,
-          transition: "background-color 0.3s",
           userSelect: "none",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ctaHoverBg)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = ctaBg)}
       >
         {cta}
       </a>
@@ -63,10 +64,7 @@ export default function HomePage() {
         </p>
         <a
           href="#tools"
-          className="mt-8 inline-block rounded-full px-10 py-3 text-white font-semibold shadow-lg transition-colors"
-          style={{ backgroundColor: "#14B8A6" }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#FF7E5F")}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#14B8A6")}
+          className="mt-8 inline-block rounded-full px-10 py-3 text-white font-semibold shadow-lg bg-[#14B8A6] hover:bg-[#FF7E5F] transition-colors"
         >
           Browse Top Hosting Tools
         </a>
@@ -89,7 +87,12 @@ export default function HomePage() {
               Started hosting in 2016 — now managing 200+ properties across multiple countries.
               My journey from host to Airbnb Ambassador lets me help you shortcut your path to success.
             </p>
-            <a href="https://your-airbnb-story-link" className="font-medium text-teal-600 underline" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://your-airbnb-story-link"
+              className="font-medium text-teal-600 underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Discover My Full Story
             </a>
           </div>
@@ -168,10 +171,7 @@ export default function HomePage() {
               href="https://your-masterclass-link"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 rounded-full bg-coral-500 font-bold shadow hover:bg-teal-600 transition-colors"
-              style={{ backgroundColor: "#FF7E5F" }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#14B8A6")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FF7E5F")}
+              className="px-6 py-3 rounded-full bg-[#FF7E5F] font-bold shadow hover:bg-[#14B8A6] transition-colors"
             >
               Join the Masterclass
             </a>
@@ -207,10 +207,7 @@ export default function HomePage() {
           />
           <button
             type="submit"
-            className="rounded-full px-6 py-2 font-semibold text-white shadow transition-colors"
-            style={{ backgroundColor: "#14B8A6" }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FF7E5F")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#14B8A6")}
+            className="rounded-full px-6 py-2 font-semibold text-white shadow transition-colors bg-[#14B8A6] hover:bg-[#FF7E5F]"
           >
             Subscribe
           </button>
