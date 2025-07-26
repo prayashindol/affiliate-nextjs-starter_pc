@@ -2,6 +2,54 @@
 
 import Image from "next/image";
 
+type AchievementCardProps = {
+  imgSrc: string;
+  alt: string;
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+  ctaBg: string;
+  ctaHoverBg: string;
+  ctaText: string;
+};
+
+function AchievementCard({
+  imgSrc,
+  alt,
+  title,
+  description,
+  href,
+  cta,
+  ctaBg,
+  ctaHoverBg,
+  ctaText,
+}: AchievementCardProps) {
+  return (
+    <div className="rounded-xl bg-white/60 backdrop-blur-md border border-teal-300/30 p-6 flex flex-col items-center shadow-md text-center">
+      <Image src={imgSrc} alt={alt} width={56} height={56} className="mb-4" />
+      <h3 className="font-semibold text-[#2D334A]">{title}</h3>
+      <p className="text-sm text-slate-700 opacity-80 mt-2 mb-3">{description}</p>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-full px-5 py-2 font-semibold shadow"
+        style={{
+          backgroundColor: ctaBg,
+          color: ctaText,
+          transition: "background-color 0.3s",
+          userSelect: "none",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ctaHoverBg)}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = ctaBg)}
+      >
+        {cta}
+      </a>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#F8FAFC] to-[#CBD5E1] text-[#2D334A] font-sans">
@@ -15,8 +63,10 @@ export default function HomePage() {
         </p>
         <a
           href="#tools"
-          className="mt-8 inline-block rounded-full bg-teal-600 px-10 py-3 text-white font-semibold shadow-lg hover:bg-coral-500 transition-colors"
-          style={{ backgroundColor: "#14B8A6", transition: "background-color 0.3s" }}
+          className="mt-8 inline-block rounded-full px-10 py-3 text-white font-semibold shadow-lg transition-colors"
+          style={{ backgroundColor: "#14B8A6" }}
+          onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#FF7E5F")}
+          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#14B8A6")}
         >
           Browse Top Hosting Tools
         </a>
@@ -39,7 +89,7 @@ export default function HomePage() {
               Started hosting in 2016 — now managing 200+ properties across multiple countries.
               My journey from host to Airbnb Ambassador lets me help you shortcut your path to success.
             </p>
-            <a href="https://your-airbnb-story-link" className="font-medium text-teal-600 underline">
+            <a href="https://your-airbnb-story-link" className="font-medium text-teal-600 underline" target="_blank" rel="noopener noreferrer">
               Discover My Full Story
             </a>
           </div>
@@ -48,7 +98,6 @@ export default function HomePage() {
 
       {/* ACHIEVEMENTS / CONNECT WITH ME */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-6 sm:px-0 mb-16">
-        {/* Airbnb Ambassador */}
         <AchievementCard
           imgSrc="/airbnb-ambassador.svg"
           alt="Airbnb Ambassador"
@@ -60,7 +109,6 @@ export default function HomePage() {
           ctaHoverBg="#FF7E5F"
           ctaText="white"
         />
-        {/* Fiverr Pro */}
         <AchievementCard
           imgSrc="/fiverr.svg"
           alt="Fiverr Pro Seller"
@@ -72,7 +120,6 @@ export default function HomePage() {
           ctaHoverBg="#6EE7B7"
           ctaText="white"
         />
-        {/* Weekly Webinar */}
         <AchievementCard
           imgSrc="/webinar-icon.svg"
           alt="Weekly Webinar"
@@ -84,7 +131,6 @@ export default function HomePage() {
           ctaHoverBg="#14B8A6"
           ctaText="white"
         />
-        {/* YouTube */}
         <AchievementCard
           imgSrc="/youtube.svg"
           alt="YouTube Channel"
@@ -121,8 +167,11 @@ export default function HomePage() {
             <a
               href="https://your-masterclass-link"
               target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-3 rounded-full bg-coral-500 font-bold shadow hover:bg-teal-600 transition-colors"
               style={{ backgroundColor: "#FF7E5F" }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#14B8A6")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FF7E5F")}
             >
               Join the Masterclass
             </a>
@@ -141,14 +190,14 @@ export default function HomePage() {
               Discover the latest tools and tips for hands-free hosting, boosting bookings and revenue.
             </p>
           </article>
-          {/* Additional posts can go here */}
+          {/* More posts can be dynamically loaded here */}
         </div>
       </section>
 
       {/* NEWSLETTER & INDUSTRY NEWS */}
       <section className="flex flex-col items-center bg-gradient-to-tr from-[#F8FAFC] to-[#CBD5E1] py-12 px-6 sm:px-0">
         <h2 className="text-xl font-bold text-[#2D334A] mb-4">Stay Ahead — Get News & Hot Tips</h2>
-        <form className="flex w-full max-w-md gap-4" onSubmit={e => e.preventDefault()}>
+        <form className="flex w-full max-w-md gap-4" onSubmit={(e) => e.preventDefault()}>
           <input
             aria-label="Email address"
             type="email"
@@ -158,8 +207,10 @@ export default function HomePage() {
           />
           <button
             type="submit"
-            className="rounded-full bg-teal-600 px-6 py-2 font-semibold text-white shadow hover:bg-coral-500 transition-colors"
+            className="rounded-full px-6 py-2 font-semibold text-white shadow transition-colors"
             style={{ backgroundColor: "#14B8A6" }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FF7E5F")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#14B8A6")}
           >
             Subscribe
           </button>
@@ -169,47 +220,15 @@ export default function HomePage() {
       {/* FOOTER */}
       <footer className="py-6 bg-[#F1F5F9] text-center text-[#334155] mt-10">
         © {new Date().getFullYear()} Prayas Choudhary · All Rights Reserved ·{" "}
-        <a className="font-semibold text-teal-600 underline" href="https://strspecialist.com">
+        <a
+          href="https://strspecialist.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-teal-600 underline"
+        >
           strspecialist.com
         </a>
       </footer>
     </main>
   );
 }
-
-// Achievement card component used above
-function AchievementCard({
-  imgSrc,
-  alt,
-  title,
-  description,
-  href,
-  cta,
-  ctaBg,
-  ctaHoverBg,
-  ctaText,
-}) {
-  return (
-    <div className="rounded-xl bg-white/60 backdrop-blur-md border border-teal-300/30 p-6 flex flex-col items-center shadow-md text-center">
-      <Image src={imgSrc} alt={alt} width={56} height={56} className="mb-4" />
-      <h3 className="font-semibold text-[#2D334A]">{title}</h3>
-      <p className="text-sm text-slate-700 opacity-80 mt-2 mb-3">{description}</p>
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="rounded-full px-5 py-2 font-semibold shadow"
-        style={{
-          backgroundColor: ctaBg,
-          color: ctaText,
-          transition: "background-color 0.3s",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.backgroundColor = ctaHoverBg)}
-        onMouseLeave={e => (e.currentTarget.style.backgroundColor = ctaBg)}
-      >
-        {cta}
-      </a>
-    </div>
-  );
-}
-
