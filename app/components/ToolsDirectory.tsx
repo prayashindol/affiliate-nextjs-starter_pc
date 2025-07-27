@@ -15,7 +15,7 @@ type Tool = {
 };
 
 const softwareTools: Tool[] = [
-  // ... (your tool objects, unchanged)
+  // ... your tool objects (unchanged)
   {
     id: 1,
     name: "Hospitable",
@@ -184,26 +184,28 @@ export default function ToolsDirectory() {
                   ))}
                 </ul>
               </div>
-              {/* Price + Button pinned to bottom */}
+              {/* Price + Button on the same row */}
               <div className="mt-auto border-t border-gray-100 pt-2">
-                <div className="flex items-baseline gap-1 mb-2">
-                  {tool.pricing.startsWith('From') ? (
-                    <>
-                      <span className="text-sm text-gray-500 font-normal">From</span>
-                      <span className="text-indigo-700 font-bold text-base">{tool.pricing.replace('From ', '')}</span>
-                    </>
-                  ) : (
-                    <span className="text-indigo-700 font-bold text-base">{tool.pricing}</span>
-                  )}
+                <div className="flex items-center justify-between gap-2 w-full">
+                  <div>
+                    {tool.pricing.startsWith('From') ? (
+                      <>
+                        <span className="text-sm text-gray-500 font-normal">From </span>
+                        <span className="text-indigo-700 font-bold text-base">{tool.pricing.replace('From ', '')}</span>
+                      </>
+                    ) : (
+                      <span className="text-indigo-700 font-bold text-base">{tool.pricing}</span>
+                    )}
+                  </div>
+                  <a
+                    href={tool.affiliateLink}
+                    target="_blank"
+                    rel="noopener"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-semibold text-sm"
+                  >
+                    Try now →
+                  </a>
                 </div>
-                <a
-                  href={tool.affiliateLink}
-                  target="_blank"
-                  rel="noopener"
-                  className="w-full bg-indigo-600 text-white px-3 py-2 rounded-full hover:bg-indigo-700 shadow transition font-semibold text-center text-sm block"
-                >
-                  Get Started →
-                </a>
               </div>
             </div>
           ))}
