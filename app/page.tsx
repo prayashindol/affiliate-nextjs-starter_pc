@@ -155,8 +155,7 @@ export default function Example() {
                   The Ultimate Resource Hub<br />for Airbnb Hosts
                 </h1>
                 <p className="mt-8 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8">
-                  Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt
-                  amet fugiat veniam occaecat.
+                  Your central reliable resource for essential tools, templates, and training to maximize your hosting success
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <a
