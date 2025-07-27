@@ -175,34 +175,35 @@ export default function ToolsDirectory() {
           {filteredTools.map((tool) => (
             <div
               key={tool.id}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[460px]"
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[450px] h-full"
+              style={{ display: "flex", flexDirection: "column", height: "100%" }}
             >
-              {/* Top */}
-              <div className="flex items-center gap-4 mb-3">
-                <span className="text-4xl">{tool.logo}</span>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">{tool.name}</h3>
-                  <span className={`inline-flex items-center gap-1 mt-0.5 px-3 py-0.5 text-xs font-semibold border border-gray-200 text-gray-600 bg-gray-50 rounded-full`}>
-                    <span className={`w-2 h-2 rounded-full mr-1 ${categoryColors[tool.category] || "bg-gray-300"}`} />
-                    {tool.category}
-                  </span>
+              {/* Card Content (flex-grow) */}
+              <div className="flex-1 flex flex-col">
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="text-4xl">{tool.logo}</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">{tool.name}</h3>
+                    <span className={`inline-flex items-center gap-1 mt-0.5 px-3 py-0.5 text-xs font-semibold border border-gray-200 text-gray-600 bg-gray-50 rounded-full`}>
+                      <span className={`w-2 h-2 rounded-full mr-1 ${categoryColors[tool.category] || "bg-gray-300"}`} />
+                      {tool.category}
+                    </span>
+                  </div>
                 </div>
+                <p className="text-gray-700 mb-2">{tool.description}</p>
+                <div className="flex items-center gap-2 mb-2 text-indigo-600 text-base font-semibold">
+                  <span className="text-lg">{generateStars(tool.rating)}</span>
+                  <span className="text-gray-900 font-medium">{tool.rating}</span>
+                </div>
+                <ul className="list-disc list-inside mb-2 text-gray-600 text-sm space-y-1">
+                  {tool.features.map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))}
+                </ul>
               </div>
-              <p className="text-gray-700 mb-2">{tool.description}</p>
-              {/* Stars */}
-              <div className="flex items-center gap-2 mb-2 text-indigo-600 text-base font-semibold">
-                <span className="text-lg">{generateStars(tool.rating)}</span>
-                <span className="text-gray-900 font-medium">{tool.rating}</span>
-              </div>
-              {/* Features */}
-              <ul className="list-disc list-inside mb-2 text-gray-600 text-sm space-y-1">
-                {tool.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {/* Price + Buttons */}
-              <div className="flex flex-col gap-2 border-t border-gray-100 pt-2 mt-3">
-                <div className="flex items-baseline gap-1">
+              {/* Price + Buttons pinned to bottom */}
+              <div className="border-t border-gray-100 pt-2 mt-2">
+                <div className="flex items-baseline gap-1 mb-2">
                   {tool.pricing.startsWith('From') ? (
                     <>
                       <span className="text-sm text-gray-500 font-normal">From</span>
@@ -240,3 +241,4 @@ export default function ToolsDirectory() {
     </section>
   );
 }
+
