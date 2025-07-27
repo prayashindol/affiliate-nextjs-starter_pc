@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link";
+import Image from "next/image";
 import { FaYoutube, FaInstagram, FaTwitter } from "react-icons/fa";
 import { SiAirbnb, SiFiverr } from "react-icons/si";
 
@@ -23,6 +24,21 @@ export default function Footer() {
   return (
     <footer className="w-full border-t border-gray-200 bg-gray-50 text-gray-700">
       <div className="mx-auto max-w-7xl px-4 py-8 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-0">
+        {/* LOGO */}
+        <div className="flex flex-col items-start justify-start md:mr-10 mb-6 md:mb-0">
+          <Link href="/" aria-label="Home" className="mb-2">
+            <Image
+              src="/logo-2.svg"
+              alt="STR Specialist Logo"
+              width={130}
+              height={32}
+              priority
+              className="h-10 w-auto"
+              style={{ objectFit: 'contain' }}
+            />
+          </Link>
+        </div>
+
         {/* Navigation */}
         <nav className="flex-1 flex flex-col md:flex-row gap-4 md:gap-16">
           {footerLinks.map((group, i) => (
