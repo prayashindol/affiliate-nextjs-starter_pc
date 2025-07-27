@@ -91,25 +91,31 @@ const categories = [
   { label: "Guest Experience", value: "Guest Experience" }
 ];
 
+const categoryColors: { [key: string]: string } = {
+  "Guest Communication": "bg-indigo-400",
+  "Dynamic Pricing": "bg-amber-400",
+  "Property Management": "bg-pink-400",
+  "Guest Experience": "bg-emerald-400",
+};
+
 function generateStars(rating: number) {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   return (
     <>
       {Array.from({ length: fullStars }, (_, i) => (
-        <span key={i}>★</span>
+        <span key={i} className="text-yellow-400">★</span>
       ))}
-      {hasHalfStar && <span>☆</span>}
+      {hasHalfStar && <span className="text-yellow-400">☆</span>}
     </>
   );
 }
 
-// --- Compare Button with Feedback ---
 function CompareButton({ tool }: { tool: Tool }) {
   const [added, setAdded] = useState(false);
   return (
     <button
-      className={`flex-1 border border-indigo-400 text-indigo-700 px-4 py-2 rounded-full font-semibold transition text-center
+      className={`flex-1 border border-indigo-400 text-indigo-700 px-3 py-2 rounded-full font-semibold transition text-center text-sm
         ${added ? "bg-indigo-50 border-indigo-600" : "hover:bg-indigo-50"}`}
       type="button"
       onClick={() => {
@@ -122,7 +128,6 @@ function CompareButton({ tool }: { tool: Tool }) {
     </button>
   );
 }
-
 
 export default function ToolsDirectory() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -169,16 +174,16 @@ export default function ToolsDirectory() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTools.map((tool) => (
             <div
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl transition-all duration-200 min-h-[460px]"
               key={tool.id}
-              data-category={tool.category}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[460px]"
             >
               {/* Top */}
               <div className="flex items-center gap-4 mb-3">
                 <span className="text-4xl">{tool.logo}</span>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1">{tool.name}</h3>
-                  <span className="inline-flex items-center gap-1 mt-0.5 px-3 py-0.5 text-xs font-semibold border border-gray-200 text-gray-500 bg-gray-50 rounded-full">
+                  <span className={`inline-flex items-center gap-1 mt-0.5 px-3 py-0.5 text-xs font-semibold border border-gray-200 text-gray-600 bg-gray-50 rounded-full`}>
+                    <span className={`w-2 h-2 rounded-full mr-1 ${categoryColors[tool.category] || "bg-gray-300"}`} />
                     {tool.category}
                   </span>
                 </div>
@@ -187,7 +192,7 @@ export default function ToolsDirectory() {
               {/* Stars */}
               <div className="flex items-center gap-2 mb-2 text-indigo-600 text-base font-semibold">
                 <span className="text-lg">{generateStars(tool.rating)}</span>
-                <span>{tool.rating}</span>
+                <span className="text-gray-900 font-medium">{tool.rating}</span>
               </div>
               {/* Features */}
               <ul className="list-disc list-inside mb-2 text-gray-600 text-sm space-y-1">
@@ -195,16 +200,16 @@ export default function ToolsDirectory() {
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-              {/* Divider and Footer */}
-              <div className="mt-auto pt-3 border-t border-gray-100">
-                <div className="flex flex-col sm:flex-row gap-2 mt-3 items-stretch">
-                  <div className="font-bold text-indigo-700 flex items-center sm:justify-start justify-center w-full sm:w-auto">{tool.pricing}</div>
+              {/* Price */}
+              <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2">
+                <div className="font-extrabold text-indigo-700 text-base text-center sm:text-left pt-3 pb-1">{tool.pricing}</div>
+                <div className="flex gap-2">
                   <CompareButton tool={tool} />
                   <a
                     href={tool.affiliateLink}
                     target="_blank"
                     rel="noopener"
-                    className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-bold text-center"
+                    className="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-full hover:bg-indigo-700 shadow transition font-bold text-center text-sm"
                   >
                     Get Started →
                   </a>
