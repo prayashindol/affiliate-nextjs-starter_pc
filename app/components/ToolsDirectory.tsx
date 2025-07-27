@@ -201,17 +201,17 @@ export default function ToolsDirectory() {
                 ))}
               </ul>
               {/* Price + Buttons */}
-              <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-3">
-                <div className="flex items-center gap-1 pt-3 pb-1">
-                  {tool.pricing.startsWith('From') ? (
-                    <>
-                      <span className="text-sm text-gray-500">From</span>
-                      <span className="text-indigo-700 font-semibold text-base">{tool.pricing.replace('From ', '')}</span>
-                    </>
-                  ) : (
-                    <span className="text-indigo-700 font-semibold text-base">{tool.pricing}</span>
-                  )}
-                </div>
+            <div className="mt-auto pt-2 border-t border-gray-100 flex flex-col gap-3">
+  <div className="flex items-center gap-1 pb-1">
+    {tool.pricing.startsWith('From') ? (
+      <>
+        <span className="text-sm text-gray-500">From</span>
+        <span className="text-indigo-700 font-semibold text-base">{tool.pricing.replace('From ', '')}</span>
+      </>
+    ) : (
+      <span className="text-indigo-700 font-semibold text-base">{tool.pricing}</span>
+    )}
+  </div>
                 <div className="flex gap-2">
                   <CompareButton tool={tool} />
                   <a
