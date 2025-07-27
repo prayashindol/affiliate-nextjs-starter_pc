@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 
-// Fallback emoji if Clearbit or domain missing
 const fallbackEmojis: Record<string, string> = {
   "Property Management": "🏢",
   "Dynamic Pricing": "💰",
@@ -19,7 +18,6 @@ const categories = [
   { label: "Guest Experience", value: "Guest Experience" }
 ];
 
-// Generate stars for ratings
 function generateStars(rating?: number) {
   if (!rating || isNaN(rating)) return null;
   const fullStars = Math.floor(rating);
@@ -34,14 +32,11 @@ function generateStars(rating?: number) {
   );
 }
 
-// Get the logo url via Clearbit or fallback
 function getLogoUrl(domain?: string, category?: string) {
   if (domain && domain !== "N/A") {
-    // Remove protocol if accidentally included
     const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
     return `https://logo.clearbit.com/${cleanDomain}`;
   }
-  // Fallback emoji if no domain
   return fallbackEmojis[category || "default"];
 }
 
@@ -49,7 +44,18 @@ function getButtonLink(tool: any) {
   return tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
 }
 
-// Main Component
+function cleanText(value: any) {
+  if (!value) return "";
+  if (typeof value === "number" && isNaN(value)) return "";
+  if (typeof value === "string" && (value === "NaN" || value === "N/A")) return "";
+  return value;
+}
+
+function formatUserCount(userCount: any) {
+  const cleaned = cleanText(userCount);
+  return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
+}
+
 export default function ToolsDirectory() {
   const [tools, setTools] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -63,14 +69,13 @@ export default function ToolsDirectory() {
         setTools(
           data.map((rec: any) => ({
             ...rec.fields,
-            _id: rec.id // keep original Airtable record id
+            _id: rec.id
           }))
         );
       })
       .finally(() => setLoading(false));
   }, []);
 
-  // Memoized filtering by category
   const filteredTools = useMemo(() => {
     if (activeCategory === "all") return tools;
     return tools.filter((tool) => tool.Category === activeCategory);
@@ -85,7 +90,6 @@ export default function ToolsDirectory() {
             Discover the best software solutions to automate and optimize your hosting business
           </p>
         </div>
-
         {/* Filters */}
         <div className="flex flex-wrap gap-3 justify-center mb-14">
           {categories.map((cat) => (
@@ -104,7 +108,6 @@ export default function ToolsDirectory() {
             </button>
           ))}
         </div>
-
         {/* Loading state */}
         {loading ? (
           <div className="text-center text-gray-400 py-20">Loading tools…</div>
@@ -113,7 +116,6 @@ export default function ToolsDirectory() {
             {filteredTools.map((tool) => {
               const logo = getLogoUrl(tool.Domain, tool.Category);
 
-              // Features, Pros, etc. from Airtable could be either array or string
               const features = Array.isArray(tool.Features)
                 ? tool.Features
                 : (tool.Features?.split?.('|') || []).map((f: string) => f.trim()).filter(Boolean);
@@ -122,58 +124,58 @@ export default function ToolsDirectory() {
                 ? tool.Pros
                 : (tool.Pros?.split?.('|') || []).map((p: string) => p.trim()).filter(Boolean);
 
-              // Parse rating, fallback if needed
-              let rating = typeof tool.Rating === "number" ? tool.Rating : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
+              let rating = typeof tool.Rating === "number"
+                ? tool.Rating
+                : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
 
-              // Button/link logic
+              if (!isFinite(rating)) rating = undefined;
+
               const buttonLink = getButtonLink(tool);
               const showButton = !!buttonLink;
-              const buttonDisabled = !showButton;
 
-              // Fallback for missing pricing
-              const priceDisplay = tool.Pricing && tool.Pricing !== "N/A" ? tool.Pricing : "—";
+              // Price line: max 1 line, ellipsis if too long
+              const priceDisplay = cleanText(tool.Pricing) || "—";
 
               return (
                 <div
                   key={tool._id}
-                  className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[460px]"
+                  className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
                 >
-                  {/* Badge and Logo */}
-                  <div className="flex justify-between items-start mb-2">
+                  {/* Badge + Logo */}
+                  <div className="flex items-center mb-2 min-h-[2.25rem]">
                     {tool.Badge && (
-                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg">{tool.Badge}</span>
+                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg mr-2">
+                        {cleanText(tool.Badge)}
+                      </span>
                     )}
-                    {/* Logo or Emoji */}
+                    {/* Logo left-aligned, never pushed right */}
                     {typeof logo === "string" && logo.startsWith("http") ? (
                       <img
                         src={logo}
                         alt={tool.Name}
-                        className="h-8 w-8 object-contain rounded bg-gray-100"
+                        className="h-8 w-8 object-contain rounded bg-gray-100 mr-2"
                         onError={e => (e.currentTarget.style.display = "none")}
+                        style={{ minWidth: 32 }}
                       />
                     ) : (
-                      <span className="text-3xl">{logo}</span>
+                      <span className="text-3xl mr-2">{logo}</span>
                     )}
                   </div>
                   {/* Name */}
                   <div className="mb-1">
-                    <h3 className="text-lg font-bold text-gray-900">{tool.Name}</h3>
+                    <h3 className="text-lg font-bold text-gray-900">{cleanText(tool.Name)}</h3>
                   </div>
-                  {/* USP/Highlight/Summary */}
-                  {tool.Highlight && (
-                    <div className="text-xs text-emerald-600 font-semibold mb-2">{tool.Highlight}</div>
+                  {/* Highlight/Summary */}
+                  {cleanText(tool.Highlight) && (
+                    <div className="text-xs text-emerald-600 font-semibold mb-2">{cleanText(tool.Highlight)}</div>
                   )}
                   {/* Description */}
-                  <p className="text-gray-700 text-sm mb-2">{tool.Description}</p>
-                  {/* Stars & Reviews */}
+                  <p className="text-gray-700 text-sm mb-2">{cleanText(tool.Description)}</p>
+                  {/* Stars & User Count */}
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">{generateStars(rating)}</span>
-                    {rating && (
-                      <span className="text-gray-900 font-medium text-sm">{rating}</span>
-                    )}
-                    {tool.UserCount && (
-                      <span className="ml-2 text-gray-400 text-xs">({tool.UserCount})</span>
-                    )}
+                    {generateStars(rating)}
+                    {rating && <span className="text-gray-900 font-medium text-sm">{rating}</span>}
+                    <span className="ml-2 text-gray-400 text-xs">{formatUserCount(tool.UserCount)}</span>
                   </div>
                   {/* Pros */}
                   {pros && pros.length > 0 && (
@@ -191,27 +193,28 @@ export default function ToolsDirectory() {
                       ))}
                     </ul>
                   )}
-                  {/* Price and Button Row */}
-                  <div className="mt-auto">
-                    <div className="border-t border-gray-100 pt-2 flex flex-row justify-between items-center gap-2">
-                      <span className="text-sm text-gray-500 font-normal">
-                        {priceDisplay.startsWith('From') ? (
-                          <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
-                        ) : (
-                          <span className="text-indigo-700 font-bold">{priceDisplay}</span>
-                        )}
-                      </span>
-                      <a
-                        href={showButton ? buttonLink : undefined}
-                        target="_blank"
-                        rel="noopener"
-                        className={`px-4 py-2 rounded-full text-white font-semibold text-sm transition shadow ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
-                        aria-disabled={buttonDisabled}
-                        tabIndex={buttonDisabled ? -1 : 0}
-                      >
-                        Get Started →
-                      </a>
-                    </div>
+                  {/* Price & Button row */}
+                  <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
+                    <span
+                      className="text-sm text-gray-500 font-normal truncate max-w-[60%]"
+                      title={priceDisplay}
+                    >
+                      {priceDisplay.startsWith('From') ? (
+                        <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
+                      ) : (
+                        <span className="text-indigo-700 font-bold">{priceDisplay}</span>
+                      )}
+                    </span>
+                    <a
+                      href={showButton ? buttonLink : undefined}
+                      target="_blank"
+                      rel="noopener"
+                      className={`px-4 py-2 rounded-full text-white font-semibold text-sm transition shadow text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+                      aria-disabled={!showButton}
+                      tabIndex={showButton ? 0 : -1}
+                    >
+                      Try Now →
+                    </a>
                   </div>
                 </div>
               );
