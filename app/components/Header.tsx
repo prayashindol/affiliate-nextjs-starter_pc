@@ -5,7 +5,6 @@ import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
-// --- NAVIGATION STRUCTURE --- //
 const navigation = [
   {
     name: 'Tools',
@@ -137,7 +136,7 @@ export default function Header() {
                                 <Menu.Item key={sub.name}>
                                   {({ active }) => (
                                     <Link
-                                      href={sub.href}
+                                      href={sub.href as string}
                                       className={classNames(
                                         active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
                                         'block px-2 py-1 rounded'
@@ -151,11 +150,11 @@ export default function Header() {
                             </div>
                           </div>
                         ) : (
-                          "href" in child ? (
+                          "href" in child && typeof child.href === 'string' ? (
                             <Menu.Item key={child.name}>
                               {({ active }) => (
                                 <Link
-                                  href={child.href}
+                                  href={child.href as string}
                                   className={classNames(
                                     active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
                                     'block px-4 py-2 rounded'
@@ -173,10 +172,10 @@ export default function Header() {
                 </Transition>
               </Menu>
             ) : (
-              "href" in item ? (
+              "href" in item && typeof item.href === 'string' ? (
                 <Link
                   key={item.name}
-                  href={item.href}
+                  href={item.href as string}
                   className="text-base font-semibold text-gray-900 hover:text-indigo-600"
                 >
                   {item.name}
@@ -220,7 +219,6 @@ export default function Header() {
               </button>
             </div>
             <nav className="p-4 flex flex-col gap-2">
-              {/* Show prominent links at top */}
               {navigation
                 .filter((item) =>
                   ['Tools', 'Templates & Merch', 'Checklists'].includes(item.name)
@@ -241,15 +239,15 @@ export default function Header() {
                                   <span className="font-semibold">{child.name}</span>
                                   <div className="ml-2 mt-1 flex flex-col gap-1">
                                     {child.children.map((sub) => (
-                                      <Link key={sub.name} href={sub.href} className="block text-gray-600 py-1">
+                                      <Link key={sub.name} href={sub.href as string} className="block text-gray-600 py-1">
                                         {sub.name}
                                       </Link>
                                     ))}
                                   </div>
                                 </div>
                               ) : (
-                                "href" in child ? (
-                                  <Link key={child.name} href={child.href} className="block text-gray-600 py-1">
+                                "href" in child && typeof child.href === 'string' ? (
+                                  <Link key={child.name} href={child.href as string} className="block text-gray-600 py-1">
                                     {child.name}
                                   </Link>
                                 ) : null
@@ -261,7 +259,6 @@ export default function Header() {
                     )}
                   </Disclosure>
                 ))}
-              {/* All other links */}
               <div className="mt-4 flex flex-col gap-2">
                 {navigation
                   .filter(
@@ -284,15 +281,15 @@ export default function Header() {
                                     <span className="font-semibold">{child.name}</span>
                                     <div className="ml-2 mt-1 flex flex-col gap-1">
                                       {child.children.map((sub) => (
-                                        <Link key={sub.name} href={sub.href} className="block text-gray-600 py-1">
+                                        <Link key={sub.name} href={sub.href as string} className="block text-gray-600 py-1">
                                           {sub.name}
                                         </Link>
                                       ))}
                                     </div>
                                   </div>
                                 ) : (
-                                  "href" in child ? (
-                                    <Link key={child.name} href={child.href} className="block text-gray-600 py-1">
+                                  "href" in child && typeof child.href === 'string' ? (
+                                    <Link key={child.name} href={child.href as string} className="block text-gray-600 py-1">
                                       {child.name}
                                     </Link>
                                   ) : null
@@ -306,7 +303,6 @@ export default function Header() {
                   ))}
               </div>
             </nav>
-            {/* Sticky "Connect" Button */}
             <div className="fixed bottom-0 left-0 w-full max-w-xs bg-white border-t p-4 z-50">
               <Link
                 href="/connect"
