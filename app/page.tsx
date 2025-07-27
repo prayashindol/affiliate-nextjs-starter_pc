@@ -129,6 +129,14 @@ const faqs = [
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
+// Server-side fetch (works on Vercel, Next.js 13+ App Router)
+async function getTools() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/tools`, {
+    cache: "no-store",
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
 
 export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
