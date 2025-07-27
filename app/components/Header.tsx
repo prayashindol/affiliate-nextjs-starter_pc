@@ -118,70 +118,73 @@ export default function Header() {
         </div>
 
         {/* Desktop navigation */}
-        <div className="hidden lg:flex lg:gap-x-6">
-          {navigation.map((item) =>
-            item.children ? (
-              <Menu as="div" className="relative" key={item.name}>
-                <Menu.Button className="flex items-center gap-x-1 text-base font-semibold text-gray-900 hover:text-indigo-600">
-                  {item.name}
-                  <ChevronDownIcon className="h-4 w-4" aria-hidden="true" />
-                </Menu.Button>
-                <Transition as={Fragment}>
-                  <Menu.Items className="absolute left-0 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                    <div className="py-1">
-                      {item.children.map((child) =>
-                        child.children ? (
-                          <div key={child.name} className="border-b border-gray-100 px-4 py-2">
-                            <span className="font-semibold text-gray-700">{child.name}</span>
-                            <div className="ml-2 mt-1 flex flex-col gap-1">
-                              {child.children.map((sub) => (
-                                <Menu.Item key={sub.name}>
-                                  {({ active }) => (
-                                    <Link
-                                      href={sub.href}
-                                      className={classNames(
-                                        active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
-                                        'block px-2 py-1 rounded'
-                                      )}
-                                    >
-                                      {sub.name}
-                                    </Link>
-                                  )}
-                                </Menu.Item>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <Menu.Item key={child.name}>
-                            {({ active }) => (
-                              <Link
-                                href={child.href}
-                                className={classNames(
-                                  active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
-                                  'block px-4 py-2 rounded'
-                                )}
-                              >
-                                {child.name}
-                              </Link>
-                            )}
-                          </Menu.Item>
-                        )
-                      )}
+<div className="hidden lg:flex lg:gap-x-6">
+  {navigation.map((item) =>
+    item.children ? (
+      <Menu as="div" className="relative" key={item.name}>
+        <Menu.Button className="flex items-center gap-x-1 text-base font-semibold text-gray-900 hover:text-indigo-600">
+          {item.name}
+          <ChevronDownIcon className="h-4 w-4" aria-hidden="true" />
+        </Menu.Button>
+        <Transition as={Fragment}>
+          <Menu.Items className="absolute left-0 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+            <div className="py-1">
+              {item.children.map((child) =>
+                child.children ? (
+                  <div key={child.name} className="border-b border-gray-100 px-4 py-2">
+                    <span className="font-semibold text-gray-700">{child.name}</span>
+                    <div className="ml-2 mt-1 flex flex-col gap-1">
+                      {child.children.map((sub) => (
+                        <Menu.Item key={sub.name}>
+                          {({ active }) => (
+                            <Link
+                              href={sub.href}
+                              className={classNames(
+                                active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
+                                'block px-2 py-1 rounded'
+                              )}
+                            >
+                              {sub.name}
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      ))}
                     </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-            ) : (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-base font-semibold text-gray-900 hover:text-indigo-600"
-              >
-                {item.name}
-              </Link>
-            )
-          )}
-        </div>
+                  </div>
+                ) : (
+                  <Menu.Item key={child.name}>
+                    {({ active }) => (
+                      <Link
+                        href={child.href}
+                        className={classNames(
+                          active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
+                          'block px-4 py-2 rounded'
+                        )}
+                      >
+                        {child.name}
+                      </Link>
+                    )}
+                  </Menu.Item>
+                )
+              )}
+            </div>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+    ) : (
+      // Only render Link if item.href exists!
+      item.href ? (
+        <Link
+          key={item.name}
+          href={item.href}
+          className="text-base font-semibold text-gray-900 hover:text-indigo-600"
+        >
+          {item.name}
+        </Link>
+      ) : null
+    )
+  )}
+</div>
 
         {/* Spacer for right side */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end"></div>
