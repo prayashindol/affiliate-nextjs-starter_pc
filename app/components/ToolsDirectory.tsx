@@ -105,7 +105,7 @@ function generateStars(rating: number) {
 }
 
 // --- Compare Button with Feedback ---
-function CompareButton({ tool }) {
+function CompareButton({ tool }: { tool: Tool }) {
   const [added, setAdded] = useState(false);
   return (
     <button
@@ -115,7 +115,6 @@ function CompareButton({ tool }) {
       onClick={() => {
         setAdded(true);
         setTimeout(() => setAdded(false), 1200);
-        // Here you could add to a global compare list.
       }}
       aria-pressed={added}
     >
@@ -123,6 +122,7 @@ function CompareButton({ tool }) {
     </button>
   );
 }
+
 
 export default function ToolsDirectory() {
   const [activeCategory, setActiveCategory] = useState("all");
