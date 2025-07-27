@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import {
@@ -138,10 +136,12 @@ async function getTools() {
   return res.json();
 }
 
-export default function Example() {
+export default async function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  
 
   return (
+    <ToolsDirectory records={records} />
     <div className="bg-white">
       <main className="isolate">
         {/* Hero section */}
@@ -191,7 +191,7 @@ export default function Example() {
 </div>
               
         </div>
-             <ToolsDirectory records={records} />
+             
               <div className="mt-16 flow-root sm:mt-24">
                 <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-gray-900/10 ring-inset lg:-m-4 lg:rounded-2xl lg:p-4">
                   <img
