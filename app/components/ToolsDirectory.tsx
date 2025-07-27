@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
-// Example integration SVG icons (for demo, you’d use images in prod)
-const IntegrationIcons = ({ integrations }: { integrations: string[] }) => (
+// SVG Integration Icons (same as before)
+const IntegrationIcons = ({ integrations = [] }: { integrations: string[] }) => (
   <div className="flex gap-2 mt-1">
     {integrations.includes('Airbnb') && (
       <span title="Airbnb">
@@ -23,119 +23,23 @@ const IntegrationIcons = ({ integrations }: { integrations: string[] }) => (
   </div>
 );
 
+// Tool type based on your Airtable fields (case-sensitive!)
 type Tool = {
-  id: number;
-  name: string;
-  category: string;
-  description: string;
-  rating: number;
-  pricing: string;
-  features: string[];
-  affiliateLink: string;
-  logo: string;
-  badge?: string; // e.g. "Editor's Choice", "Free Trial"
-  highlight?: string; // e.g. "Best for Automation"
-  integrations?: string[];
-  userCount?: string;
-  pros?: string[];
+  id: string;
+  Name: string;
+  Category?: string;
+  Description?: string;
+  Rating?: number;
+  Pricing?: string;
+  Features?: string[];
+  AffiliateLink?: string;
+  Logo?: string;
+  Badge?: string;
+  Highlight?: string;
+  Integrations?: string[];
+  UserCount?: string;
+  Pros?: string[];
 };
-
-const softwareTools: Tool[] = [
-  {
-    id: 1,
-    name: "Hospitable",
-    category: "Guest Communication",
-    description: "Automate guest messaging and task management.",
-    rating: 4.8,
-    pricing: "From $25/month",
-    features: ["Automated messaging", "Multi-platform sync", "Task management", "Review management"],
-    affiliateLink: "#hospitable-affiliate",
-    logo: "🏠",
-    badge: "Editor's Choice",
-    highlight: "#1 for Automated Messaging",
-    integrations: ['Airbnb', 'Booking', 'VRBO'],
-    userCount: "10,000+ Hosts",
-    pros: ["Easy Setup", "Mobile App", "24/7 Support"]
-  },
-  {
-    id: 2,
-    name: "PriceLabs",
-    category: "Dynamic Pricing",
-    description: "AI-powered pricing optimization for maximum revenue.",
-    rating: 4.9,
-    pricing: "From $19.99/month",
-    features: ["Dynamic pricing", "Market analysis", "Seasonal adjustments", "Event-based pricing"],
-    affiliateLink: "#pricelabs-affiliate",
-    logo: "💰",
-    badge: "14-day Free Trial",
-    highlight: "Best for Revenue Growth",
-    integrations: ['Airbnb', 'Booking'],
-    userCount: "8,000+ Hosts",
-    pros: ["AI Pricing", "Market Data"]
-  },
-  {
-    id: 3,
-    name: "Guesty",
-    category: "Property Management",
-    description: "All-in-one property management platform.",
-    rating: 4.7,
-    pricing: "From $35/month",
-    features: ["Multi-channel management", "Unified inbox", "Automation tools", "Revenue optimization"],
-    affiliateLink: "#guesty-affiliate",
-    logo: "🏢",
-    badge: "Most Popular",
-    highlight: "Best for Scaling",
-    integrations: ['Airbnb', 'VRBO'],
-    userCount: "5,000+ Hosts",
-    pros: ["Full PMS", "Integrations"]
-  },
-  // ...continue for the rest (use pros/integrations/badges as you wish)
-  {
-    id: 4,
-    name: "Touch Stay",
-    category: "Guest Experience",
-    description: "Digital guidebooks for enhanced guest experience.",
-    rating: 4.8,
-    pricing: "From £9.99/month",
-    features: ["Digital guidebooks", "Offline access", "Custom branding", "Multi-language support"],
-    affiliateLink: "#touchstay-affiliate",
-    logo: "📱",
-    badge: "Free Demo",
-    highlight: "Best for Guest Experience",
-    integrations: ['Airbnb'],
-    userCount: "2,000+ Hosts",
-    pros: ["Easy to Share", "Brandable"]
-  },
-  {
-    id: 5,
-    name: "Beyond Pricing",
-    category: "Dynamic Pricing",
-    description: "Revenue management with airline industry expertise.",
-    rating: 4.6,
-    pricing: "1% of revenue",
-    features: ["Revenue optimization", "Market data analysis", "Automated pricing", "Performance tracking"],
-    affiliateLink: "#beyondpricing-affiliate",
-    logo: "📊",
-    highlight: "Best for Data-Lovers",
-    integrations: ['Booking', 'VRBO'],
-    userCount: "3,500+ Hosts",
-    pros: ["Detailed Analytics", "Easy Sync"]
-  },
-  {
-    id: 6,
-    name: "Hostfully",
-    category: "Property Management",
-    description: "Comprehensive property management solution.",
-    rating: 4.5,
-    pricing: "From $50/month",
-    features: ["Property management", "Guest experience tools", "Direct bookings", "Automation"],
-    affiliateLink: "#hostfully-affiliate",
-    logo: "🎯",
-    integrations: ['Airbnb', 'Booking'],
-    userCount: "1,200+ Hosts",
-    pros: ["Direct Booking", "Great Support"]
-  }
-];
 
 const categories = [
   { label: "All Tools", value: "all" },
@@ -145,7 +49,8 @@ const categories = [
   { label: "Guest Experience", value: "Guest Experience" }
 ];
 
-function generateStars(rating: number) {
+function generateStars(rating: number | undefined) {
+  if (!rating) return null;
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   return (
@@ -159,14 +64,43 @@ function generateStars(rating: number) {
 }
 
 export default function ToolsDirectory() {
+  const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/tools')
+      .then(res => res.json())
+      .then(data => {
+        setTools(
+          data.map((rec: any) => ({
+            id: rec.id,
+            Name: rec.fields.Name,
+            Category: rec.fields.Category || "",
+            Description: rec.fields.Description || "",
+            Rating: rec.fields.Rating ? parseFloat(rec.fields.Rating) : undefined,
+            Pricing: rec.fields.Pricing || "",
+            Features: Array.isArray(rec.fields.Features) ? rec.fields.Features : [],
+            AffiliateLink: rec.fields.AffiliateLink || "",
+            Logo: rec.fields.Logo || "💡",
+            Badge: rec.fields.Badge || "",
+            Highlight: rec.fields.Highlight || "",
+            Integrations: Array.isArray(rec.fields.Integrations) ? rec.fields.Integrations : [],
+            UserCount: rec.fields.UserCount || "",
+            Pros: Array.isArray(rec.fields.Pros) ? rec.fields.Pros : [],
+          }))
+        );
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const filteredTools = useMemo(
     () =>
       activeCategory === "all"
-        ? softwareTools
-        : softwareTools.filter((tool) => tool.category === activeCategory),
-    [activeCategory]
+        ? tools
+        : tools.filter((tool) => tool.Category === activeCategory),
+    [activeCategory, tools]
   );
 
   return (
@@ -198,77 +132,84 @@ export default function ToolsDirectory() {
           ))}
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredTools.map((tool) => (
-            <div
-              key={tool.id}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[460px]"
-            >
-              {/* Badge and Integrations */}
-              <div className="flex justify-between items-start mb-2">
-                {tool.badge && (
-                  <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg">{tool.badge}</span>
-                )}
-                {tool.integrations && <IntegrationIcons integrations={tool.integrations} />}
-              </div>
-              {/* Logo and Name */}
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-3xl">{tool.logo}</span>
-                <h3 className="text-lg font-bold text-gray-900">{tool.name}</h3>
-              </div>
-              {/* USP/Highlight */}
-              {tool.highlight && (
-                <div className="text-xs text-emerald-600 font-semibold mb-2">{tool.highlight}</div>
-              )}
-              {/* Description */}
-              <p className="text-gray-700 text-sm mb-2">{tool.description}</p>
-              {/* Stars & Reviews */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">{generateStars(tool.rating)}</span>
-                <span className="text-gray-900 font-medium text-sm">{tool.rating}</span>
-                {tool.userCount && (
-                  <span className="ml-2 text-gray-400 text-xs">({tool.userCount})</span>
-                )}
-              </div>
-              {/* Pros */}
-              {tool.pros && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {tool.pros.map((pro) => (
-                    <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-xs rounded-full px-2 py-0.5">✅ {pro}</span>
-                  ))}
-                </div>
-              )}
-              {/* Features */}
-              <ul className="list-disc list-inside mb-2 text-gray-600 text-xs space-y-0.5">
-                {tool.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {/* Price and Button Row */}
-              <div className="mt-auto">
-                <div className="border-t border-gray-100 pt-2 flex flex-row justify-between items-center gap-2">
-                  {tool.pricing.startsWith('From') ? (
-                    <span className="text-sm text-gray-500 font-normal">
-                      From <span className="text-indigo-700 font-bold">{tool.pricing.replace('From ', '')}</span>
-                    </span>
-                  ) : (
-                    <span className="text-indigo-700 font-bold text-sm">{tool.pricing}</span>
+        {loading ? (
+          <div className="text-center text-gray-500 py-10">Loading tools…</div>
+        ) : (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredTools.map((tool) => (
+              <div
+                key={tool.id}
+                className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[460px]"
+              >
+                {/* Badge and Integrations */}
+                <div className="flex justify-between items-start mb-2">
+                  {tool.Badge && (
+                    <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg">{tool.Badge}</span>
                   )}
-                  <a
-                    href={tool.affiliateLink}
-                    target="_blank"
-                    rel="noopener"
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-semibold text-sm"
-                  >
-                    Try Now →
-                  </a>
+                  {tool.Integrations && <IntegrationIcons integrations={tool.Integrations} />}
+                </div>
+                {/* Logo and Name */}
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="text-3xl">{tool.Logo || "💡"}</span>
+                  <h3 className="text-lg font-bold text-gray-900">{tool.Name}</h3>
+                </div>
+                {/* USP/Highlight */}
+                {tool.Highlight && (
+                  <div className="text-xs text-emerald-600 font-semibold mb-2">{tool.Highlight}</div>
+                )}
+                {/* Description */}
+                <p className="text-gray-700 text-sm mb-2">{tool.Description}</p>
+                {/* Stars & Reviews */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{generateStars(tool.Rating)}</span>
+                  {tool.Rating && (
+                    <span className="text-gray-900 font-medium text-sm">{tool.Rating}</span>
+                  )}
+                  {tool.UserCount && (
+                    <span className="ml-2 text-gray-400 text-xs">({tool.UserCount})</span>
+                  )}
+                </div>
+                {/* Pros */}
+                {tool.Pros && tool.Pros.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {tool.Pros.map((pro) => (
+                      <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-xs rounded-full px-2 py-0.5">✅ {pro}</span>
+                    ))}
+                  </div>
+                )}
+                {/* Features */}
+                <ul className="list-disc list-inside mb-2 text-gray-600 text-xs space-y-0.5">
+                  {tool.Features && tool.Features.map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))}
+                </ul>
+                {/* Price and Button Row */}
+                <div className="mt-auto">
+                  <div className="border-t border-gray-100 pt-2 flex flex-row justify-between items-center gap-2">
+                    {tool.Pricing?.startsWith('From') ? (
+                      <span className="text-sm text-gray-500 font-normal">
+                        From <span className="text-indigo-700 font-bold">{tool.Pricing.replace('From ', '')}</span>
+                      </span>
+                    ) : (
+                      <span className="text-indigo-700 font-bold text-sm">{tool.Pricing}</span>
+                    )}
+                    {tool.AffiliateLink && (
+                      <a
+                        href={tool.AffiliateLink}
+                        target="_blank"
+                        rel="noopener"
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-semibold text-sm"
+                      >
+                        Try Now →
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-      {/* ...animation style omitted for brevity */}
     </section>
   );
 }
