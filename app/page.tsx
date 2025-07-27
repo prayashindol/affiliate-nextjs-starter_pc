@@ -151,6 +151,9 @@ export default function Example() {
           <div className="py-24 sm:py-32 lg:pb-40">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-4xl text-center">
+                <p className="mb-4 text-center text-sm font-semibold text-cyan-400">
+  Trusted by 10,000+ hosts worldwide
+</p>
                 <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl">
                   The Ultimate Resource Hub<br />for Airbnb Hosts
                 </h1>
