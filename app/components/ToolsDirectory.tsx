@@ -15,7 +15,6 @@ type Tool = {
 };
 
 const softwareTools: Tool[] = [
-  // ...your tools data (unchanged)
   {
     id: 1,
     name: "Hospitable",
@@ -202,29 +201,27 @@ export default function ToolsDirectory() {
                 ))}
               </ul>
               {/* Price + Buttons */}
-              <div className="mt-auto">
-                <div className="border-t border-gray-100 pt-2 flex flex-col gap-2">
-                  <div className="flex items-baseline gap-1">
-                    {tool.pricing.startsWith('From') ? (
-                      <>
-                        <span className="text-sm text-gray-500 font-normal">From</span>
-                        <span className="text-indigo-700 font-bold text-base">{tool.pricing.replace('From ', '')}</span>
-                      </>
-                    ) : (
-                      <span className="text-indigo-700 font-bold text-base">{tool.pricing}</span>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <CompareButton tool={tool} />
-                    <a
-                      href={tool.affiliateLink}
-                      target="_blank"
-                      rel="noopener"
-                      className="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-full hover:bg-indigo-700 shadow transition font-semibold text-center text-sm"
-                    >
-                      Get Started →
-                    </a>
-                  </div>
+              <div className="flex flex-col gap-2 border-t border-gray-100 pt-2 mt-3">
+                <div className="flex items-baseline gap-1">
+                  {tool.pricing.startsWith('From') ? (
+                    <>
+                      <span className="text-sm text-gray-500 font-normal">From</span>
+                      <span className="text-indigo-700 font-bold text-base">{tool.pricing.replace('From ', '')}</span>
+                    </>
+                  ) : (
+                    <span className="text-indigo-700 font-bold text-base">{tool.pricing}</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <CompareButton tool={tool} />
+                  <a
+                    href={tool.affiliateLink}
+                    target="_blank"
+                    rel="noopener"
+                    className="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-full hover:bg-indigo-700 shadow transition font-semibold text-center text-sm"
+                  >
+                    Get Started →
+                  </a>
                 </div>
               </div>
             </div>
