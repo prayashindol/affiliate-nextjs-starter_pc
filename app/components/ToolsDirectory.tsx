@@ -202,7 +202,7 @@ export default function ToolsDirectory() {
               </ul>
               {/* Price + Buttons */}
             <div className="mt-auto pt-2 border-t border-gray-100 flex flex-col gap-3">
-  <div className="flex items-center gap-1 pb-1">
+ <div className="flex items-center gap-1 pb-1">
     {tool.pricing.startsWith('From') ? (
       <>
         <span className="text-sm text-gray-500">From</span>
