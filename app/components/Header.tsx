@@ -4,7 +4,85 @@ import { useState, Fragment } from 'react'
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { navigation } from './page' // or wherever your navigation array is
+
+// --- NAVIGATION STRUCTURE --- //
+const navigation = [
+  {
+    name: 'Tools',
+    children: [
+      { name: 'All Tools', href: '/tools' },
+      { name: 'Price Comparison', href: '/tools/comparison' },
+      {
+        name: 'By Category',
+        children: [
+          { name: 'Channel Manager', href: '/tools/channel-manager' },
+          { name: 'Automation', href: '/tools/automation' },
+          { name: 'Pricing', href: '/tools/pricing' },
+          { name: 'Communication', href: '/tools/communication' },
+          { name: 'Cleaning', href: '/tools/cleaning' },
+          // Add more categories as needed
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Templates & Merch',
+    children: [
+      { name: 'All Templates', href: '/templates' },
+      { name: 'Shop Merchandise', href: '/merch' },
+    ],
+  },
+  {
+    name: 'Masterclass',
+    children: [
+      { name: 'Course Details', href: '/masterclass' },
+      { name: 'Weekly Webinar', href: '/webinar' },
+      { name: 'Testimonials', href: '/testimonials' },
+    ],
+  },
+  {
+    name: 'Checklists',
+    children: [
+      { name: 'Cleaning Checklist', href: '/checklists/cleaning' },
+      { name: 'Furnishing List', href: '/checklists/furnishing' },
+      { name: 'Setup Checklist', href: '/checklists/setup' },
+      { name: 'Printable Resources', href: '/checklists/printable' },
+    ],
+  },
+  {
+    name: 'Guides',
+    children: [
+      { name: 'Getting Started', href: '/guides/getting-started' },
+      { name: 'Pro Tips', href: '/guides/pro-tips' },
+      { name: 'Automation', href: '/guides/automation' },
+      { name: 'Troubleshooting', href: '/guides/troubleshooting' },
+    ],
+  },
+  {
+    name: 'Industry News',
+    children: [
+      { name: 'Platform Updates', href: '/news/updates' },
+      { name: 'Regulation Alerts', href: '/news/regulations' },
+      { name: 'Market Trends', href: '/news/trends' },
+    ],
+  },
+  {
+    name: 'About',
+    children: [
+      { name: 'Our Story', href: '/about' },
+      { name: 'Achievements/Press', href: '/about/press' },
+    ],
+  },
+  {
+    name: 'Connect',
+    children: [
+      { name: 'Airbnb Ambassador (affiliate)', href: '/connect/ambassador' },
+      { name: 'Book a Consultation', href: '/connect/consultation' },
+      { name: 'Join a Webinar', href: '/webinar' },
+      { name: 'YouTube / Podcast / Socials', href: '/socials' },
+    ],
+  },
+];
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -237,4 +315,3 @@ export default function Header() {
     </header>
   )
 }
-
