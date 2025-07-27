@@ -115,102 +115,101 @@ export default function ToolsDirectory() {
     [activeCategory]
   );
 
-  return (
-    <section id="tools" className="tools-section py-16 bg-gray-50">
-     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="section-header text-center mb-10">
-          <h2 className="section-title text-3xl md:text-4xl font-bold mb-2 text-gray-900">
-            Essential Airbnb Management Tools
-          </h2>
-          <p className="section-subtitle text-gray-500">
-            Discover the best software solutions to automate and optimize your hosting business
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 justify-center mb-10">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              className={`filter-btn px-5 py-2 rounded-full border text-sm font-medium transition-all
-                ${
-                  activeCategory === cat.value
-                    ? "bg-indigo-600 text-white border-indigo-600 shadow ring-2 ring-indigo-300"
-                    : "bg-white text-gray-700 border-gray-200 hover:bg-indigo-50 hover:border-indigo-200"
-                }
-              `}
-              onClick={() => setActiveCategory(cat.value)}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Cards grid */}
-        <div className="tools-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredTools.map((tool) => (
-            <div
-              className="tool-card bg-white rounded-3xl shadow-xl hover:shadow-2xl border border-gray-100 p-8 flex flex-col transition-all duration-200 animate-fadeInUp"
-              key={tool.id}
-              data-category={tool.category}
-              style={{ minHeight: 420 }}
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <span className="tool-logo text-4xl">{tool.logo}</span>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{tool.name}</h3>
-                  <span className="tool-category text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-full mt-1 inline-block">
-                    {tool.category}
-                  </span>
-                </div>
-              </div>
-              <p className="tool-description text-gray-700 mb-4">{tool.description}</p>
-              <div className="tool-rating flex items-center gap-2 mb-3 text-indigo-600 text-sm">
-                <span className="tool-stars text-lg">{generateStars(tool.rating)}</span>
-                <span className="tool-rating-value font-medium">{tool.rating}</span>
-              </div>
-              <div className="tool-features mb-4">
-                <ul className="list-disc list-inside space-y-1 text-gray-600 text-sm">
-                  {tool.features.map((feature) => (
-                    <li key={feature}>{feature}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-auto flex justify-between items-end gap-2">
-                <div className="tool-pricing font-semibold text-indigo-700">{tool.pricing}</div>
-                <div className="tool-actions flex gap-2">
-                  <button
-                    className="btn btn--sm btn--outline border border-indigo-400 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-50 transition font-semibold"
-                    type="button"
-                  >
-                    Compare
-                  </button>
-                  <a
-                    href={tool.affiliateLink}
-                    target="_blank"
-                    rel="noopener"
-                    className="btn btn--sm btn--affiliate bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-bold"
-                  >
-                    Get Started →
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+ return (
+  <section id="tools" className="bg-gray-50 py-24 sm:py-32">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Section Header */}
+      <div className="text-center mb-8">
+        <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">Essential Airbnb Management Tools</h2>
+        <p className="text-lg text-gray-500 mb-6">
+          Discover the best software solutions to automate and optimize your hosting business
+        </p>
       </div>
 
-      {/* FadeInUp animation (keeps your animation smooth) */}
-      <style jsx global>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
-        .animate-fadeInUp {
-          animation: fadeInUp 0.6s both;
-        }
-      `}</style>
-    </section>
-  );
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 justify-center mb-12">
+        {categories.map((cat) => (
+          <button
+            key={cat.value}
+            className={`px-6 py-2 rounded-full border text-sm font-semibold transition
+              ${
+                activeCategory === cat.value
+                  ? "bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-300"
+                  : "bg-white text-gray-700 border-gray-200 hover:bg-indigo-50 hover:border-indigo-200"
+              }
+            `}
+            onClick={() => setActiveCategory(cat.value)}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Cards grid */}
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredTools.map((tool) => (
+          <div
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-8 hover:shadow-2xl transition-all duration-200"
+            key={tool.id}
+            data-category={tool.category}
+            style={{ minHeight: 420 }}
+          >
+            {/* Top */}
+            <div className="flex items-center gap-4 mb-3">
+              <span className="text-4xl">{tool.logo}</span>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">{tool.name}</h3>
+                <span className="inline-block mt-1 px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">
+                  {tool.category}
+                </span>
+              </div>
+            </div>
+            <p className="text-gray-700 mb-3">{tool.description}</p>
+            {/* Stars */}
+            <div className="flex items-center gap-2 mb-2 text-indigo-600 text-base font-semibold">
+              <span className="text-lg">{generateStars(tool.rating)}</span>
+              <span>{tool.rating}</span>
+            </div>
+            {/* Features */}
+            <ul className="list-disc list-inside mb-5 text-gray-600 text-sm space-y-1">
+              {tool.features.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+            {/* Footer */}
+            <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pt-4 border-t border-gray-100">
+              <div className="font-bold text-indigo-700">{tool.pricing}</div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  className="flex-1 sm:flex-none border border-indigo-400 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-50 transition font-semibold"
+                  type="button"
+                >
+                  Compare
+                </button>
+                <a
+                  href={tool.affiliateLink}
+                  target="_blank"
+                  rel="noopener"
+                  className="flex-1 sm:flex-none bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-bold text-center"
+                >
+                  Get Started →
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    {/* FadeInUp animation (optional, keeps your animation smooth) */}
+    <style jsx global>{`
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px);}
+        to { opacity: 1; transform: translateY(0);}
+      }
+      .animate-fadeInUp {
+        animation: fadeInUp 0.6s both;
+      }
+    `}</style>
+  </section>
+);
 }
