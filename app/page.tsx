@@ -176,6 +176,7 @@ export default function Example() {
       <div className="text-2xl font-bold text-gray-900">32%</div>
       <div className="text-sm text-gray-500">Avg Revenue Increase</div>
     </div>
+    <ToolsDirectory />
   </div>
 </div>
         </div>
