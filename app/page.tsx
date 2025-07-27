@@ -166,7 +166,7 @@ export default function Example() {
               <span className="sr-only">Your Company</span>
               <img
                 alt=""
-                src="/logo.svg?color=indigo&shade=600"
+                src="/logo-2.svg?color=indigo&shade=600"
                 className="h-16 w-auto"
               />
             </a>
@@ -202,7 +202,7 @@ export default function Example() {
                 <span className="sr-only">Your Company</span>
                 <img
                   alt=""
-                  src="/logo.svg?color=indigo&shade=600"
+                  src="/logo-2.svg?color=indigo&shade=600"
                   className="h-16 w-auto"
                 />
               </a>
@@ -585,7 +585,7 @@ export default function Example() {
           <div className="xl:grid xl:grid-cols-3 xl:gap-8">
             <img
               alt="Company name"
-              src="/logo.svg?color=indigo&shade=600"
+              src="/logo-2.svg?color=indigo&shade=600"
               className="h-16"
             />
             <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
