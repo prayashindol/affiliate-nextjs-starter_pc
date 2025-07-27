@@ -151,8 +151,8 @@ export default function Example() {
             />
           </div>
           <div className="py-24 sm:py-32 lg:pb-40">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-4xl text-center">
+        <div className="container mx-auto px-4">
+    <div className="mx-auto max-w-4xl text-center">
                 <p className="mb-4 text-center text-sm font-semibold text-indigo-600">
   Trusted by 10,000+ hosts worldwide
 </p>
