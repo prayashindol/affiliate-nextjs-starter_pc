@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link";
-import { FaAirbnb, FaFiverr, FaYoutube, FaInstagram, FaXTwitter } from "react-icons/fa6";
+import { FaYoutube, FaInstagram, FaTwitter } from "react-icons/fa";
+import { SiAirbnb, SiFiverr } from "react-icons/si";
 
 const footerLinks = [
   [
@@ -63,10 +64,10 @@ export default function Footer() {
         {/* Social Icons */}
         <div className="flex items-center gap-4 mb-2 md:mb-0">
           <Link href="https://airbnb.com/" target="_blank" rel="noopener noreferrer" aria-label="Airbnb">
-            <FaAirbnb className="w-6 h-6" />
+            <SiAirbnb className="w-6 h-6" />
           </Link>
           <Link href="https://fiverr.com/" target="_blank" rel="noopener noreferrer" aria-label="Fiverr">
-            <FaFiverr className="w-6 h-6" />
+            <SiFiverr className="w-6 h-6" />
           </Link>
           <Link href="https://youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
             <FaYoutube className="w-6 h-6" />
@@ -74,8 +75,8 @@ export default function Footer() {
           <Link href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <FaInstagram className="w-6 h-6" />
           </Link>
-          <Link href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-            <FaXTwitter className="w-6 h-6" />
+          <Link href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+            <FaTwitter className="w-6 h-6" />
           </Link>
         </div>
         {/* Copyright & Legal */}
