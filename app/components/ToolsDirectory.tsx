@@ -115,26 +115,26 @@ export default function ToolsDirectory() {
     [activeCategory]
   );
 
- return (
+return (
   <section id="tools" className="bg-gray-50 py-24 sm:py-32">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Section Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">Essential Airbnb Management Tools</h2>
-        <p className="text-lg text-gray-500 mb-6">
+      <div className="text-center mb-10">
+        <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">Essential Airbnb Management Tools</h2>
+        <p className="text-lg text-gray-500 mb-7">
           Discover the best software solutions to automate and optimize your hosting business
         </p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 justify-center mb-12">
+      <div className="flex flex-wrap gap-3 justify-center mb-14">
         {categories.map((cat) => (
           <button
             key={cat.value}
             className={`px-6 py-2 rounded-full border text-sm font-semibold transition
               ${
                 activeCategory === cat.value
-                  ? "bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-300"
+                  ? "bg-indigo-600 text-white border-indigo-600 shadow ring-2 ring-indigo-300"
                   : "bg-white text-gray-700 border-gray-200 hover:bg-indigo-50 hover:border-indigo-200"
               }
             `}
@@ -149,17 +149,17 @@ export default function ToolsDirectory() {
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {filteredTools.map((tool) => (
           <div
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-8 hover:shadow-2xl transition-all duration-200"
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-8 hover:shadow-2xl transition-all duration-200 min-h-[480px]"
             key={tool.id}
             data-category={tool.category}
-            style={{ minHeight: 420 }}
           >
             {/* Top */}
-            <div className="flex items-center gap-4 mb-3">
+            <div className="flex items-center gap-4 mb-4">
               <span className="text-4xl">{tool.logo}</span>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">{tool.name}</h3>
-                <span className="inline-block mt-1 px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{tool.name}</h3>
+                <span className="inline-flex items-center gap-1 mt-0.5 px-3 py-0.5 text-xs font-semibold border border-gray-200 text-gray-500 bg-gray-50 rounded-full">
+                  <span className="w-2 h-2 rounded-full" style={{ background: "#6366f1", display: 'inline-block' }}></span>
                   {tool.category}
                 </span>
               </div>
@@ -171,17 +171,17 @@ export default function ToolsDirectory() {
               <span>{tool.rating}</span>
             </div>
             {/* Features */}
-            <ul className="list-disc list-inside mb-5 text-gray-600 text-sm space-y-1">
+            <ul className="list-disc list-inside mb-6 text-gray-600 text-sm space-y-1">
               {tool.features.map((feature) => (
                 <li key={feature}>{feature}</li>
               ))}
             </ul>
             {/* Footer */}
-            <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pt-4 border-t border-gray-100">
-              <div className="font-bold text-indigo-700">{tool.pricing}</div>
-              <div className="flex gap-2 w-full sm:w-auto">
+            <div className="mt-auto pt-4 flex flex-col gap-2">
+              <div className="font-bold text-indigo-700 mb-2">{tool.pricing}</div>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
-                  className="flex-1 sm:flex-none border border-indigo-400 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-50 transition font-semibold"
+                  className="w-full sm:w-auto border border-indigo-400 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-50 transition font-semibold"
                   type="button"
                 >
                   Compare
@@ -190,7 +190,7 @@ export default function ToolsDirectory() {
                   href={tool.affiliateLink}
                   target="_blank"
                   rel="noopener"
-                  className="flex-1 sm:flex-none bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-bold text-center"
+                  className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 shadow transition font-bold text-center"
                 >
                   Get Started →
                 </a>
@@ -200,7 +200,6 @@ export default function ToolsDirectory() {
         ))}
       </div>
     </div>
-    {/* FadeInUp animation (optional, keeps your animation smooth) */}
     <style jsx global>{`
       @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px);}
