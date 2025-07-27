@@ -1,11 +1,14 @@
-
-// /app/api/tools/route.ts
+// app/api/tools/route.ts
 
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const AIRTABLE_API_URL = "https://api.airtable.com/v0/app40ZHtvYU2nqvAg/shrttRklwIcpmazc7";
+  const AIRTABLE_API_URL = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}`;
   const AIRTABLE_API_KEY = process.env.AIRTABLE_PERSONAL_TOKEN;
+
+  if (!AIRTABLE_API_KEY) {
+    return NextResponse.json({ error: "Missing Airtable token" }, { status: 500 });
+  }
 
   const res = await fetch(AIRTABLE_API_URL, {
     headers: {
@@ -20,6 +23,5 @@ export async function GET() {
 
   const data = await res.json();
 
-  // Map and clean up data as needed here if you want
   return NextResponse.json(data.records);
 }
