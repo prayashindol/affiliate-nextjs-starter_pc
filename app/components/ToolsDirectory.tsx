@@ -15,6 +15,7 @@ type Tool = {
 };
 
 const softwareTools: Tool[] = [
+  // ...your tools data (unchanged)
   {
     id: 1,
     name: "Hospitable",
@@ -202,15 +203,15 @@ export default function ToolsDirectory() {
               </ul>
               {/* Price + Buttons */}
               <div className="mt-auto">
-                <div className="border-t border-gray-100 mt-4 pt-3 flex flex-col gap-2">
-                  <div className="flex items-center gap-1">
+                <div className="border-t border-gray-100 pt-2 flex flex-col gap-2">
+                  <div className="flex items-baseline gap-1">
                     {tool.pricing.startsWith('From') ? (
                       <>
-                        <span className="text-sm text-gray-500">From</span>
-                        <span className="text-indigo-700 font-semibold text-base">{tool.pricing.replace('From ', '')}</span>
+                        <span className="text-sm text-gray-500 font-normal">From</span>
+                        <span className="text-indigo-700 font-bold text-base">{tool.pricing.replace('From ', '')}</span>
                       </>
                     ) : (
-                      <span className="text-indigo-700 font-semibold text-base">{tool.pricing}</span>
+                      <span className="text-indigo-700 font-bold text-base">{tool.pricing}</span>
                     )}
                   </div>
                   <div className="flex gap-2">
