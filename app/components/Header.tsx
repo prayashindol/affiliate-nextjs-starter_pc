@@ -186,7 +186,14 @@ export default function Header() {
         </div>
 
         {/* Spacer for right side */}
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end"></div>
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+  <Link
+    href="/login"
+    className="text-base font-semibold text-gray-900 hover:text-indigo-600"
+  >
+    Log in <span aria-hidden="true">&rarr;</span>
+  </Link>
+</div>
       </nav>
 
       {/* Mobile Drawer */}
