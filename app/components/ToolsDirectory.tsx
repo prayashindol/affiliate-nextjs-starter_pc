@@ -177,22 +177,26 @@ export default function ToolsDirectory() {
                     {rating && <span className="text-gray-900 font-medium text-sm">{rating}</span>}
                     <span className="ml-2 text-gray-400 text-xs">{formatUserCount(tool.UserCount)}</span>
                   </div>
-                  {/* Pros */}
-                  {pros && pros.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {pros.map((pro: string) => (
-                        <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-xs rounded-full px-2 py-0.5">✅ {pro}</span>
-                      ))}
-                    </div>
-                  )}
-                  {/* Features */}
-                  {features && features.length > 0 && (
-                    <ul className="list-disc list-inside mb-2 text-gray-600 text-xs space-y-0.5">
-                      {features.map((feature: string) => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  )}
+                 {/* Pros (green ticks, vertical list) */}
+{pros && pros.length > 0 && (
+  <ul className="mb-2 space-y-1">
+    {pros.map((pro: string) => (
+      <li key={pro} className="flex items-start gap-2 text-sm text-gray-700">
+        <span className="inline-block mt-0.5 text-green-500">✔️</span>
+        <span>{pro}</span>
+      </li>
+    ))}
+  </ul>
+)}
+
+{/* Features (regular bullets, vertical list) */}
+{features && features.length > 0 && (
+  <ul className="mb-2 space-y-1 list-disc list-inside text-xs text-gray-600">
+    {features.map((feature: string) => (
+      <li key={feature} className="ml-1">{feature}</li>
+    ))}
+  </ul>
+)}
                   {/* Price & Button row */}
                   <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
                     <span
