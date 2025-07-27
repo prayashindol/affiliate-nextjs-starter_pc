@@ -178,9 +178,10 @@ export default function Example() {
       <div className="text-2xl font-bold text-gray-900">32%</div>
       <div className="text-sm text-gray-500">Avg Revenue Increase</div>
     </div>
-    <ToolsDirectory />
-  </div>
+     </div>
+           
 </div>
+                 <ToolsDirectory />
         </div>
               <div className="mt-16 flow-root sm:mt-24">
                 <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-gray-900/10 ring-inset lg:-m-4 lg:rounded-2xl lg:p-4">
