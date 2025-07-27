@@ -5,6 +5,7 @@ import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
+// === NEW NAVIGATION STRUCTURE ===
 const navigation = [
   {
     name: 'Tools',
@@ -24,63 +25,29 @@ const navigation = [
     ],
   },
   {
-    name: 'Templates & Merch',
+    name: 'Resources',
     children: [
-      { name: 'All Templates', href: '/templates' },
-      { name: 'Shop Merchandise', href: '/merch' },
-    ],
-  },
-  {
-    name: 'Masterclass',
-    children: [
-      { name: 'Course Details', href: '/masterclass' },
-      { name: 'Weekly Webinar', href: '/webinar' },
+      { name: 'Templates & Merch', href: '/templates' },
+      { name: 'Checklists', href: '/checklists' },
+      { name: 'Guides', href: '/guides' },
+      { name: 'Masterclass', href: '/masterclass' },
+      { name: 'Webinars', href: '/webinars' },
+      { name: 'Printable Resources', href: '/resources/printable' },
       { name: 'Testimonials', href: '/testimonials' },
     ],
   },
-  {
-    name: 'Checklists',
-    children: [
-      { name: 'Cleaning Checklist', href: '/checklists/cleaning' },
-      { name: 'Furnishing List', href: '/checklists/furnishing' },
-      { name: 'Setup Checklist', href: '/checklists/setup' },
-      { name: 'Printable Resources', href: '/checklists/printable' },
-    ],
-  },
-  {
-    name: 'Guides',
-    children: [
-      { name: 'Getting Started', href: '/guides/getting-started' },
-      { name: 'Pro Tips', href: '/guides/pro-tips' },
-      { name: 'Automation', href: '/guides/automation' },
-      { name: 'Troubleshooting', href: '/guides/troubleshooting' },
-    ],
-  },
-  {
-    name: 'Industry News',
-    children: [
-      { name: 'Platform Updates', href: '/news/updates' },
-      { name: 'Regulation Alerts', href: '/news/regulations' },
-      { name: 'Market Trends', href: '/news/trends' },
-    ],
-  },
-  {
-    name: 'About',
-    children: [
-      { name: 'Our Story', href: '/about' },
-      { name: 'Achievements/Press', href: '/about/press' },
-    ],
-  },
+  { name: 'Industry News', href: '/news' },
+  { name: 'About', href: '/about' },
   {
     name: 'Connect',
     children: [
-      { name: 'Airbnb Ambassador (affiliate)', href: '/connect/ambassador' },
+      { name: 'Airbnb Ambassador', href: '/connect/ambassador' },
       { name: 'Book a Consultation', href: '/connect/consultation' },
       { name: 'Join a Webinar', href: '/webinar' },
       { name: 'YouTube / Podcast / Socials', href: '/socials' },
     ],
   },
-];
+]
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -116,7 +83,7 @@ export default function Header() {
         </div>
 
         {/* Desktop navigation */}
-        <div className="hidden lg:flex lg:gap-x-6">
+        <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) =>
             item.children ? (
               <Menu as="div" className="relative" key={item.name}>
@@ -187,13 +154,14 @@ export default function Header() {
 
         {/* Spacer for right side */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-  <Link
-    href="/login"
-    className="text-base font-semibold text-gray-900 hover:text-indigo-600"
-  >
-    Log in <span aria-hidden="true">&rarr;</span>
-  </Link>
-</div>
+          <Link
+            href="/login"
+            className="text-base font-bold text-gray-900 hover:text-indigo-600 px-4 py-2 rounded transition"
+            style={{ marginLeft: '16px' }}
+          >
+            Log in &rarr;
+          </Link>
+        </div>
       </nav>
 
       {/* Mobile Drawer */}
@@ -226,11 +194,8 @@ export default function Header() {
               </button>
             </div>
             <nav className="p-4 flex flex-col gap-2">
-              {navigation
-                .filter((item) =>
-                  ['Tools', 'Templates & Merch', 'Checklists'].includes(item.name)
-                )
-                .map((item) => (
+              {navigation.map((item) =>
+                item.children ? (
                   <Disclosure key={item.name}>
                     {({ open }) => (
                       <>
@@ -240,7 +205,7 @@ export default function Header() {
                         </Disclosure.Button>
                         <Disclosure.Panel>
                           <div className="pl-4 flex flex-col gap-2">
-                            {item.children?.map((child) =>
+                            {item.children.map((child) =>
                               "children" in child && child.children ? (
                                 <div key={child.name}>
                                   <span className="font-semibold">{child.name}</span>
@@ -265,60 +230,25 @@ export default function Header() {
                       </>
                     )}
                   </Disclosure>
-                ))}
-              <div className="mt-4 flex flex-col gap-2">
-                {navigation
-                  .filter(
-                    (item) =>
-                      !['Tools', 'Templates & Merch', 'Checklists', 'Connect'].includes(item.name)
-                  )
-                  .map((item) => (
-                    <Disclosure key={item.name}>
-                      {({ open }) => (
-                        <>
-                          <Disclosure.Button className="flex w-full justify-between items-center px-2 py-2 text-base font-semibold text-gray-900 hover:bg-gray-100 rounded">
-                            {item.name}
-                            {item.children && <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />}
-                          </Disclosure.Button>
-                          <Disclosure.Panel>
-                            <div className="pl-4 flex flex-col gap-2">
-                              {item.children?.map((child) =>
-                                "children" in child && child.children ? (
-                                  <div key={child.name}>
-                                    <span className="font-semibold">{child.name}</span>
-                                    <div className="ml-2 mt-1 flex flex-col gap-1">
-                                      {child.children.map((sub) => (
-                                        <Link key={sub.name} href={sub.href as string} className="block text-gray-600 py-1">
-                                          {sub.name}
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  "href" in child && typeof child.href === 'string' ? (
-                                    <Link key={child.name} href={child.href as string} className="block text-gray-600 py-1">
-                                      {child.name}
-                                    </Link>
-                                  ) : null
-                                )
-                              )}
-                            </div>
-                          </Disclosure.Panel>
-                        </>
-                      )}
-                    </Disclosure>
-                  ))}
+                ) : (
+                  "href" in item && typeof item.href === 'string' ? (
+                    <Link key={item.name} href={item.href as string} className="block px-2 py-2 text-base font-semibold text-gray-900 hover:bg-gray-100 rounded">
+                      {item.name}
+                    </Link>
+                  ) : null
+                )
+              )}
+              {/* Log in button at the bottom */}
+              <div className="mt-6">
+                <Link
+                  href="/login"
+                  className="block w-full text-center bg-indigo-600 text-white py-2 rounded-md font-bold"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Log in →
+                </Link>
               </div>
             </nav>
-            <div className="fixed bottom-0 left-0 w-full max-w-xs bg-white border-t p-4 z-50">
-              <Link
-                href="/connect"
-                className="block w-full text-center bg-indigo-600 text-white py-2 rounded-md font-bold"
-                onClick={() => setMobileOpen(false)}
-              >
-                Connect
-              </Link>
-            </div>
           </div>
         </Dialog>
       </Transition.Root>
