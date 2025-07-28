@@ -1,30 +1,60 @@
-// pages/products.js
-import { sanity } from '../lib/sanity'
-import Link from 'next/link'
+import { createClient } from 'next-sanity'
 
+const client = createClient({
+  projectId: 'ph27cqpd',
+  dataset: 'production',
+  apiVersion: '2023-07-01',
+  useCdn: true,
+})
+
+// If using app directory, use `async function Page() {}` instead
 export async function getServerSideProps() {
-  const products = await sanity.fetch(`*[_type == "product"]{
-    _id, title, slug, images[0]{asset->{url}}, price
+  const products = await client.fetch(`*[_type == "product"]{
+    _id,
+    title,
+    slug,
+    price,
+    description,
+    images[0]{asset->{url}},
+    // Add more fields as needed
   }`)
   return { props: { products } }
 }
 
 export default function ProductsPage({ products }) {
   return (
-    <div className="max-w-5xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Products</h1>
-      <div className="grid md:grid-cols-3 gap-8">
-        {products.map(product => (
-          <Link key={product._id} href={`/products/${product.slug.current}`} className="block group">
-            <div className="bg-white rounded-2xl shadow p-4 hover:shadow-lg transition">
-              {product.images?.asset?.url && (
-                <img src={product.images.asset.url} alt={product.title} className="rounded-xl mb-2 h-48 w-full object-cover" />
-              )}
-              <h2 className="text-xl font-semibold group-hover:underline">{product.title}</h2>
-              <div className="text-lg mt-2">{product.price ? `$${product.price}` : ''}</div>
+    <div className="bg-white">
+      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        <h2 className="sr-only">Products</h2>
+
+        <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 lg:gap-x-8">
+          {products.map((product) => (
+            <div
+              key={product._id}
+              className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+            >
+              <img
+                alt={product.title}
+                src={product.images?.asset?.url || '/placeholder.jpg'}
+                className="aspect-3/4 w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto sm:h-96"
+              />
+              <div className="flex flex-1 flex-col space-y-2 p-4">
+                <h3 className="text-sm font-medium text-gray-900">
+                  <a href={`/products/${product.slug.current}`}>
+                    <span aria-hidden="true" className="absolute inset-0" />
+                    {product.title}
+                  </a>
+                </h3>
+                <p className="text-sm text-gray-500">{product.description}</p>
+                <div className="flex flex-1 flex-col justify-end">
+                  {/* Add options if you have variants */}
+                  {/* <p className="text-sm text-gray-500 italic">{product.options}</p> */}
+                  <p className="text-base font-medium text-gray-900">{product.price ? `$${product.price}` : ''}</p>
+                </div>
+              </div>
             </div>
-          </Link>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
