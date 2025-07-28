@@ -100,11 +100,17 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">Essential Airbnb Management Tools</h2>
-          <p className="text-lg font-medium text-gray-500 mb-7">
-            Discover the best software solutions to automate and optimize your hosting business
-          </p>
-        </div>
+  <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">
+    {featuredOnly
+      ? "Featured Tools for Airbnb Hosts"
+      : "Essential Airbnb Management Tools"}
+  </h2>
+  <p className="text-lg text-gray-500 mb-7">
+    {featuredOnly
+      ? "Handpicked solutions to streamline operations, boost bookings, and give you back your time—trusted by leading hosts worldwide."
+      : "Discover the best software solutions to automate and optimize your hosting business"}
+  </p>
+</div>
         {/* Dynamic Category Filters */}
         <div className="flex flex-wrap gap-3 justify-center mb-14">
           {dynamicCategories.map((cat) => (
