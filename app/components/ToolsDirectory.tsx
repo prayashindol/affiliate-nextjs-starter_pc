@@ -35,6 +35,8 @@ function getLogoUrl(domain?: string, category?: string) {
 function getButtonLink(tool: any) {
   const link = tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
   if (!link) return "";
+
+  // If link starts with http, return as is. Else, prepend https://
   if (/^https?:\/\//i.test(link)) {
     return link;
   }
@@ -57,9 +59,9 @@ type ToolsDirectoryProps = {
   featuredOnly?: boolean;
 };
 
-// Helper: get unique categories for all tools in the *current* list (before category filtering)
-function getUniqueCategoriesFromTools(tools: any[]) {
-  const cats = new Set();
+// Helper to get unique categories in useable form (TS safe)
+function getUniqueCategoriesFromTools(tools: any[]): string[] {
+  const cats = new Set<string>();
   tools.forEach(tool => {
     if (tool.Category && typeof tool.Category === 'string') {
       cats.add(tool.Category.trim());
@@ -88,30 +90,29 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       .finally(() => setLoading(false));
   }, []);
 
-  // List of tools with only dontshow and featured filtered, for categories bar
-  const categorySourceTools = useMemo(() => {
+  // Filter: Don'tShow, Featured
+  const displayTools = useMemo(() => {
     let result = tools.filter((tool) => !tool.DontShow);
-    if (featuredOnly) result = result.filter((tool) => !!tool.Featured);
+    if (featuredOnly) {
+      result = result.filter((tool) => !!tool.Featured);
+    }
     return result;
   }, [tools, featuredOnly]);
 
-  // Build dynamic categories bar
+  // Dynamic categories: built from currently displayed tools (not filtered by category yet!)
   const dynamicCategories = useMemo(() => {
-    const cats = getUniqueCategoriesFromTools(categorySourceTools);
+    const cats = getUniqueCategoriesFromTools(displayTools);
     return [
       { label: "All Tools", value: "all" },
-      ...cats.map(c => ({ label: c, value: c }))
+      ...cats.map((c: string) => ({ label: c, value: c }))
     ];
-  }, [categorySourceTools]);
+  }, [displayTools]);
 
-  // Filter tools by DontShow, Featured, and Category
+  // Filter tools for grid (category)
   const filteredTools = useMemo(() => {
-    let result = categorySourceTools;
-    if (activeCategory !== "all") {
-      result = result.filter((tool) => tool.Category === activeCategory);
-    }
-    return result;
-  }, [activeCategory, categorySourceTools]);
+    if (activeCategory === "all") return displayTools;
+    return displayTools.filter((tool) => tool.Category === activeCategory);
+  }, [activeCategory, displayTools]);
 
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
@@ -132,7 +133,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
         <div className="flex flex-wrap gap-3 justify-center mb-14">
           {dynamicCategories.map((cat) => (
             <button
-              key={cat.value}
+              key={String(cat.value)}
               className={`px-6 py-2 rounded-full border text-sm font-semibold transition
                 ${
                   activeCategory === cat.value
