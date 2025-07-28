@@ -36,7 +36,14 @@ function getLogoUrl(domain?: string, category?: string) {
 }
 
 function getButtonLink(tool: any) {
-  return tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
+  const link = tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
+  if (!link) return "";
+
+  // If link starts with http, return as is. Else, prepend https://
+  if (/^https?:\/\//i.test(link)) {
+    return link;
+  }
+  return `https://${link}`;
 }
 
 function cleanText(value: any) {
