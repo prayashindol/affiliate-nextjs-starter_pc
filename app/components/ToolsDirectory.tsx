@@ -183,51 +183,52 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
                   )}
                   {/* Description */}
                   <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
-                  {/* Stars & User Count */}
-                  <div className="flex items-center gap-2 mb-2">
-                    {generateStars(rating)}
-                    {rating && <span className="text-gray-900 font-medium text-sm">{rating}</span>}
-                    <span className="ml-2 text-gray-400 text-xs">{formatUserCount(tool.UserCount)}</span>
-                  </div>
-                  {/* Pros */}
-                  {pros && pros.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {pros.map((pro: string) => (
-                        <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-xs rounded-full px-2 py-0.5">✅ {pro}</span>
-                      ))}
-                    </div>
-                  )}
-                  {/* Features */}
-                  {features && features.length > 0 && (
-                    <ul className="list-disc list-inside mb-2 text-gray-600 text-xs space-y-0.5">
-                      {features.map((feature: string) => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* Price & Button row */}
-                  <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
-                    <span
-                      className="text-sm text-gray-500 font-normal truncate max-w-[60%]"
-                      title={priceDisplay}
-                    >
-                      {priceDisplay.startsWith('From') ? (
-                        <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
-                      ) : (
-                        <span className="text-indigo-700 font-bold">{priceDisplay}</span>
-                      )}
-                    </span>
-                    <a
-                      href={showButton ? buttonLink : undefined}
-                      target="_blank"
-                      rel="noopener"
-                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
-                      aria-disabled={!showButton}
-                      tabIndex={showButton ? 0 : -1}
-                    >
-                      Try Now →
-                    </a>
-                  </div>
+                {/* Stars & User Count */}
+<div className="flex items-center gap-2 mb-2">
+  {generateStars(rating)}
+  {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
+  <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
+</div>
+{/* Pros */}
+{pros && pros.length > 0 && (
+  <div className="flex flex-wrap gap-2 mb-2">
+    {pros.map((pro: string) => (
+      <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
+    ))}
+  </div>
+)}
+{/* Features */}
+{features && features.length > 0 && (
+  <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
+    {features.map((feature: string) => (
+      <li key={feature}>{feature}</li>
+    ))}
+  </ul>
+)}
+{/* Price & Button row */}
+<div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
+  <span
+    className="text-base text-gray-500 font-normal truncate max-w-[60%]"
+    title={priceDisplay}
+  >
+    {priceDisplay.startsWith('From') ? (
+      <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
+    ) : (
+      <span className="text-indigo-700 font-bold">{priceDisplay}</span>
+    )}
+  </span>
+  <a
+    href={showButton ? buttonLink : undefined}
+    target="_blank"
+    rel="noopener"
+    className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+    aria-disabled={!showButton}
+    tabIndex={showButton ? 0 : -1}
+  >
+    Try Now →
+  </a>
+</div>
+
                 </div>
               );
             })}
