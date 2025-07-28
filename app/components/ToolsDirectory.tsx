@@ -164,26 +164,26 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
                   key={tool._id}
                   className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
                 >
-                  {/* Badge + Logo */}
-                  <div className="flex items-center mb-2 min-h-[2.25rem]">
-                    {tool.Badge && (
-                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg mr-2">
-                        {cleanText(tool.Badge)}
-                      </span>
-                    )}
-                    {/* Logo left-aligned, never pushed right */}
-                    {typeof logo === "string" && logo.startsWith("http") ? (
-                      <img
-                        src={logo}
-                        alt={tool.Name}
-                        className="h-8 w-8 object-contain rounded bg-gray-100 mr-2"
-                        onError={e => (e.currentTarget.style.display = "none")}
-                        style={{ minWidth: 32 }}
-                      />
-                    ) : (
-                      <span className="text-3xl mr-2">{logo}</span>
-                    )}
-                  </div>
+                {/* Badge + Logo */}
+<div className="flex items-center gap-2 mb-2 min-h-[2.25rem]">
+  {typeof logo === "string" && logo.startsWith("http") ? (
+    <img
+      src={logo}
+      alt={tool.Name}
+      className="h-8 w-8 object-contain rounded bg-gray-100"
+      onError={e => (e.currentTarget.style.display = "none")}
+      style={{ minWidth: 32 }}
+    />
+  ) : (
+    <span className="text-3xl">{logo}</span>
+  )}
+  {tool.Badge && (
+    <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg">
+      {cleanText(tool.Badge)}
+    </span>
+  )}
+</div>
+
                   {/* Name */}
                   <div className="mb-1">
                     <h3 className="text-lg font-bold text-gray-900">{cleanText(tool.Name)}</h3>
