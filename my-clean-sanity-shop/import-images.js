@@ -7,7 +7,7 @@ const { nanoid } = require('nanoid') // <--- ADD THIS
 const client = createClient({
   projectId: 'ph27cqpd',
   dataset: 'production',
-  token: 'skFvysJGPYJDECY4aqOIX1I7tis4dITOUq4LyKPWdS2EUyvcnXhcHIZhvA6AKc4QOTdBjUsEcqaozZgoWjPZ8ePVLkbA5seSeU5gVTA4I1NlA4kJXoK7mcbSvcImTaZRx7RysfPK6gnl8twBjYUgCPB0LiYYCWAAIIRa5RrzAiehqHLtdXIb',
+  token: '--',
   useCdn: false,
   apiVersion: '2023-07-01'
 })
