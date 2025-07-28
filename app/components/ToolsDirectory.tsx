@@ -10,14 +10,6 @@ const fallbackEmojis: Record<string, string> = {
   default: "🛠️"
 };
 
-const categories = [
-  { label: "All Tools", value: "all" },
-  { label: "Property Management", value: "Property Management" },
-  { label: "Dynamic Pricing", value: "Dynamic Pricing" },
-  { label: "Guest Communication", value: "Guest Communication" },
-  { label: "Guest Experience", value: "Guest Experience" }
-];
-
 function generateStars(rating?: number) {
   if (!rating || isNaN(rating)) return null;
   const fullStars = Math.floor(rating);
@@ -86,9 +78,9 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
 
   // ---- FILTER FOR DONT SHOW + FEATURED ----
   const filteredTools = useMemo(() => {
-    let result = tools.filter((tool) => !tool.DontShow); // Don't show if DontShow is truthy/checked
+    let result = tools.filter((tool) => !tool.DontShow);
     if (featuredOnly) {
-      result = result.filter((tool) => !!tool.Featured); // Only show featured if prop is true
+      result = result.filter((tool) => !!tool.Featured);
     }
     if (activeCategory !== "all") {
       result = result.filter((tool) => tool.Category === activeCategory);
@@ -96,7 +88,22 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
     return result;
   }, [activeCategory, tools, featuredOnly]);
 
-  // --- REST IS THE SAME ---
+  // === DYNAMIC CATEGORIES (from filteredTools) ===
+  const dynamicCategories = useMemo(() => {
+    const unique = Array.from(
+      new Set(
+        tools
+          .filter(tool => !tool.DontShow && (!featuredOnly || tool.Featured))
+          .map((tool) => tool.Category)
+          .filter(Boolean)
+      )
+    );
+    return [
+      { label: "All Tools", value: "all" },
+      ...unique.map((cat) => ({ label: cat, value: cat }))
+    ];
+  }, [tools, featuredOnly]);
+
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,7 +115,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
         </div>
         {/* Filters */}
         <div className="flex flex-wrap gap-3 justify-center mb-14">
-          {categories.map((cat) => (
+          {dynamicCategories.map((cat) => (
             <button
               key={cat.value}
               className={`px-6 py-2 rounded-full border text-sm font-semibold transition
