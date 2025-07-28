@@ -10,6 +10,9 @@ const fallbackEmojis: Record<string, string> = {
   default: "🛠️"
 };
 
+// Categories are now dynamic below, but you can keep this as fallback if needed
+// const categories = [...];
+
 function generateStars(rating?: number) {
   if (!rating || isNaN(rating)) return null;
   const fullStars = Math.floor(rating);
@@ -48,10 +51,6 @@ function formatUserCount(userCount: any) {
   return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
 }
 
-// ====
-// MAIN COMPONENT
-// ====
-
 type ToolsDirectoryProps = {
   featuredOnly?: boolean;
 };
@@ -76,7 +75,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       .finally(() => setLoading(false));
   }, []);
 
-  // ---- FILTER FOR DONT SHOW + FEATURED ----
+  // Filter: Don'tShow, Featured, Category
   const filteredTools = useMemo(() => {
     let result = tools.filter((tool) => !tool.DontShow);
     if (featuredOnly) {
@@ -88,32 +87,25 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
     return result;
   }, [activeCategory, tools, featuredOnly]);
 
-  // === DYNAMIC CATEGORIES (from filteredTools) ===
+  // Build dynamic categories list from filtered tools
   const dynamicCategories = useMemo(() => {
-    const unique = Array.from(
-      new Set(
-        tools
-          .filter(tool => !tool.DontShow && (!featuredOnly || tool.Featured))
-          .map((tool) => tool.Category)
-          .filter(Boolean)
-      )
-    );
+    const cats = Array.from(new Set(filteredTools.map(t => t.Category).filter(Boolean)));
     return [
       { label: "All Tools", value: "all" },
-      ...unique.map((cat) => ({ label: cat, value: cat }))
+      ...cats.map(c => ({ label: c, value: c }))
     ];
-  }, [tools, featuredOnly]);
+  }, [filteredTools]);
 
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">Essential Airbnb Management Tools</h2>
-          <p className="text-lg text-gray-500 mb-7">
+          <p className="text-lg font-medium text-gray-500 mb-7">
             Discover the best software solutions to automate and optimize your hosting business
           </p>
         </div>
-        {/* Filters */}
+        {/* Dynamic Category Filters */}
         <div className="flex flex-wrap gap-3 justify-center mb-14">
           {dynamicCategories.map((cat) => (
             <button
@@ -156,47 +148,41 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
               const buttonLink = getButtonLink(tool);
               const showButton = !!buttonLink;
 
-              // Price line: max 1 line, ellipsis if too long
               const priceDisplay = cleanText(tool.Pricing) || "—";
 
               return (
                 <div
                   key={tool._id}
-                  className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
+                  className="bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col p-8 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
                 >
-             {/* Badge + Logo Row */}
-<div className="flex items-center justify-between mb-2 min-h-[2.25rem]">
-  {/* Logo left */}
-  {typeof logo === "string" && logo.startsWith("http") ? (
-    <img
-      src={logo}
-      alt={tool.Name}
-      className="h-8 w-8 object-contain rounded bg-gray-100"
-      onError={e => (e.currentTarget.style.display = "none")}
-      style={{ minWidth: 32 }}
-    />
-  ) : (
-    <span className="text-3xl">{logo}</span>
-  )}
-  {/* Tag right */}
-  {tool.Badge && (
-    <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
-      {cleanText(tool.Badge)}
-    </span>
-  )}
-</div>
-
-
-                  {/* Name */}
-                  <div className="mb-1">
-                    <h3 className="text-lg font-bold text-gray-900">{cleanText(tool.Name)}</h3>
+                  {/* Logo and tag row: flex, spaced */}
+                  <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
+                    {/* Logo left */}
+                    {typeof logo === "string" && logo.startsWith("http") ? (
+                      <img
+                        src={logo}
+                        alt={tool.Name}
+                        className="h-8 w-8 object-contain rounded bg-gray-100"
+                        style={{ minWidth: 32 }}
+                      />
+                    ) : (
+                      <span className="text-3xl">{logo}</span>
+                    )}
+                    {/* Tag right */}
+                    {tool.Badge && (
+                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-2 whitespace-nowrap">
+                        {cleanText(tool.Badge)}
+                      </span>
+                    )}
                   </div>
-                  {/* Highlight/Summary */}
+                  {/* Name/title */}
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>
+                  {/* Highlight/subheadline */}
                   {cleanText(tool.Highlight) && (
-                    <div className="text-xs text-emerald-600 font-semibold mb-2">{cleanText(tool.Highlight)}</div>
+                    <div className="text-base text-indigo-700 font-medium mb-2">{cleanText(tool.Highlight)}</div>
                   )}
                   {/* Description */}
-                  <p className="text-gray-700 text-sm mb-2">{cleanText(tool.Description)}</p>
+                  <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
                   {/* Stars & User Count */}
                   <div className="flex items-center gap-2 mb-2">
                     {generateStars(rating)}
@@ -235,7 +221,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
                       href={showButton ? buttonLink : undefined}
                       target="_blank"
                       rel="noopener"
-                      className={`px-4 py-2 rounded-full text-white font-semibold text-sm transition shadow text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
                       aria-disabled={!showButton}
                       tabIndex={showButton ? 0 : -1}
                     >
