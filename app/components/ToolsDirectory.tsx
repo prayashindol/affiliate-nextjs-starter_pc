@@ -56,7 +56,15 @@ function formatUserCount(userCount: any) {
   return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
 }
 
-export default function ToolsDirectory() {
+// ====
+// MAIN COMPONENT
+// ====
+
+type ToolsDirectoryProps = {
+  featuredOnly?: boolean;
+};
+
+export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
   const [tools, setTools] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -76,11 +84,19 @@ export default function ToolsDirectory() {
       .finally(() => setLoading(false));
   }, []);
 
+  // ---- FILTER FOR DONT SHOW + FEATURED ----
   const filteredTools = useMemo(() => {
-    if (activeCategory === "all") return tools;
-    return tools.filter((tool) => tool.Category === activeCategory);
-  }, [activeCategory, tools]);
+    let result = tools.filter((tool) => !tool.DontShow); // Don't show if DontShow is truthy/checked
+    if (featuredOnly) {
+      result = result.filter((tool) => !!tool.Featured); // Only show featured if prop is true
+    }
+    if (activeCategory !== "all") {
+      result = result.filter((tool) => tool.Category === activeCategory);
+    }
+    return result;
+  }, [activeCategory, tools, featuredOnly]);
 
+  // --- REST IS THE SAME ---
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
