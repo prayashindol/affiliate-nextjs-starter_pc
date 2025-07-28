@@ -10,9 +10,6 @@ const fallbackEmojis: Record<string, string> = {
   default: "🛠️"
 };
 
-// Categories are now dynamic below, but you can keep this as fallback if needed
-// const categories = [...];
-
 function generateStars(rating?: number) {
   if (!rating || isNaN(rating)) return null;
   const fullStars = Math.floor(rating);
@@ -38,8 +35,6 @@ function getLogoUrl(domain?: string, category?: string) {
 function getButtonLink(tool: any) {
   const link = tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
   if (!link) return "";
-
-  // If link starts with http, return as is. Else, prepend https://
   if (/^https?:\/\//i.test(link)) {
     return link;
   }
@@ -62,6 +57,17 @@ type ToolsDirectoryProps = {
   featuredOnly?: boolean;
 };
 
+// Helper: get unique categories for all tools in the *current* list (before category filtering)
+function getUniqueCategoriesFromTools(tools: any[]) {
+  const cats = new Set();
+  tools.forEach(tool => {
+    if (tool.Category && typeof tool.Category === 'string') {
+      cats.add(tool.Category.trim());
+    }
+  });
+  return Array.from(cats);
+}
+
 export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
   const [tools, setTools] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -82,42 +88,46 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       .finally(() => setLoading(false));
   }, []);
 
-  // Filter: Don'tShow, Featured, Category
-  const filteredTools = useMemo(() => {
+  // List of tools with only dontshow and featured filtered, for categories bar
+  const categorySourceTools = useMemo(() => {
     let result = tools.filter((tool) => !tool.DontShow);
-    if (featuredOnly) {
-      result = result.filter((tool) => !!tool.Featured);
-    }
-    if (activeCategory !== "all") {
-      result = result.filter((tool) => tool.Category === activeCategory);
-    }
+    if (featuredOnly) result = result.filter((tool) => !!tool.Featured);
     return result;
-  }, [activeCategory, tools, featuredOnly]);
+  }, [tools, featuredOnly]);
 
-  // Build dynamic categories list from filtered tools
+  // Build dynamic categories bar
   const dynamicCategories = useMemo(() => {
-    const cats = Array.from(new Set(filteredTools.map(t => t.Category).filter(Boolean)));
+    const cats = getUniqueCategoriesFromTools(categorySourceTools);
     return [
       { label: "All Tools", value: "all" },
       ...cats.map(c => ({ label: c, value: c }))
     ];
-  }, [filteredTools]);
+  }, [categorySourceTools]);
+
+  // Filter tools by DontShow, Featured, and Category
+  const filteredTools = useMemo(() => {
+    let result = categorySourceTools;
+    if (activeCategory !== "all") {
+      result = result.filter((tool) => tool.Category === activeCategory);
+    }
+    return result;
+  }, [activeCategory, categorySourceTools]);
 
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-  <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">
-    {featuredOnly
-      ? "Featured Tools for Airbnb Hosts"
-      : "Essential Airbnb Management Tools"}
-  </h2>
-  <p className="text-lg text-gray-500 mb-7">
-    {featuredOnly
-      ? "Handpicked solutions to streamline operations, boost bookings, and give you back your time—trusted by leading hosts worldwide."
-      : "Discover the best software solutions to automate and optimize your hosting business"}
-  </p>
-</div>
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">
+            {featuredOnly
+              ? "Featured Tools for Airbnb Hosts"
+              : "Essential Airbnb Management Tools"}
+          </h2>
+          <p className="text-lg text-gray-500 mb-7">
+            {featuredOnly
+              ? "Handpicked solutions to streamline operations, boost bookings, and give you back your time—trusted by leading hosts worldwide."
+              : "Discover the best software solutions to automate and optimize your hosting business"}
+          </p>
+        </div>
         {/* Dynamic Category Filters */}
         <div className="flex flex-wrap gap-3 justify-center mb-14">
           {dynamicCategories.map((cat) => (
@@ -196,52 +206,51 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
                   )}
                   {/* Description */}
                   <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
-                {/* Stars & User Count */}
-<div className="flex items-center gap-2 mb-2">
-  {generateStars(rating)}
-  {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
-  <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
-</div>
-{/* Pros */}
-{pros && pros.length > 0 && (
-  <div className="flex flex-wrap gap-2 mb-2">
-    {pros.map((pro: string) => (
-      <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
-    ))}
-  </div>
-)}
-{/* Features */}
-{features && features.length > 0 && (
-  <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
-    {features.map((feature: string) => (
-      <li key={feature}>{feature}</li>
-    ))}
-  </ul>
-)}
-{/* Price & Button row */}
-<div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
-  <span
-    className="text-base text-gray-500 font-normal truncate max-w-[60%]"
-    title={priceDisplay}
-  >
-    {priceDisplay.startsWith('From') ? (
-      <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
-    ) : (
-      <span className="text-indigo-700 font-bold">{priceDisplay}</span>
-    )}
-  </span>
-  <a
-    href={showButton ? buttonLink : undefined}
-    target="_blank"
-    rel="noopener"
-    className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
-    aria-disabled={!showButton}
-    tabIndex={showButton ? 0 : -1}
-  >
-    Try Now →
-  </a>
-</div>
-
+                  {/* Stars & User Count */}
+                  <div className="flex items-center gap-2 mb-2">
+                    {generateStars(rating)}
+                    {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
+                    <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
+                  </div>
+                  {/* Pros */}
+                  {pros && pros.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {pros.map((pro: string) => (
+                        <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
+                      ))}
+                    </div>
+                  )}
+                  {/* Features */}
+                  {features && features.length > 0 && (
+                    <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
+                      {features.map((feature: string) => (
+                        <li key={feature}>{feature}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {/* Price & Button row */}
+                  <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
+                    <span
+                      className="text-base text-gray-500 font-normal truncate max-w-[60%]"
+                      title={priceDisplay}
+                    >
+                      {priceDisplay.startsWith('From') ? (
+                        <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
+                      ) : (
+                        <span className="text-indigo-700 font-bold">{priceDisplay}</span>
+                      )}
+                    </span>
+                    <a
+                      href={showButton ? buttonLink : undefined}
+                      target="_blank"
+                      rel="noopener"
+                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+                      aria-disabled={!showButton}
+                      tabIndex={showButton ? 0 : -1}
+                    >
+                      Try Now →
+                    </a>
+                  </div>
                 </div>
               );
             })}
