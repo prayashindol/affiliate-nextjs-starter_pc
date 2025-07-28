@@ -164,8 +164,9 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
                   key={tool._id}
                   className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col p-6 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
                 >
-                {/* Badge + Logo */}
-<div className="flex items-center gap-2 mb-2 min-h-[2.25rem]">
+             {/* Badge + Logo Row */}
+<div className="flex items-center justify-between mb-2 min-h-[2.25rem]">
+  {/* Logo left */}
   {typeof logo === "string" && logo.startsWith("http") ? (
     <img
       src={logo}
@@ -177,12 +178,14 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
   ) : (
     <span className="text-3xl">{logo}</span>
   )}
+  {/* Tag right */}
   {tool.Badge && (
-    <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg">
+    <span className="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
       {cleanText(tool.Badge)}
     </span>
   )}
 </div>
+
 
                   {/* Name */}
                   <div className="mb-1">
