@@ -30,7 +30,7 @@ export default async function ProductsPage() {
               key={product._id}
               className="rounded-2xl overflow-hidden shadow bg-white flex flex-col hover:scale-105 transition"
             >
-              <Link href={`/product/${product.slug?.current || ""}`}>
+              <Link href={`/products/${product.slug?.current || ""}`}>
                 <img
                   src={product.images?.[0]?.asset?.url || "/no-image.jpg"}
                   alt={product.title}
