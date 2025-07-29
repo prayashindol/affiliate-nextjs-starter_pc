@@ -1,51 +1,46 @@
 import { notFound } from "next/navigation";
-import { sanityClient } from "@/lib/sanity"; // Adjust this path as needed
+import { sanityClient } from "@/lib/sanity";
 import DropshipProduct from "./DropshipProduct";
 import DigitalProduct from "./DigitalProduct";
 
-// Helper to fetch product by slug
 async function getProductBySlug(slug) {
-  // Adjust fields as needed for your Sanity schema!
-  console.log("Fetching product with slug:", slug); // LOG SLUG
+  console.log("Fetching product with slug:", slug);
   const product = await sanityClient.fetch(
     `*[_type == "product" && slug.current == $slug][0]{
       _id,
-      name,
+      title,
       price,
       description,
       details,
       highlights,
       "images": images[]{asset->{url}, alt},
-      productType,
+      type,
       digitalFileUrl,
       rating,
-      relatedProducts[]->{_id, name, slug, images[]{asset->{url}}, price, color}
+      relatedProducts[]->{_id, title, slug, images[]{asset->{url}}, price, color}
     }`,
     { slug }
   );
-  console.log("Fetched product result:", product); // LOG PRODUCT
+  console.log("Fetched product result:", product);
   return product;
 }
 
 export default async function ProductPage({ params }) {
-  console.log("Incoming params:", params); // LOG PARAMS
+  console.log("Incoming params:", params);
   const product = await getProductBySlug(params.slug);
 
   if (!product) {
-    console.log("Product not found for slug:", params.slug); // LOG NOT FOUND
+    console.log("Product not found for slug:", params.slug);
     return notFound();
   }
 
-  if (product.productType === "Dropship") {
-    console.log("Rendering DropshipProduct for:", product.name); // LOG TYPE
+  if (product.type?.toLowerCase() === "dropship") {
     return <DropshipProduct product={product} />;
   }
-  if (product.productType === "Digital") {
-    console.log("Rendering DigitalProduct for:", product.name); // LOG TYPE
+  if (product.type?.toLowerCase() === "digital") {
     return <DigitalProduct product={product} />;
   }
 
-  // Render notFound for unknown product types
-  console.log("Unknown product type for product:", product); // LOG BAD TYPE
+  console.log("Unknown product type for product:", product);
   return notFound();
 }
