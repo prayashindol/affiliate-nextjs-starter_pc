@@ -44,7 +44,7 @@ export default async function ProductsPage() {
                 </p>
                 <div className="mt-auto flex items-center justify-between">
                   <span className="text-lg font-bold text-blue-600">${product.price || "N/A"}</span>
-                  <Link href={`/product/${product.slug?.current || ""}`}>
+                  <Link href={`/products/${product.slug?.current || ""}`}>
                     <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200">View</span>
                   </Link>
                 </div>
