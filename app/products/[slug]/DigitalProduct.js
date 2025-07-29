@@ -30,6 +30,7 @@ import {
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
+import AddToCart from "../../components/AddToCart";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -210,10 +211,28 @@ export default function DigitalProduct({ product }) {
                   className="space-y-6 text-base text-gray-700"
                 />
               </div>
+              {/* Add to Cart Button */}
+              <div className="mt-6">
+                <AddToCart 
+                  product={{
+                    id: product._id,
+                    title: product.title,
+                    price: product.price || 0,
+                    type: 'digital',
+                    image: product.images?.[0]?.asset?.url,
+                    downloadFiles: digitalFiles.map(file => ({
+                      url: file.asset?.url,
+                      filename: file.asset?.originalFilename
+                    }))
+                  }}
+                  className="flex w-full items-center justify-center rounded-md border border-transparent px-8 py-3 text-base font-medium focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
+                />
+              </div>
+              
               {/* Download links for digital files */}
               {digitalFiles && digitalFiles.length > 0 && (
                 <div className="mt-6 flex flex-col gap-3">
-                  <h4 className="font-bold mb-2">Downloads:</h4>
+                  <h4 className="font-bold mb-2">Preview Downloads:</h4>
                   {digitalFiles.map(
                     (file, idx) =>
                       file.asset?.url && (
@@ -223,10 +242,10 @@ export default function DigitalProduct({ product }) {
                           download={file.asset.originalFilename || `file-${idx + 1}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden mb-2"
+                          className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-8 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden mb-2"
                         >
                           <ArrowDownTrayIcon className="mr-2 size-6" />
-                          {file.asset.originalFilename || `Download file ${idx + 1}`}
+                          {file.asset.originalFilename || `Preview file ${idx + 1}`}
                         </a>
                       )
                   )}

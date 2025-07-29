@@ -2,8 +2,9 @@
 
 import { useState, Fragment } from 'react'
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, ChevronDownIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { useCart } from '../context/CartContext'
 
 // === NEW NAVIGATION STRUCTURE ===
 const navigation = [
@@ -55,6 +56,7 @@ function classNames(...classes: string[]) {
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { state } = useCart()
 
   return (
     <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
@@ -72,7 +74,16 @@ export default function Header() {
         </div>
 
         {/* Hamburger for mobile */}
-        <div className="flex lg:hidden">
+        <div className="flex lg:hidden items-center gap-4">
+          {/* Mobile Cart Icon */}
+          <Link href="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
+            <ShoppingCartIcon className="h-6 w-6" />
+            {state.itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {state.itemCount}
+              </span>
+            )}
+          </Link>
           <button
             type="button"
             className="p-2 rounded-md text-gray-600"
@@ -153,11 +164,19 @@ export default function Header() {
         </div>
 
         {/* Spacer for right side */}
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-4">
+          {/* Cart Icon */}
+          <Link href="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
+            <ShoppingCartIcon className="h-6 w-6" />
+            {state.itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {state.itemCount}
+              </span>
+            )}
+          </Link>
           <Link
             href="/login"
             className="text-base font-bold text-gray-900 hover:text-indigo-600 px-4 py-2 rounded transition"
-            style={{ marginLeft: '16px' }}
           >
             Log in &rarr;
           </Link>
