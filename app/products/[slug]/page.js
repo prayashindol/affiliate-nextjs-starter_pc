@@ -4,8 +4,7 @@ import DropshipProduct from "./DropshipProduct";
 import DigitalProduct from "./DigitalProduct";
 
 async function getProductBySlug(slug) {
-  console.log("Fetching product with slug:", slug);
-  const product = await sanityClient.fetch(
+  return sanityClient.fetch(
     `*[_type == "product" && slug.current == $slug][0]{
       _id,
       title,
@@ -15,14 +14,12 @@ async function getProductBySlug(slug) {
       highlights,
       "images": images[]{asset->{url}, alt},
       type,
-      digitalFileUrl,
+      downloadFiles[]{asset->{url, originalFilename}},
       rating,
       relatedProducts[]->{_id, title, slug, images[]{asset->{url}}, price, color}
     }`,
     { slug }
   );
-  console.log("Fetched product result:", product);
-  return product;
 }
 
 export default async function ProductPage({ params }) {

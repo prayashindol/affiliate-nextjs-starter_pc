@@ -45,7 +45,8 @@ export default function DigitalProduct({ product }) {
   const price = product.price ? `$${product.price}` : "";
   const rating = product.rating || 0;
   const relatedProducts = product.relatedProducts || [];
-  const digitalFileUrl = product.digitalFileUrl || "#";
+  // Multi-file support
+  const digitalFiles = product.downloadFiles || [];
 
   // Example navigation/footer (customize as needed)
   const navigation = { categories: [], pages: [] };
@@ -185,7 +186,7 @@ export default function DigitalProduct({ product }) {
 
             {/* Product info */}
             <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.title}</h1>
               <div className="mt-3">
                 <h2 className="sr-only">Product information</h2>
                 <p className="text-3xl tracking-tight text-gray-900">{price}</p>
@@ -209,24 +210,28 @@ export default function DigitalProduct({ product }) {
                   className="space-y-6 text-base text-gray-700"
                 />
               </div>
-              {/* Download button for digital download */}
-              <div className="mt-6 flex flex-col gap-3">
-                <a
-                  href={digitalFileUrl}
-                  download
-                  className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
-                >
-                  <ArrowDownTrayIcon className="mr-2 size-6" />
-                  Download Now
-                </a>
-                <button
-                  type="button"
-                  className="flex items-center justify-center rounded-md border border-gray-200 bg-white px-8 py-3 text-base font-medium text-indigo-600 hover:bg-gray-50"
-                >
-                  <HeartIcon className="mr-2 size-6" />
-                  Add to favorites
-                </button>
-              </div>
+              {/* Download links for digital files */}
+              {digitalFiles && digitalFiles.length > 0 && (
+                <div className="mt-6 flex flex-col gap-3">
+                  <h4 className="font-bold mb-2">Downloads:</h4>
+                  {digitalFiles.map(
+                    (file, idx) =>
+                      file.asset?.url && (
+                        <a
+                          key={file.asset.url}
+                          href={file.asset.url}
+                          download={file.asset.originalFilename || `file-${idx + 1}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden mb-2"
+                        >
+                          <ArrowDownTrayIcon className="mr-2 size-6" />
+                          {file.asset.originalFilename || `Download file ${idx + 1}`}
+                        </a>
+                      )
+                  )}
+                </div>
+              )}
               <section aria-labelledby="details-heading" className="mt-12">
                 <h2 id="details-heading" className="sr-only">
                   Additional details
@@ -275,13 +280,13 @@ export default function DigitalProduct({ product }) {
                   <div className="relative">
                     <div className="relative h-72 w-full overflow-hidden rounded-lg">
                       <img
-                        alt={rel.name}
+                        alt={rel.title}
                         src={rel.images?.[0]?.asset?.url}
                         className="size-full object-cover"
                       />
                     </div>
                     <div className="relative mt-4">
-                      <h3 className="text-sm font-medium text-gray-900">{rel.name}</h3>
+                      <h3 className="text-sm font-medium text-gray-900">{rel.title}</h3>
                       <p className="mt-1 text-sm text-gray-500">{rel.color}</p>
                     </div>
                     <div className="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">
