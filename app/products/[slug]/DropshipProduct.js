@@ -17,6 +17,7 @@ import {
 } from "@headlessui/react";
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingCartIcon, UserIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, StarIcon } from "@heroicons/react/20/solid";
+import AddToCart from "../../components/AddToCart";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -157,12 +158,16 @@ export default function DropshipProduct({ product }) {
                 ))}
               </fieldset>
             </div>
-            <button
-              type="submit"
-              className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
-            >
-              Add to bag
-            </button>
+            <AddToCart 
+              product={{
+                id: product._id,
+                title: product.title || product.name,
+                price: product.price || 0,
+                type: 'dropship',
+                image: product.images?.[0]?.asset?.url
+              }}
+              className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent px-8 py-3 text-base font-medium focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
+            />
           </div>
 
           {/* Description, highlights, details */}
