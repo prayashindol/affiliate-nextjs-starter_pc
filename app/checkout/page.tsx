@@ -31,27 +31,6 @@ interface PaymentInfo {
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
   const router = useRouter()
-  
-  // Check if cart contains only digital products
-//  const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
-
-  // Redirect if cart is empty
-  if (state.items.length === 0) {
-    return (
-      <div className="min-h-screen py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Checkout</h1>
-          <p className="text-gray-600 mb-6">Your cart is empty. Please add some items before checkout.</p>
-          <Link 
-            href="/products" 
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Browse Products
-          </Link>
-        </div>
-      </div>
-    )
-  }
 
   const [formData, setFormData] = useState<CheckoutForm>({
     email: '',
@@ -114,7 +93,7 @@ export default function CheckoutPage() {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<CheckoutForm & PaymentInfo> = {}
-    
+
     // Always require email
     if (!formData.email) newErrors.email = 'Email is required'
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
@@ -139,13 +118,13 @@ export default function CheckoutPage() {
         if (!paymentData.expiryDate) newErrors.expiryDate = 'Expiry date is required'
         if (!paymentData.cvv) newErrors.cvv = 'CVV is required'
         if (!paymentData.cardholderName) newErrors.cardholderName = 'Cardholder name is required'
-        
+
         // Basic card number validation (remove spaces and check if it's 16 digits)
         const cardNum = paymentData.cardNumber.replace(/\s/g, '')
         if (cardNum && !/^\d{16}$/.test(cardNum)) {
           newErrors.cardNumber = 'Please enter a valid 16-digit card number'
         }
-        
+
         // CVV validation
         if (paymentData.cvv && !/^\d{3,4}$/.test(paymentData.cvv)) {
           newErrors.cvv = 'Please enter a valid 3 or 4-digit CVV'
@@ -159,24 +138,24 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     if (currentStep === 'info') {
       setCurrentStep('payment')
       return
     }
-    
+
     setIsSubmitting(true)
-    
+
     try {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000))
-      
+
       // Store order data for confirmation page
       const orderData = {
         orderNumber: Math.random().toString(36).substr(2, 9).toUpperCase(),
-        customerInfo: isDigitalOnly ? { 
+        customerInfo: isDigitalOnly ? {
           email: formData.email,
           firstName: '',
           lastName: '',
@@ -195,16 +174,16 @@ export default function CheckoutPage() {
         timestamp: new Date().toISOString(),
         isDigitalOnly
       }
-      
+
       // Store in localStorage for the confirmation page
       localStorage.setItem('orderData', JSON.stringify(orderData))
-      
+
       // Clear cart
       clearCart()
-      
+
       // Redirect to order summary
       router.push('/order-summary')
-      
+
     } catch (error) {
       console.error('Order submission failed:', error)
       alert('Order submission failed. Please try again.')
@@ -221,7 +200,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Customer Information Form */}
           <div className="bg-white shadow rounded-lg p-6">
@@ -239,7 +218,7 @@ export default function CheckoutPage() {
                 </button>
               )}
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {currentStep === 'info' && (
                 <>
@@ -548,7 +527,7 @@ export default function CheckoutPage() {
           {/* Order Summary */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
-            
+
             {isDigitalOnly && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
                 <p className="text-sm text-blue-800">
@@ -556,7 +535,7 @@ export default function CheckoutPage() {
                 </p>
               </div>
             )}
-            
+
             <div className="space-y-4 mb-6">
               {state.items.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4">
@@ -577,7 +556,7 @@ export default function CheckoutPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
                     <p className="text-sm text-gray-500">
@@ -587,7 +566,7 @@ export default function CheckoutPage() {
                       • Qty: {item.quantity}
                     </p>
                   </div>
-                  
+
                   <div className="text-sm font-medium text-gray-900">
                     ${(item.price * item.quantity).toFixed(2)}
                   </div>
