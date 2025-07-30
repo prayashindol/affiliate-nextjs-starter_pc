@@ -18,9 +18,14 @@ interface OrderData {
     zipCode: string
     country: string
   }
+  paymentInfo?: {
+    method: string
+    last4: string
+  }
   items: CartItem[]
   total: number
   timestamp: string
+  isDigitalOnly?: boolean
 }
 
 export default function OrderSummaryPage() {
@@ -78,11 +83,18 @@ export default function OrderSummaryPage() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Order Confirmed!</h1>
           <p className="text-lg text-gray-600 mt-2">
-            Thank you for your purchase, {orderData.customerInfo.firstName}!
+            Thank you for your purchase{orderData.customerInfo.firstName ? `, ${orderData.customerInfo.firstName}` : ''}!
           </p>
           <p className="text-sm text-gray-500 mt-1">
             Order #{orderData.orderNumber} • {new Date(orderData.timestamp).toLocaleDateString()}
           </p>
+          {orderData.isDigitalOnly && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md inline-block">
+              <p className="text-sm text-blue-800">
+                📱 Digital purchase - Check your downloads below!
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Order Details */}
@@ -98,10 +110,14 @@ export default function OrderSummaryPage() {
                 <h3 className="text-sm font-medium text-gray-900 mb-3">Customer Information</h3>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>{orderData.customerInfo.email}</p>
-                  <p>{orderData.customerInfo.firstName} {orderData.customerInfo.lastName}</p>
-                  <p>{orderData.customerInfo.address}</p>
-                  <p>{orderData.customerInfo.city}, {orderData.customerInfo.state} {orderData.customerInfo.zipCode}</p>
-                  <p>{orderData.customerInfo.country}</p>
+                  {!orderData.isDigitalOnly && (
+                    <>
+                      <p>{orderData.customerInfo.firstName} {orderData.customerInfo.lastName}</p>
+                      <p>{orderData.customerInfo.address}</p>
+                      <p>{orderData.customerInfo.city}, {orderData.customerInfo.state} {orderData.customerInfo.zipCode}</p>
+                      <p>{orderData.customerInfo.country}</p>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -121,6 +137,14 @@ export default function OrderSummaryPage() {
                     <span>Total:</span>
                     <span>${orderData.total.toFixed(2)}</span>
                   </div>
+                  {orderData.paymentInfo && (
+                    <div className="flex justify-between pt-2">
+                      <span>Payment Method:</span>
+                      <span className="capitalize">
+                        {orderData.paymentInfo.method === 'card' ? `Card ending in ${orderData.paymentInfo.last4}` : orderData.paymentInfo.method}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
