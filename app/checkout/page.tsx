@@ -33,7 +33,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   
   // Check if cart contains only digital products
-  const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
+//  const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
 
   // Redirect if cart is empty
   if (state.items.length === 0) {
