@@ -57,7 +57,7 @@ export default function OrderSummaryPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Order Not Found</h1>
-          <p className="text-gray-600 mb-6">We couldn't find your order information.</p>
+          <p className="text-gray-600 mb-6">We couldn&apos;t find your order information.</p>
           <Link 
             href="/products" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
