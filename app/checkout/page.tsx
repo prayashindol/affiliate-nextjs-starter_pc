@@ -5,6 +5,9 @@ import { useCart } from '../context/CartContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { FaCreditCard, FaPaypal } from 'react-icons/fa'
+import { SiApplepay } from 'react-icons/si'
+import SecurePaymentSeal from '../components/SecurePaymentSeal'
 
 interface CheckoutForm {
   email: string
@@ -28,6 +31,28 @@ interface PaymentInfo {
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
   const router = useRouter()
+  
+  // Check if cart contains only digital products
+  const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
+
+  // Redirect if cart is empty
+  if (state.items.length === 0) {
+    return (
+      <div className="min-h-screen py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Checkout</h1>
+          <p className="text-gray-600 mb-6">Your cart is empty. Please add some items before checkout.</p>
+          <Link 
+            href="/products" 
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Browse Products
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   const [formData, setFormData] = useState<CheckoutForm>({
     email: '',
     firstName: '',
@@ -52,7 +77,7 @@ export default function CheckoutPage() {
   // Check if cart contains only digital products
   const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (unless in demo mode)
   if (state.items.length === 0) {
     return (
       <div className="min-h-screen py-12">
@@ -374,35 +399,38 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: 'card' }))}
-                        className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border text-sm font-medium ${
                           paymentData.paymentMethod === 'card'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        💳 Card
+                        <FaCreditCard className="w-4 h-4" />
+                        Card
                       </button>
                       <button
                         type="button"
                         onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: 'paypal' }))}
-                        className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border text-sm font-medium ${
                           paymentData.paymentMethod === 'paypal'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        🅿️ PayPal
+                        <FaPaypal className="w-4 h-4 text-blue-600" />
+                        PayPal
                       </button>
                       <button
                         type="button"
                         onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: 'apple_pay' }))}
-                        className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border text-sm font-medium ${
                           paymentData.paymentMethod === 'apple_pay'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        🍎 Apple Pay
+                        <SiApplepay className="w-4 h-4 text-black" />
+                        Apple Pay
                       </button>
                     </div>
                   </div>
@@ -586,6 +614,11 @@ export default function CheckoutPage() {
               <p className="text-sm text-gray-600">
                 <strong>Note:</strong> This is a demo checkout. No actual payment will be processed.
               </p>
+            </div>
+
+            {/* Secure Payment Seal */}
+            <div className="mt-4">
+              <SecurePaymentSeal />
             </div>
 
             {/* Progress Indicator */}

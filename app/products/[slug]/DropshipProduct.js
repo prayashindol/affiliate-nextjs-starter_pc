@@ -18,6 +18,7 @@ import {
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingCartIcon, UserIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, StarIcon } from "@heroicons/react/20/solid";
 import AddToCart from "../../components/AddToCart";
+import SecurePaymentSeal from "../../components/SecurePaymentSeal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -168,6 +169,11 @@ export default function DropshipProduct({ product }) {
               }}
               className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent px-8 py-3 text-base font-medium focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
             />
+            
+            {/* Secure Payment Seal */}
+            <div className="mt-4">
+              <SecurePaymentSeal variant="compact" className="justify-center" />
+            </div>
           </div>
 
           {/* Description, highlights, details */}
