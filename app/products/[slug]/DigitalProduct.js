@@ -31,6 +31,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
 import AddToCart from "../../components/AddToCart";
+import SecurePaymentSeal from "../../components/SecurePaymentSeal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -227,6 +228,11 @@ export default function DigitalProduct({ product }) {
                   }}
                   className="flex w-full items-center justify-center rounded-md border border-transparent px-8 py-3 text-base font-medium focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
                 />
+              </div>
+              
+              {/* Secure Payment Seal */}
+              <div className="mt-4">
+                <SecurePaymentSeal variant="compact" className="justify-center" />
               </div>
               
               {/* Download links for digital files */}

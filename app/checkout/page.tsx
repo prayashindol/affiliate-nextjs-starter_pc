@@ -5,6 +5,9 @@ import { useCart } from '../context/CartContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { FaCreditCard, FaPaypal } from 'react-icons/fa'
+import { SiApplepay } from 'react-icons/si'
+import SecurePaymentSeal from '../components/SecurePaymentSeal'
 
 interface CheckoutForm {
   email: string
@@ -374,35 +377,38 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: 'card' }))}
-                        className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border text-sm font-medium ${
                           paymentData.paymentMethod === 'card'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        💳 Card
+                        <FaCreditCard className="w-4 h-4" />
+                        Card
                       </button>
                       <button
                         type="button"
                         onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: 'paypal' }))}
-                        className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border text-sm font-medium ${
                           paymentData.paymentMethod === 'paypal'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        🅿️ PayPal
+                        <FaPaypal className="w-4 h-4 text-blue-600" />
+                        PayPal
                       </button>
                       <button
                         type="button"
                         onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: 'apple_pay' }))}
-                        className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border text-sm font-medium ${
                           paymentData.paymentMethod === 'apple_pay'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        🍎 Apple Pay
+                        <SiApplepay className="w-4 h-4 text-black" />
+                        Apple Pay
                       </button>
                     </div>
                   </div>
@@ -586,6 +592,11 @@ export default function CheckoutPage() {
               <p className="text-sm text-gray-600">
                 <strong>Note:</strong> This is a demo checkout. No actual payment will be processed.
               </p>
+            </div>
+
+            {/* Secure Payment Seal */}
+            <div className="mt-4">
+              <SecurePaymentSeal />
             </div>
 
             {/* Progress Indicator */}
