@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { CheckIcon } from '@heroicons/react/20/solid'
 import ToolsDirectory from './components/ToolsDirectory'
+import { NewsTicker } from './components/NewsTicker'
 
 
 const navigation = [
@@ -210,6 +211,9 @@ export default function Example() {
             />
           </div>
         </div>
+
+        {/* Industry News Ticker */}
+        <NewsTicker />
 
         {/* Logo cloud */}
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
