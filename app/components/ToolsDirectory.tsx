@@ -190,8 +190,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
                 ? tool.Rating
                 : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
 
-              if (!isFinite(rating)) rating = undefined;
-
+if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 works for stars
               const buttonLink = getButtonLink(tool);
               const showButton = !!buttonLink;
 
