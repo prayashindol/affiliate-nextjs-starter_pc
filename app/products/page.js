@@ -3,58 +3,22 @@ import { sanityClient } from "@/lib/sanity"; // Adjust the path if needed
 import AddToCart from "../components/AddToCart";
 
 async function getProducts() {
-  // Mock data for testing - replace with actual Sanity fetch in production
-  const mockProducts = [
-    {
-      _id: '1',
-      title: 'Digital Marketing eBook',
-      slug: { current: 'digital-marketing-ebook' },
-      price: 29.99,
-      type: 'digital',
-      images: [{ asset: { url: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=400' } }],
-      description: 'Complete guide to digital marketing strategies',
-      downloadFiles: [
-        { asset: { url: '/sample-ebook.pdf', originalFilename: 'Digital-Marketing-Guide.pdf' } }
-      ]
-    },
-    {
-      _id: '2',
-      title: 'Affiliate Marketing Course',
-      slug: { current: 'affiliate-marketing-course' },
-      price: 199.99,
-      type: 'affiliate',
-      images: [{ asset: { url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400' } }],
-      description: 'Learn affiliate marketing from experts',
-      affiliateLink: 'https://example.com/affiliate-course'
-    },
-    {
-      _id: '3',
-      title: 'Business Templates Pack',
-      slug: { current: 'business-templates-pack' },
-      price: 49.99,
-      type: 'digital',
-      images: [{ asset: { url: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400' } }],
-      description: 'Professional business document templates',
-      downloadFiles: [
-        { asset: { url: '/templates.zip', originalFilename: 'Business-Templates.zip' } }
-      ]
-    }
-  ];
-
-  // In production, use this instead:
-  // return await sanityClient.fetch(`*[_type == "product"]{
-  //   _id,
-  //   title,
-  //   slug,
-  //   price,
-  //   type,
-  //   images[]{asset->{url}},
-  //   description,
-  //   downloadFiles[]{asset->{url, originalFilename}},
-  //   affiliateLink
-  // }`);
-
-  return mockProducts;
+  try {
+    return await sanityClient.fetch(`*[_type == "product"]{
+      _id,
+      title,
+      slug,
+      price,
+      type,
+      images[]{asset->{url}},
+      description,
+      downloadFiles[]{asset->{url, originalFilename}},
+      affiliateLink
+    }`);
+  } catch (error) {
+    console.error('Error fetching products from Sanity:', error);
+    return [];
+  }
 }
 
 export default async function ProductsPage() {
