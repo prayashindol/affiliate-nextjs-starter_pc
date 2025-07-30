@@ -33,6 +33,9 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Partial<CheckoutForm>>({})
 
+  // Check if cart contains only digital products
+  const isDigitalOnlyCart = state.items.length > 0 && state.items.every(item => item.type === 'digital')
+
   // Redirect if cart is empty
   if (state.items.length === 0) {
     return (
@@ -66,11 +69,15 @@ export default function CheckoutPage() {
     if (!formData.email) newErrors.email = 'Email is required'
     if (!formData.firstName) newErrors.firstName = 'First name is required'
     if (!formData.lastName) newErrors.lastName = 'Last name is required'
-    if (!formData.address) newErrors.address = 'Address is required'
-    if (!formData.city) newErrors.city = 'City is required'
-    if (!formData.state) newErrors.state = 'State is required'
-    if (!formData.zipCode) newErrors.zipCode = 'ZIP code is required'
-    if (!formData.country) newErrors.country = 'Country is required'
+    
+    // Only validate address fields if cart contains non-digital products
+    if (!isDigitalOnlyCart) {
+      if (!formData.address) newErrors.address = 'Address is required'
+      if (!formData.city) newErrors.city = 'City is required'
+      if (!formData.state) newErrors.state = 'State is required'
+      if (!formData.zipCode) newErrors.zipCode = 'ZIP code is required'
+      if (!formData.country) newErrors.country = 'Country is required'
+    }
 
     // Email validation
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
@@ -127,6 +134,13 @@ export default function CheckoutPage() {
           {/* Customer Information Form */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Customer Information</h2>
+            {isDigitalOnlyCart && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-700">
+                  <strong>Digital Products Only:</strong> Since you&apos;re purchasing digital products, we only need your name and email for delivery.
+                </p>
+              </div>
+            )}
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -182,92 +196,96 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address *
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    errors.address ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                />
-                {errors.address && <p className="text-red-600 text-sm mt-1">{errors.address}</p>}
-              </div>
+              {!isDigitalOnlyCart && (
+                <>
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                      Address *
+                    </label>
+                    <input
+                      type="text"
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                        errors.address ? 'border-red-300' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.address && <p className="text-red-600 text-sm mt-1">{errors.address}</p>}
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
-                    City *
-                  </label>
-                  <input
-                    type="text"
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                      errors.city ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.city && <p className="text-red-600 text-sm mt-1">{errors.city}</p>}
-                </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                          errors.city ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.city && <p className="text-red-600 text-sm mt-1">{errors.city}</p>}
+                    </div>
 
-                <div>
-                  <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                    State *
-                  </label>
-                  <input
-                    type="text"
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                      errors.state ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.state && <p className="text-red-600 text-sm mt-1">{errors.state}</p>}
-                </div>
+                    <div>
+                      <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                          errors.state ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.state && <p className="text-red-600 text-sm mt-1">{errors.state}</p>}
+                    </div>
 
-                <div>
-                  <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
-                    ZIP Code *
-                  </label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                      errors.zipCode ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.zipCode && <p className="text-red-600 text-sm mt-1">{errors.zipCode}</p>}
-                </div>
-              </div>
+                    <div>
+                      <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
+                        ZIP Code *
+                      </label>
+                      <input
+                        type="text"
+                        id="zipCode"
+                        name="zipCode"
+                        value={formData.zipCode}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                          errors.zipCode ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.zipCode && <p className="text-red-600 text-sm mt-1">{errors.zipCode}</p>}
+                    </div>
+                  </div>
 
-              <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
-                  Country *
-                </label>
-                <input
-                  type="text"
-                  id="country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    errors.country ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                />
-                {errors.country && <p className="text-red-600 text-sm mt-1">{errors.country}</p>}
-              </div>
+                  <div>
+                    <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+                      Country *
+                    </label>
+                    <input
+                      type="text"
+                      id="country"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                        errors.country ? 'border-red-300' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.country && <p className="text-red-600 text-sm mt-1">{errors.country}</p>}
+                  </div>
+                </>
+              )}
 
               <button
                 type="submit"
