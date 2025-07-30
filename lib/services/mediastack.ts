@@ -17,7 +17,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12 hours ago
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "VRBO Introduces AI-Powered Pricing Tools for Vacation Rental Hosts",
@@ -28,7 +28,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en", 
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(), // 18 hours ago
-    image: "https://images.unsplash.com/photo-1460472178825-e5240623afd5?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "Short-Term Rental Regulations: New City Policies Impact Host Operations",
@@ -39,7 +39,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us", 
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "Vacation Rental Market Shows Strong Recovery with 35% Year-Over-Year Growth",
@@ -50,7 +50,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 36).toISOString(), // 1.5 days ago
-    image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "Home Sharing Platforms Partner with Local Tourism Boards for Sustainable Travel",
@@ -61,7 +61,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "Rental Property Technology: Smart Home Integration Boosts Guest Satisfaction", 
@@ -72,7 +72,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 60).toISOString(), // 2.5 days ago
-    image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "Hospitality Industry Trends: Short-Term Rentals Reshape Travel Accommodation Preferences",
@@ -83,7 +83,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
-    image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   },
   {
     title: "Rental Management Software: New Platform Features Streamline Host Operations",
@@ -94,7 +94,7 @@ const SAMPLE_NEWS_DATA: NewsArticle[] = [
     language: "en",
     country: "us",
     published_at: new Date(Date.now() - 1000 * 60 * 60 * 84).toISOString(), // 3.5 days ago
-    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=400&fit=crop"
+    image: "/logo.svg"
   }
 ];
 
@@ -125,8 +125,6 @@ export class MediaStackService {
       const queryString = this.buildQueryParams(filters);
       const url = `${BASE_URL}?${queryString}`;
       
-      console.log('Fetching news from:', url);
-      
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -156,10 +154,28 @@ export class MediaStackService {
         });
       }
       
+      // If we have no articles after filtering, fall back to sample data
+      if (!data.data || data.data.length === 0) {
+        const limit = filters.limit || 50;
+        const offset = filters.offset || 0;
+        const startIndex = offset;
+        const endIndex = Math.min(startIndex + limit, SAMPLE_NEWS_DATA.length);
+        const paginatedData = SAMPLE_NEWS_DATA.slice(startIndex, endIndex);
+        
+        return {
+          pagination: { 
+            limit, 
+            offset, 
+            count: paginatedData.length, 
+            total: SAMPLE_NEWS_DATA.length 
+          },
+          data: paginatedData
+        };
+      }
+      
       return data;
     } catch (error) {
       console.error('Error fetching news:', error);
-      console.log('Using fallback sample data for development');
       
       // Return sample data with pagination info when API fails
       const limit = filters.limit || 50;
