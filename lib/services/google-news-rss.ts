@@ -214,6 +214,172 @@ export class GoogleNewsRSSService {
         country: "us",
         published_at: new Date(Date.now() - 1000 * 60 * 60 * 60).toISOString(),
         image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop&crop=faces"
+      },
+      // Additional articles for pagination testing
+      {
+        title: "Airbnb Host Insurance Updates: New Coverage Options for Property Owners",
+        description: "The platform expands insurance offerings to provide better protection for hosts against property damage and liability claims.",
+        url: "https://www.airbnb.com/help/article/937/airbnb-host-protection-insurance",
+        source: "Airbnb Support",
+        category: "business",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+        image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "VRBO Introduces Enhanced Guest Verification System",
+        description: "New identity verification features help hosts feel more secure when welcoming guests to their vacation rental properties.",
+        url: "https://help.vrbo.com/articles/What-is-guest-verification",
+        source: "VRBO Help Center",
+        category: "technology",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 84).toISOString(),
+        image: "https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Short-Term Rental Tax Guidelines: What Hosts Need to Know for 2024",
+        description: "Tax experts provide guidance on income reporting requirements and deductible expenses for vacation rental property owners.",
+        url: "https://www.nolo.com/legal-encyclopedia/tax-rules-short-term-rentals.html",
+        source: "Nolo Legal",
+        category: "general",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 96).toISOString(),
+        image: "https://images.unsplash.com/photo-1554224154-26032fced8bd?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Digital Nomad Trends Boost Long-Term Vacation Rental Bookings",
+        description: "Remote work culture continues to drive demand for extended stays in vacation rental properties across popular destinations.",
+        url: "https://www.skift.com/2024/01/15/digital-nomad-vacation-rental-trends/",
+        source: "Skift",
+        category: "business",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 108).toISOString(),
+        image: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Vacation Rental Cleaning Standards: Industry Best Practices Update",
+        description: "New cleaning protocols and standards help hosts maintain high hygiene levels and guest satisfaction ratings.",
+        url: "https://www.cleaningstandards.com/vacation-rental-cleaning-guide",
+        source: "Cleaning Standards Institute",
+        category: "general",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 120).toISOString(),
+        image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Smart Lock Technology Adoption Rises Among Vacation Rental Hosts",
+        description: "Keyless entry systems become increasingly popular for their convenience and security benefits in short-term rental properties.",
+        url: "https://www.proptech-news.com/smart-locks-vacation-rentals-2024",
+        source: "PropTech News",
+        category: "technology",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 132).toISOString(),
+        image: "https://images.unsplash.com/photo-1558002038-1055907df827?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Vacation Rental Investment Returns: Market Analysis Q4 2024",
+        description: "Real estate investors see strong ROI in vacation rental properties as travel demand continues to recover and grow.",
+        url: "https://www.realestateinvestment.com/vacation-rental-roi-2024",
+        source: "Real Estate Investment",
+        category: "business",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 144).toISOString(),
+        image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Guest Experience Enhancements: New Features for Vacation Rental Platforms",
+        description: "Leading platforms introduce innovative features to improve booking experience and guest satisfaction in vacation rentals.",
+        url: "https://www.hospitalitytech.com/vacation-rental-platform-updates",
+        source: "Hospitality Tech",
+        category: "technology",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 156).toISOString(),
+        image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Seasonal Pricing Strategies for Vacation Rental Success",
+        description: "Industry experts share proven methods for optimizing rental rates based on seasonal demand patterns and local events.",
+        url: "https://www.rental-pricing.com/seasonal-strategies-guide",
+        source: "Rental Pricing Guide",
+        category: "business",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 168).toISOString(),
+        image: "https://images.unsplash.com/photo-1551836022-4c4c79ecde51?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Vacation Rental Security: Protecting Properties and Guests",
+        description: "Comprehensive security measures help hosts safeguard their properties while ensuring guest safety and peace of mind.",
+        url: "https://www.security-solutions.com/vacation-rental-protection",
+        source: "Security Solutions",
+        category: "general",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 180).toISOString(),
+        image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Eco-Friendly Vacation Rentals: Sustainability Trends in Hospitality",
+        description: "Green initiatives and sustainable practices become key differentiators for environmentally conscious vacation rental hosts.",
+        url: "https://www.sustainable-hospitality.com/eco-vacation-rentals",
+        source: "Sustainable Hospitality",
+        category: "general",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 192).toISOString(),
+        image: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Multi-Platform Listing Management: Tools for Vacation Rental Hosts",
+        description: "New software solutions help hosts efficiently manage listings across multiple booking platforms and channels.",
+        url: "https://www.channel-management.com/vacation-rental-tools",
+        source: "Channel Management",
+        category: "technology",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 204).toISOString(),
+        image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Vacation Rental Market Forecast: Predictions for 2025",
+        description: "Industry analysts provide insights into expected growth trends and market opportunities in the vacation rental sector.",
+        url: "https://www.market-forecast.com/vacation-rental-2025",
+        source: "Market Forecast",
+        category: "business",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 216).toISOString(),
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Guest Communication Best Practices for Vacation Rental Hosts",
+        description: "Effective communication strategies help hosts improve guest satisfaction and earn higher reviews for their properties.",
+        url: "https://www.host-communication.com/best-practices-guide",
+        source: "Host Communication",
+        category: "general",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 228).toISOString(),
+        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&crop=faces"
+      },
+      {
+        title: "Vacation Rental Photography: Tips for Stunning Property Listings",
+        description: "Professional photography techniques help hosts showcase their properties effectively and attract more bookings.",
+        url: "https://www.property-photography.com/vacation-rental-tips",
+        source: "Property Photography",
+        category: "general",
+        language: "en",
+        country: "us",
+        published_at: new Date(Date.now() - 1000 * 60 * 60 * 240).toISOString(),
+        image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=250&fit=crop&crop=faces"
       }
     ];
 
