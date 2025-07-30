@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { Tool, AirtableRecord } from '../types/tool';
 
 const fallbackEmojis: Record<string, string> = {
   "Property Management": "🏢",
@@ -32,7 +33,7 @@ function getLogoUrl(domain?: string, category?: string) {
   return fallbackEmojis[category || "default"];
 }
 
-function getButtonLink(tool: any) {
+function getButtonLink(tool: Tool) {
   const link = tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
   if (!link) return "";
 
@@ -43,14 +44,14 @@ function getButtonLink(tool: any) {
   return `https://${link}`;
 }
 
-function cleanText(value: any) {
+function cleanText(value: unknown) {
   if (!value) return "";
   if (typeof value === "number" && isNaN(value)) return "";
   if (typeof value === "string" && (value === "NaN" || value === "N/A")) return "";
   return value;
 }
 
-function formatUserCount(userCount: any) {
+function formatUserCount(userCount: unknown) {
   const cleaned = cleanText(userCount);
   return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
 }
@@ -60,7 +61,7 @@ type ToolsDirectoryProps = {
 };
 
 // Helper to get unique categories in useable form (TS safe)
-function getUniqueCategoriesFromTools(tools: any[]): string[] {
+function getUniqueCategoriesFromTools(tools: Tool[]): string[] {
   const cats = new Set<string>();
   tools.forEach(tool => {
     if (tool.Category && typeof tool.Category === 'string') {
@@ -71,7 +72,7 @@ function getUniqueCategoriesFromTools(tools: any[]): string[] {
 }
 
 export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
-  const [tools, setTools] = useState<any[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +82,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       .then(res => res.json())
       .then(data => {
         setTools(
-          data.map((rec: any) => ({
+          data.map((rec: AirtableRecord) => ({
             ...rec.fields,
             _id: rec.id
           }))

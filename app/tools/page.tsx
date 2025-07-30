@@ -1,6 +1,7 @@
 // /app/tools/page.tsx
 
 import React from "react";
+import { AirtableRecord } from "../types/tool";
 
 async function getTools() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/tools`, {
@@ -19,7 +20,7 @@ export default async function ToolsPage() {
     <main className="max-w-5xl mx-auto p-8">
       <h1 className="text-3xl font-bold mb-6">All Tools & Resources</h1>
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {records.map((rec: any) => {
+        {records.map((rec: AirtableRecord) => {
           const tool = rec.fields;
           return (
             <div key={rec.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 flex flex-col">
