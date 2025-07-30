@@ -3,15 +3,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
 import {
+  Bars3Icon,
   MagnifyingGlassIcon,
   MinusIcon,
   PlusIcon,
   ShoppingBagIcon,
+  XMarkIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
