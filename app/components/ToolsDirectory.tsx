@@ -10,7 +10,7 @@ const fallbackEmojis: Record<string, string> = {
   default: "🛠️"
 };
 
-// Define a robust Tool interface for type safety
+// TypeScript interface for a Tool
 interface Tool {
   _id?: string;
   Name?: string;
@@ -29,7 +29,7 @@ interface Tool {
   Features?: string[] | string;
   DontShow?: boolean;
   Featured?: boolean;
-  [key: string]: any; // fallback for unexpected fields
+  [key: string]: unknown;
 }
 
 function generateStars(rating?: number) {
@@ -55,10 +55,8 @@ function getLogoUrl(domain?: string, category?: string) {
 }
 
 function getButtonLink(tool: Tool) {
-  const link = tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
+  const link = tool.AffiliateLink?.toString().trim() || tool.Website?.toString().trim() || tool.Domain?.toString().trim() || "";
   if (!link) return "";
-
-  // If link starts with http, return as is. Else, prepend https://
   if (/^https?:\/\//i.test(link)) {
     return link;
   }
@@ -102,10 +100,10 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       .then(res => res.json())
       .then(data => {
         setTools(
-          data.map((rec: any) => ({
+          (data as { fields: Tool; id: string }[]).map((rec) => ({
             ...rec.fields,
             _id: rec.id
-          })) as Tool[]
+          }))
         );
       })
       .finally(() => setLoading(false));
@@ -178,11 +176,15 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
 
               const features = Array.isArray(tool.Features)
                 ? tool.Features
-                : (tool.Features?.split?.('|') || []).map((f: string) => f.trim()).filter(Boolean);
+                : (typeof tool.Features === "string"
+                  ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
+                  : []);
 
               const pros = Array.isArray(tool.Pros)
                 ? tool.Pros
-                : (tool.Pros?.split?.('|') || []).map((p: string) => p.trim()).filter(Boolean);
+                : (typeof tool.Pros === "string"
+                  ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
+                  : []);
 
               let rating = typeof tool.Rating === "number"
                 ? tool.Rating
