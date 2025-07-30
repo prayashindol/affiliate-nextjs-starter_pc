@@ -32,6 +32,7 @@ import {
 import { StarIcon } from "@heroicons/react/20/solid";
 import AddToCart from "../../components/AddToCart";
 import SecurePaymentSeal from "../../components/SecurePaymentSeal";
+import Link from "next/link";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -111,14 +112,15 @@ export default function DigitalProduct({ product }) {
                   <MagnifyingGlassIcon aria-hidden="true" className="size-6" />
                 </a>
               </div>
-              <a href="/" className="flex">
+              {/* INTERNAL LINK */}
+              <Link href="/" className="flex">
                 <span className="sr-only">Your Company</span>
                 <img
                   alt=""
                   src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
                   className="h-8 w-auto"
                 />
-              </a>
+              </Link>
               <div className="flex flex-1 items-center justify-end">
                 <a href="#" className="hidden text-gray-700 hover:text-gray-800 lg:flex lg:items-center">
                   <span className="ml-3 block text-sm font-medium">USD</span>
@@ -295,6 +297,7 @@ export default function DigitalProduct({ product }) {
             </div>
           </div>
 
+          {/* RELATED PRODUCTS */}
           <section aria-labelledby="related-heading" className="mt-10 border-t border-gray-200 px-4 py-16 sm:px-0">
             <h2 id="related-heading" className="text-xl font-bold text-gray-900">
               Customers also bought
@@ -323,12 +326,13 @@ export default function DigitalProduct({ product }) {
                     </div>
                   </div>
                   <div className="mt-6">
-                    <a
+                    {/* INTERNAL LINK */}
+                    <Link
                       href={`/products/${rel.slug?.current}`}
                       className="relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
                     >
                       View Product
-                    </a>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -345,11 +349,14 @@ export default function DigitalProduct({ product }) {
           <div className="border-t border-gray-200 py-20">
             <div className="grid grid-cols-1 md:grid-flow-col md:auto-rows-min md:grid-cols-12 md:gap-x-8 md:gap-y-16">
               <div className="col-span-1 md:col-span-2 lg:col-start-1 lg:row-start-1">
-                <img
-                  alt=""
-                  src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                  className="h-8 w-auto"
-                />
+                {/* INTERNAL LINK */}
+                <Link href="/" className="flex">
+                  <img
+                    alt=""
+                    src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+                    className="h-8 w-auto"
+                  />
+                </Link>
               </div>
               <div className="col-span-6 mt-10 grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8 md:col-start-3 md:row-start-1 md:mt-0 lg:col-span-6 lg:col-start-2">
                 <div className="grid grid-cols-1 gap-y-12 sm:col-span-2 sm:grid-cols-2 sm:gap-x-8">
@@ -358,6 +365,7 @@ export default function DigitalProduct({ product }) {
                     <ul role="list" className="mt-6 space-y-6">
                       {footerNavigation.products.map((item) => (
                         <li key={item.name} className="text-sm">
+                          {/* You can use Link here if you change hrefs to internal URLs */}
                           <a href={item.href} className="text-gray-500 hover:text-gray-600">
                             {item.name}
                           </a>
