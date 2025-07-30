@@ -38,6 +38,7 @@ const navigation = [
     ],
   },
   { name: 'Industry News', href: '/news' },
+  { name: 'Blog', href: '/blog' },
   { name: 'About', href: '/about' },
   {
     name: 'Connect',
