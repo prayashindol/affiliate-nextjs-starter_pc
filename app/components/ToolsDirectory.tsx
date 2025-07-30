@@ -10,6 +10,28 @@ const fallbackEmojis: Record<string, string> = {
   default: "🛠️"
 };
 
+// Define a robust Tool interface for type safety
+interface Tool {
+  _id?: string;
+  Name?: string;
+  Domain?: string;
+  Website?: string;
+  AffiliateLink?: string;
+  Category?: string;
+  Badge?: string;
+  Highlight?: string;
+  Description?: string;
+  Rating?: number | string;
+  UserCount?: number | string;
+  Pricing?: string;
+  Pros?: string[] | string;
+  Cons?: string[] | string;
+  Features?: string[] | string;
+  DontShow?: boolean;
+  Featured?: boolean;
+  [key: string]: any; // fallback for unexpected fields
+}
+
 function generateStars(rating?: number) {
   if (!rating || isNaN(rating)) return null;
   const fullStars = Math.floor(rating);
@@ -32,7 +54,7 @@ function getLogoUrl(domain?: string, category?: string) {
   return fallbackEmojis[category || "default"];
 }
 
-function getButtonLink(tool: any) {
+function getButtonLink(tool: Tool) {
   const link = tool.AffiliateLink?.trim() || tool.Website?.trim() || tool.Domain?.trim() || "";
   if (!link) return "";
 
@@ -43,14 +65,14 @@ function getButtonLink(tool: any) {
   return `https://${link}`;
 }
 
-function cleanText(value: any) {
+function cleanText(value: unknown): string {
   if (!value) return "";
   if (typeof value === "number" && isNaN(value)) return "";
   if (typeof value === "string" && (value === "NaN" || value === "N/A")) return "";
-  return value;
+  return value as string;
 }
 
-function formatUserCount(userCount: any) {
+function formatUserCount(userCount: unknown): string {
   const cleaned = cleanText(userCount);
   return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
 }
@@ -59,8 +81,7 @@ type ToolsDirectoryProps = {
   featuredOnly?: boolean;
 };
 
-// Helper to get unique categories in useable form (TS safe)
-function getUniqueCategoriesFromTools(tools: any[]): string[] {
+function getUniqueCategoriesFromTools(tools: Tool[]): string[] {
   const cats = new Set<string>();
   tools.forEach(tool => {
     if (tool.Category && typeof tool.Category === 'string') {
@@ -71,7 +92,7 @@ function getUniqueCategoriesFromTools(tools: any[]): string[] {
 }
 
 export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
-  const [tools, setTools] = useState<any[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
@@ -84,7 +105,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
           data.map((rec: any) => ({
             ...rec.fields,
             _id: rec.id
-          }))
+          })) as Tool[]
         );
       })
       .finally(() => setLoading(false));
@@ -152,7 +173,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
           <div className="text-center text-gray-400 py-20">Loading tools…</div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredTools.map((tool) => {
+            {filteredTools.map((tool: Tool) => {
               const logo = getLogoUrl(tool.Domain, tool.Category);
 
               const features = Array.isArray(tool.Features)
