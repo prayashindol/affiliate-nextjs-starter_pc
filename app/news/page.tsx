@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MediaStackService } from '@/lib/services/mediastack';
 import { NewsArticle } from '@/lib/types/news';
 import { NewsCard } from '../components/NewsCard';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
@@ -23,9 +22,16 @@ export default function NewsPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await MediaStackService.getNewsByPage(page, articlesPerPage);
-      setArticles(response.data || []);
-      setTotalPages(Math.ceil((response.pagination?.total || 0) / articlesPerPage));
+      
+      const response = await fetch(`/api/news?page=${page}&limit=${articlesPerPage}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setArticles(data.data || []);
+      setTotalPages(Math.ceil((data.pagination?.total || 0) / articlesPerPage));
     } catch (err) {
       setError('Failed to load news. Please try again later.');
       console.error('Error fetching news:', err);
