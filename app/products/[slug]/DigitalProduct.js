@@ -1,32 +1,17 @@
 "use client";
 
-import { useState, Fragment } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
 import {
-  Bars3Icon,
-  HeartIcon,
   MagnifyingGlassIcon,
   MinusIcon,
   PlusIcon,
   ShoppingBagIcon,
-  UserIcon,
-  XMarkIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
@@ -110,14 +95,14 @@ export default function DigitalProduct({ product }) {
                   <MagnifyingGlassIcon aria-hidden="true" className="size-6" />
                 </a>
               </div>
-              <a href="/" className="flex">
+              <Link href="/" className="flex">
                 <span className="sr-only">Your Company</span>
                 <img
                   alt=""
                   src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
                   className="h-8 w-auto"
                 />
-              </a>
+              </Link>
               <div className="flex flex-1 items-center justify-end">
                 <a href="#" className="hidden text-gray-700 hover:text-gray-800 lg:flex lg:items-center">
                   <span className="ml-3 block text-sm font-medium">USD</span>
