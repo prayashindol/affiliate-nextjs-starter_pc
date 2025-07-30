@@ -31,6 +31,28 @@ interface PaymentInfo {
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
   const router = useRouter()
+  
+  // Check if cart contains only digital products
+  const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
+
+  // Redirect if cart is empty
+  if (state.items.length === 0) {
+    return (
+      <div className="min-h-screen py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Checkout</h1>
+          <p className="text-gray-600 mb-6">Your cart is empty. Please add some items before checkout.</p>
+          <Link 
+            href="/products" 
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Browse Products
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   const [formData, setFormData] = useState<CheckoutForm>({
     email: '',
     firstName: '',
@@ -55,7 +77,7 @@ export default function CheckoutPage() {
   // Check if cart contains only digital products
   const isDigitalOnly = state.items.length > 0 && state.items.every(item => item.type === 'digital')
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (unless in demo mode)
   if (state.items.length === 0) {
     return (
       <div className="min-h-screen py-12">
