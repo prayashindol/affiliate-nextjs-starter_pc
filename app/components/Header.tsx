@@ -68,9 +68,9 @@ export default function Header() {
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 flex items-center">
             <img
-              src="/STR New Logo-3.png"
+              src="/logo-2.svg"
               alt="STR Specialist"
-              className="h-18 w-auto"
+              className="h-8 w-auto"
               style={{ objectFit: 'contain' }}
             />
           </Link>
@@ -261,9 +261,9 @@ export default function Header() {
             <div className="flex items-center justify-between p-4 border-b">
               <Link href="/" className="flex items-center">
                 <img
-                  src="/STR New Logo-3.png"
+                  src="/logo-2.svg"
                   alt="STR Specialist"
-                  className="h-18 w-auto"
+                  className="h-8 w-auto"
                   style={{ objectFit: 'contain' }}
                 />
               </Link>
