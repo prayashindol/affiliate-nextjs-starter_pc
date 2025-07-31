@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 
 const fallbackEmojis: Record<string, string> = {
@@ -58,6 +58,10 @@ function getLogoUrl(domain?: string, category?: string) {
 function LogoImage({ src, alt, category }: { src: string; alt: string; category?: string }) {
   const [imageError, setImageError] = useState(false);
   
+  const handleError = useCallback(() => {
+    setImageError(true);
+  }, []);
+  
   if (imageError || !src.startsWith("http")) {
     return <span className="text-3xl">{fallbackEmojis[category || "default"]}</span>;
   }
@@ -70,7 +74,10 @@ function LogoImage({ src, alt, category }: { src: string; alt: string; category?
       height={32}
       className="h-8 w-8 object-contain rounded bg-gray-100"
       style={{ minWidth: 32 }}
-      onError={() => setImageError(true)}
+      onError={handleError}
+      loading="lazy"
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R4+XvLLKMC7Ct1MGtBi7k3KBa4J29ub/9k="
     />
   );
 }
@@ -95,6 +102,113 @@ function formatUserCount(userCount: unknown): string {
   const cleaned = cleanText(userCount);
   return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
 }
+
+// Memoized tool card component to prevent unnecessary re-renders
+const ToolCard = React.memo(function ToolCard({ tool }: { tool: Tool }) {
+  const logo = getLogoUrl(tool.Domain, tool.Category);
+
+  const features = useMemo(() => {
+    return Array.isArray(tool.Features)
+      ? tool.Features
+      : (typeof tool.Features === "string"
+        ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
+        : []);
+  }, [tool.Features]);
+
+  const pros = useMemo(() => {
+    return Array.isArray(tool.Pros)
+      ? tool.Pros
+      : (typeof tool.Pros === "string"
+        ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
+        : []);
+  }, [tool.Pros]);
+
+  const rating = useMemo(() => {
+    const r = typeof tool.Rating === "number"
+      ? tool.Rating
+      : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
+    return !isFinite(r) ? 0 : r;
+  }, [tool.Rating]);
+
+  const buttonLink = useMemo(() => getButtonLink(tool), [tool]);
+  const showButton = !!buttonLink;
+  const priceDisplay = cleanText(tool.Pricing) || "—";
+
+  return (
+    <div
+      className="bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col p-8 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
+    >
+      {/* Logo and tag row: flex, spaced */}
+      <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
+        {/* Logo left */}
+        <LogoImage 
+          src={logo}
+          alt={tool.Name || 'Tool logo'}
+          category={tool.Category}
+        />
+        {/* Tag right */}
+        {tool.Badge && (
+          <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-2 whitespace-nowrap">
+            {cleanText(tool.Badge)}
+          </span>
+        )}
+      </div>
+      {/* Name/title */}
+      <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>
+      {/* Highlight/subheadline */}
+      {cleanText(tool.Highlight) && (
+        <div className="text-base text-indigo-700 font-medium mb-2">{cleanText(tool.Highlight)}</div>
+      )}
+      {/* Description */}
+      <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
+      {/* Stars & User Count */}
+      <div className="flex items-center gap-2 mb-2">
+        {generateStars(rating)}
+        {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
+        <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
+      </div>
+      {/* Pros */}
+      {pros && pros.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {pros.map((pro: string) => (
+            <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
+          ))}
+        </div>
+      )}
+      {/* Features */}
+      {features && features.length > 0 && (
+        <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
+          {features.map((feature: string) => (
+            <li key={feature}>{feature}</li>
+          ))}
+        </ul>
+      )}
+      {/* Price & Button row */}
+      <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
+        <span
+          className="text-base text-gray-500 font-normal truncate max-w-[60%]"
+          title={priceDisplay}
+        >
+          {priceDisplay.startsWith('From') ? (
+            <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
+          ) : (
+            <span className="text-indigo-700 font-bold">{priceDisplay}</span>
+          )}
+        </span>
+        <a
+          href={showButton ? buttonLink : undefined}
+          target="_blank"
+          rel="noopener"
+          className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+          aria-disabled={!showButton}
+          tabIndex={showButton ? 0 : -1}
+        >
+          Try Now →
+        </a>
+      </div>
+    </div>
+  );
+});
 
 type ToolsDirectoryProps = {
   featuredOnly?: boolean;
@@ -163,6 +277,10 @@ export default function ToolsDirectoryClient({ featuredOnly = false, initialTool
     return displayTools.filter((tool) => tool.Category === activeCategory);
   }, [activeCategory, displayTools]);
 
+  const handleCategoryChange = useCallback((category: string) => {
+    setActiveCategory(category);
+  }, []);
+
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,7 +308,7 @@ export default function ToolsDirectoryClient({ featuredOnly = false, initialTool
                     : "bg-white text-gray-700 border-gray-200 hover:bg-indigo-50 hover:border-indigo-200"
                 }
               `}
-              onClick={() => setActiveCategory(cat.value)}
+              onClick={() => handleCategoryChange(cat.value)}
             >
               {cat.label}
             </button>
@@ -201,107 +319,9 @@ export default function ToolsDirectoryClient({ featuredOnly = false, initialTool
           <div className="text-center text-gray-400 py-20">Loading tools…</div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredTools.map((tool: Tool) => {
-              const logo = getLogoUrl(tool.Domain, tool.Category);
-
-              const features = Array.isArray(tool.Features)
-                ? tool.Features
-                : (typeof tool.Features === "string"
-                  ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
-                  : []);
-
-              const pros = Array.isArray(tool.Pros)
-                ? tool.Pros
-                : (typeof tool.Pros === "string"
-                  ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
-                  : []);
-
-              let rating = typeof tool.Rating === "number"
-                ? tool.Rating
-                : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
-
-if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 works for stars
-              const buttonLink = getButtonLink(tool);
-              const showButton = !!buttonLink;
-
-              const priceDisplay = cleanText(tool.Pricing) || "—";
-
-              return (
-                <div
-                  key={tool._id}
-                  className="bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col p-8 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
-                >
-                  {/* Logo and tag row: flex, spaced */}
-                  <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
-                    {/* Logo left */}
-                    <LogoImage 
-                      src={logo}
-                      alt={tool.Name || 'Tool logo'}
-                      category={tool.Category}
-                    />
-                    {/* Tag right */}
-                    {tool.Badge && (
-                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-2 whitespace-nowrap">
-                        {cleanText(tool.Badge)}
-                      </span>
-                    )}
-                  </div>
-                  {/* Name/title */}
-                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>
-                  {/* Highlight/subheadline */}
-                  {cleanText(tool.Highlight) && (
-                    <div className="text-base text-indigo-700 font-medium mb-2">{cleanText(tool.Highlight)}</div>
-                  )}
-                  {/* Description */}
-                  <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
-                  {/* Stars & User Count */}
-                  <div className="flex items-center gap-2 mb-2">
-                    {generateStars(rating)}
-                    {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
-                    <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
-                  </div>
-                  {/* Pros */}
-                  {pros && pros.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {pros.map((pro: string) => (
-                        <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
-                      ))}
-                    </div>
-                  )}
-                  {/* Features */}
-                  {features && features.length > 0 && (
-                    <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
-                      {features.map((feature: string) => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* Price & Button row */}
-                  <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
-                    <span
-                      className="text-base text-gray-500 font-normal truncate max-w-[60%]"
-                      title={priceDisplay}
-                    >
-                      {priceDisplay.startsWith('From') ? (
-                        <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
-                      ) : (
-                        <span className="text-indigo-700 font-bold">{priceDisplay}</span>
-                      )}
-                    </span>
-                    <a
-                      href={showButton ? buttonLink : undefined}
-                      target="_blank"
-                      rel="noopener"
-                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
-                      aria-disabled={!showButton}
-                      tabIndex={showButton ? 0 : -1}
-                    >
-                      Try Now →
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
+            {filteredTools.map((tool: Tool) => (
+              <ToolCard key={tool._id} tool={tool} />
+            ))}
           </div>
         )}
       </div>
