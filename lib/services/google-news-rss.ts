@@ -1,4 +1,5 @@
 import Parser from 'rss-parser';
+import sanitizeHtml from 'sanitize-html';
 import { MediaStackResponse, NewsArticle, NewsFilters } from '../types/news';
 
 // Define a type for RSS items to avoid any types
@@ -80,9 +81,8 @@ export class GoogleNewsRSSService {
   }
 
   private static cleanDescription(description: string): string {
-    // Remove HTML tags and clean up the description
-    return description
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
+    // Remove HTML tags and clean up the description using sanitize-html
+    return sanitizeHtml(description, { allowedTags: [], allowedAttributes: {} })
       .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
       .trim()
       .substring(0, MAX_DESCRIPTION_LENGTH) + (description.length > MAX_DESCRIPTION_LENGTH ? '...' : '');
