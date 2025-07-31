@@ -18,6 +18,7 @@ export interface UserOrder {
 
 export interface UserFavorite {
   id: string
+  itemId: string // Original item ID for identification
   type: 'tool' | 'post' | 'product'
   title: string
   url: string
@@ -116,8 +117,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setFavorites(prev => [newFavorite, ...prev])
   }
 
-  const removeFavorite = (id: string) => {
-    setFavorites(prev => prev.filter(fav => fav.id !== id))
+  const removeFavorite = (itemId: string) => {
+    setFavorites(prev => prev.filter(fav => fav.itemId !== itemId))
   }
 
   const updatePreferences = (prefs: Partial<UserPreferences>) => {

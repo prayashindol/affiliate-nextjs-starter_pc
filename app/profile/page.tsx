@@ -214,7 +214,7 @@ export default function ProfilePage() {
                             </p>
                           </div>
                           <button
-                            onClick={() => removeFavorite(favorite.id)}
+                            onClick={() => removeFavorite(favorite.itemId)}
                             className="ml-2 text-red-400 hover:text-red-600"
                           >
                             <HeartIconSolid className="h-5 w-5" />

@@ -21,7 +21,7 @@ export default function FavoriteButton({ item, className = '' }: FavoriteButtonP
   const { favorites, addFavorite, removeFavorite } = useUser()
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const isFavorited = favorites.some(fav => fav.id === item.id)
+  const isFavorited = favorites.some(fav => fav.itemId === item.id)
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -37,13 +37,10 @@ export default function FavoriteButton({ item, className = '' }: FavoriteButtonP
     
     try {
       if (isFavorited) {
-        const favorite = favorites.find(fav => fav.id === item.id)
-        if (favorite) {
-          removeFavorite(favorite.id)
-        }
+        removeFavorite(item.id)
       } else {
         addFavorite({
-          id: item.id,
+          itemId: item.id,
           type: item.type,
           title: item.title,
           url: item.url,
