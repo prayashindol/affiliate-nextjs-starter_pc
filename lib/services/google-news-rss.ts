@@ -48,18 +48,18 @@ export class GoogleNewsRSSService {
       gl: 'US',
       ceid: 'US:en'
     });
-    
+
     return `${GOOGLE_NEWS_RSS_BASE}?${params.toString()}`;
   }
 
   private static extractImageFromContent(item: RSSItem): string | undefined {
     // Try to extract image from various sources
-    
+
     // 1. Check media:content or media:thumbnail
     if (item.mediaContent && item.mediaContent.$ && item.mediaContent.$.url) {
       return item.mediaContent.$.url;
     }
-    
+
     if (item.mediaThumbnail && item.mediaThumbnail.$ && item.mediaThumbnail.$.url) {
       return item.mediaThumbnail.$.url;
     }
@@ -94,7 +94,7 @@ export class GoogleNewsRSSService {
 
   private static convertRSSItemToNewsArticle(item: RSSItem): NewsArticle {
     const cleanDesc = item.contentSnippet || item.description || '';
-    
+
     return {
       title: item.title || 'Untitled',
       description: this.cleanDescription(cleanDesc),
@@ -112,15 +112,15 @@ export class GoogleNewsRSSService {
     try {
       const keywords = filters.keywords || DEFAULT_KEYWORDS;
       const rssUrl = this.buildRSSUrl(keywords);
-      
+
       const feed = await this.parser.parseURL(rssUrl);
-      
+
       if (!feed.items || feed.items.length === 0) {
         throw new Error('No news items found in RSS feed');
       }
 
       // Convert RSS items to NewsArticle format
-      const articles: NewsArticle[] = feed.items.map((item: RSSItem) => 
+      const articles: NewsArticle[] = (feed.items as RSSItem[]).map((item) =>
         this.convertRSSItemToNewsArticle(item)
       );
 
@@ -142,7 +142,7 @@ export class GoogleNewsRSSService {
       };
     } catch (error) {
       console.error('Error fetching Google News RSS:', error);
-      
+
       // Fallback to sample data on error
       const fallbackData = await this.getFallbackNews(filters);
       return fallbackData;
