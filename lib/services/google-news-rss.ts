@@ -85,7 +85,7 @@ export class GoogleNewsRSSService {
       .replace(/<[^>]*>/g, '') // Remove HTML tags
       .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
       .trim()
-      .substring(0, 200) + (description.length > 200 ? '...' : '');
+      .substring(0, MAX_DESCRIPTION_LENGTH) + (description.length > MAX_DESCRIPTION_LENGTH ? '...' : '');
   }
 
   private static convertRSSItemToNewsArticle(item: RSSItem): NewsArticle {
