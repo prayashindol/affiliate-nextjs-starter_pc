@@ -76,7 +76,7 @@ export class GoogleNewsRSSService {
     }
 
     // 4. Fallback to a generic news placeholder image
-    return 'https://via.placeholder.com/400x250/4F46E5/FFFFFF?text=News+Article';
+    return `https://via.placeholder.com/${PLACEHOLDER_IMAGE_DIMENSIONS}/${PLACEHOLDER_IMAGE_COLOR}/FFFFFF?text=News+Article`;
   }
 
   private static cleanDescription(description: string): string {
