@@ -70,7 +70,7 @@ export default function Header() {
             <img
               src="/STR New Logo-3.png"
               alt="STR Specialist"
-              className="h-10 w-auto"
+              className="h-18 w-auto"
               style={{ objectFit: 'contain' }}
             />
           </Link>
@@ -263,7 +263,7 @@ export default function Header() {
                 <img
                   src="/STR New Logo-3.png"
                   alt="STR Specialist"
-                  className="h-10 w-auto"
+                  className="h-18 w-auto"
                   style={{ objectFit: 'contain' }}
                 />
               </Link>
