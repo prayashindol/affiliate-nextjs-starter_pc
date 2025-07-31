@@ -25,7 +25,7 @@ interface Tool {
 
 async function getTools() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/tools`, {
+    const res = await fetch(`${process.env.SITE_URL || "http://localhost:3000"}/api/tools`, {
       // Use ISR with revalidation
       next: { revalidate: 300 }, // Revalidate every 5 minutes
     });
