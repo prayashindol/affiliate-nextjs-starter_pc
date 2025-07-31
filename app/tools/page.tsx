@@ -1,6 +1,7 @@
 // /app/tools/page.tsx
 
 import React from "react";
+import ToolsDirectory from "../components/ToolsDirectory";
 
 interface Tool {
   Name?: string;
@@ -24,17 +25,35 @@ interface Tool {
 }
 
 async function getTools() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/tools`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch tools");
+  try {
+    // For server-side rendering, construct a full URL
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/tools`, {
+      // Enable caching for static generation
+      next: { revalidate: 300 }
+    });
+    if (!res.ok) {
+      throw new Error("Failed to fetch tools");
+    }
+    return res.json();
+  } catch (error) {
+    console.warn('Failed to fetch tools during build, will render client-side:', error);
+    return [];
   }
-  return res.json();
 }
 
 export default async function ToolsPage() {
   const records: { fields: Tool; id: string }[] = await getTools();
+
+  if (records.length === 0) {
+    // If no server-side data, use client-side component
+    return (
+      <main className="max-w-5xl mx-auto p-8">
+        <h1 className="text-3xl font-bold mb-6">All Tools & Resources</h1>
+        <ToolsDirectory />
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-5xl mx-auto p-8">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 const fallbackEmojis: Record<string, string> = {
   "Property Management": "🏢",
@@ -30,6 +30,15 @@ interface Tool {
   DontShow?: boolean;
   Featured?: boolean;
   [key: string]: unknown;
+}
+
+// Cache configuration
+const CACHE_KEY = 'tools_cache';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+interface CacheData {
+  data: Tool[];
+  timestamp: number;
 }
 
 function generateStars(rating?: number) {
@@ -89,27 +98,230 @@ function getUniqueCategoriesFromTools(tools: Tool[]): string[] {
   return Array.from(cats);
 }
 
+// Cache utilities
+function getCachedData(): Tool[] | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+    
+    const cacheData: CacheData = JSON.parse(cached);
+    const now = Date.now();
+    
+    if (now - cacheData.timestamp > CACHE_DURATION) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    
+    return cacheData.data;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedData(data: Tool[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const cacheData: CacheData = {
+      data,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+  } catch {
+    // Ignore cache errors
+  }
+}
+
+// Logo component with error handling and loading states
+function ToolLogo({ domain, category, name }: { domain?: string; category?: string; name?: string }) {
+  const [logoError, setLogoError] = useState(false);
+  const [logoLoading, setLogoLoading] = useState(true);
+  
+  const logoUrl = getLogoUrl(domain, category);
+  const isImageLogo = typeof logoUrl === "string" && logoUrl.startsWith("http");
+  
+  if (!isImageLogo) {
+    return <span className="text-3xl">{logoUrl}</span>;
+  }
+  
+  if (logoError) {
+    return <span className="text-3xl">{fallbackEmojis[category || "default"]}</span>;
+  }
+  
+  return (
+    <div className="relative h-8 w-8" style={{ minWidth: 32 }}>
+      {logoLoading && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded" />
+      )}
+      <img
+        src={logoUrl}
+        alt={name || 'Tool logo'}
+        className={`h-8 w-8 object-contain rounded bg-gray-100 ${logoLoading ? 'opacity-0' : 'opacity-100'}`}
+        onLoad={() => setLogoLoading(false)}
+        onError={() => {
+          setLogoError(true);
+          setLogoLoading(false);
+        }}
+      />
+    </div>
+  );
+}
+
+// Memoized tool card component to prevent unnecessary re-renders
+const ToolCard = React.memo(({ tool }: { tool: Tool }) => {
+  // Pre-process data to avoid computing on every render
+  const toolData = useMemo(() => {
+    const features = Array.isArray(tool.Features)
+      ? tool.Features
+      : (typeof tool.Features === "string"
+        ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
+        : []);
+
+    const pros = Array.isArray(tool.Pros)
+      ? tool.Pros
+      : (typeof tool.Pros === "string"
+        ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
+        : []);
+
+    let rating = typeof tool.Rating === "number"
+      ? tool.Rating
+      : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
+
+    if (!isFinite(rating)) rating = 0;
+    
+    const buttonLink = getButtonLink(tool);
+    const showButton = !!buttonLink;
+    const priceDisplay = cleanText(tool.Pricing) || "—";
+    
+    return {
+      features,
+      pros,
+      rating,
+      buttonLink,
+      showButton,
+      priceDisplay
+    };
+  }, [tool]);
+
+  return (
+    <div
+      className="bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col p-8 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
+    >
+      {/* Logo and tag row: flex, spaced */}
+      <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
+        {/* Logo left */}
+        <ToolLogo domain={tool.Domain} category={tool.Category} name={tool.Name} />
+        {/* Tag right */}
+        {tool.Badge && (
+          <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-2 whitespace-nowrap">
+            {cleanText(tool.Badge)}
+          </span>
+        )}
+      </div>
+      {/* Name/title */}
+      <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>
+      {/* Highlight/subheadline */}
+      {cleanText(tool.Highlight) && (
+        <div className="text-base text-indigo-700 font-medium mb-2">{cleanText(tool.Highlight)}</div>
+      )}
+      {/* Description */}
+      <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
+      {/* Stars & User Count */}
+      <div className="flex items-center gap-2 mb-2">
+        {generateStars(toolData.rating)}
+        {toolData.rating > 0 && <span className="text-gray-900 font-medium text-base">{toolData.rating}</span>}
+        <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
+      </div>
+      {/* Pros */}
+      {toolData.pros && toolData.pros.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {toolData.pros.map((pro: string) => (
+            <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
+          ))}
+        </div>
+      )}
+      {/* Features */}
+      {toolData.features && toolData.features.length > 0 && (
+        <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
+          {toolData.features.map((feature: string) => (
+            <li key={feature}>{feature}</li>
+          ))}
+        </ul>
+      )}
+      {/* Price & Button row */}
+      <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
+        <span
+          className="text-base text-gray-500 font-normal truncate max-w-[60%]"
+          title={toolData.priceDisplay}
+        >
+          {toolData.priceDisplay.startsWith('From') ? (
+            <>From <span className="text-indigo-700 font-bold">{toolData.priceDisplay.replace('From ', '')}</span></>
+          ) : (
+            <span className="text-indigo-700 font-bold">{toolData.priceDisplay}</span>
+          )}
+        </span>
+        <a
+          href={toolData.showButton ? toolData.buttonLink : undefined}
+          target="_blank"
+          rel="noopener"
+          className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${toolData.showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+          aria-disabled={!toolData.showButton}
+          tabIndex={toolData.showButton ? 0 : -1}
+        >
+          Try Now →
+        </a>
+      </div>
+    </div>
+  );
+});
+
+ToolCard.displayName = 'ToolCard';
+
 export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
   const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/tools')
-      .then(res => res.json())
-      .then(data => {
-        setTools(
-          (data as { fields: Tool; id: string }[]).map((rec) => ({
-            ...rec.fields,
-            _id: rec.id
-          }))
-        );
-      })
-      .finally(() => setLoading(false));
+  const fetchTools = useCallback(async () => {
+    // Check cache first
+    const cachedData = getCachedData();
+    if (cachedData) {
+      setTools(cachedData);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const res = await fetch('/api/tools');
+      if (!res.ok) {
+        throw new Error(`Failed to fetch tools: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      const transformedTools = data.map((rec: { fields: Tool; id: string }) => ({
+        ...rec.fields,
+        _id: rec.id
+      }));
+      
+      setTools(transformedTools);
+      setCachedData(transformedTools);
+    } catch (err) {
+      console.error('Error fetching tools:', err);
+      setError('Failed to load tools. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Filter: Don'tShow, Featured
+  useEffect(() => {
+    fetchTools();
+  }, [fetchTools]);
+
+  // Filter: Don'tShow, Featured - memoized with dependency array
   const displayTools = useMemo(() => {
     let result = tools.filter((tool) => !tool.DontShow);
     if (featuredOnly) {
@@ -127,11 +339,30 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
     ];
   }, [displayTools]);
 
-  // Filter tools for grid (category)
+  // Filter tools for grid (category) - memoized with specific dependencies
   const filteredTools = useMemo(() => {
     if (activeCategory === "all") return displayTools;
     return displayTools.filter((tool) => tool.Category === activeCategory);
   }, [activeCategory, displayTools]);
+
+  // Error state
+  if (error) {
+    return (
+      <section id="tools" className="bg-gray-50 py-24 sm:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button 
+              onClick={fetchTools}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="tools" className="bg-gray-50 py-24 sm:py-32">
@@ -168,115 +399,18 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
         </div>
         {/* Loading state */}
         {loading ? (
-          <div className="text-center text-gray-400 py-20">Loading tools…</div>
+          <div className="text-center text-gray-400 py-20">
+            <div className="animate-pulse">Loading tools…</div>
+          </div>
+        ) : filteredTools.length === 0 ? (
+          <div className="text-center text-gray-400 py-20">
+            No tools found for the selected category.
+          </div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredTools.map((tool: Tool) => {
-              const logo = getLogoUrl(tool.Domain, tool.Category);
-
-              const features = Array.isArray(tool.Features)
-                ? tool.Features
-                : (typeof tool.Features === "string"
-                  ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
-                  : []);
-
-              const pros = Array.isArray(tool.Pros)
-                ? tool.Pros
-                : (typeof tool.Pros === "string"
-                  ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
-                  : []);
-
-              let rating = typeof tool.Rating === "number"
-                ? tool.Rating
-                : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
-
-if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 works for stars
-              const buttonLink = getButtonLink(tool);
-              const showButton = !!buttonLink;
-
-              const priceDisplay = cleanText(tool.Pricing) || "—";
-
-              return (
-                <div
-                  key={tool._id}
-                  className="bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col p-8 hover:shadow-2xl hover:scale-[1.025] transition-all duration-200 min-h-[440px]"
-                >
-                  {/* Logo and tag row: flex, spaced */}
-                  <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
-                    {/* Logo left */}
-                    {typeof logo === "string" && logo.startsWith("http") ? (
-                      <img
-                        src={logo}
-                        alt={tool.Name}
-                        className="h-8 w-8 object-contain rounded bg-gray-100"
-                        style={{ minWidth: 32 }}
-                      />
-                    ) : (
-                      <span className="text-3xl">{logo}</span>
-                    )}
-                    {/* Tag right */}
-                    {tool.Badge && (
-                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-2 whitespace-nowrap">
-                        {cleanText(tool.Badge)}
-                      </span>
-                    )}
-                  </div>
-                  {/* Name/title */}
-                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>
-                  {/* Highlight/subheadline */}
-                  {cleanText(tool.Highlight) && (
-                    <div className="text-base text-indigo-700 font-medium mb-2">{cleanText(tool.Highlight)}</div>
-                  )}
-                  {/* Description */}
-                  <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
-                  {/* Stars & User Count */}
-                  <div className="flex items-center gap-2 mb-2">
-                    {generateStars(rating)}
-                    {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
-                    <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
-                  </div>
-                  {/* Pros */}
-                  {pros && pros.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {pros.map((pro: string) => (
-                        <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
-                      ))}
-                    </div>
-                  )}
-                  {/* Features */}
-                  {features && features.length > 0 && (
-                    <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
-                      {features.map((feature: string) => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* Price & Button row */}
-                  <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
-                    <span
-                      className="text-base text-gray-500 font-normal truncate max-w-[60%]"
-                      title={priceDisplay}
-                    >
-                      {priceDisplay.startsWith('From') ? (
-                        <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
-                      ) : (
-                        <span className="text-indigo-700 font-bold">{priceDisplay}</span>
-                      )}
-                    </span>
-                    <a
-                      href={showButton ? buttonLink : undefined}
-                      target="_blank"
-                      rel="noopener"
-                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
-                      aria-disabled={!showButton}
-                      tabIndex={showButton ? 0 : -1}
-                    >
-                      Try Now →
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
+            {filteredTools.map((tool: Tool) => (
+              <ToolCard key={tool._id} tool={tool} />
+            ))}
           </div>
         )}
       </div>
