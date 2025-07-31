@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import FavoriteButton from './FavoriteButton';
 
 const fallbackEmojis: Record<string, string> = {
   "Property Management": "🏢",
@@ -204,22 +205,35 @@ if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 work
                   {/* Logo and tag row: flex, spaced */}
                   <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
                     {/* Logo left */}
-                    {typeof logo === "string" && logo.startsWith("http") ? (
-                      <img
-                        src={logo}
-                        alt={tool.Name}
-                        className="h-8 w-8 object-contain rounded bg-gray-100"
-                        style={{ minWidth: 32 }}
+                    <div className="flex items-center gap-2">
+                      {typeof logo === "string" && logo.startsWith("http") ? (
+                        <img
+                          src={logo}
+                          alt={tool.Name}
+                          className="h-8 w-8 object-contain rounded bg-gray-100"
+                          style={{ minWidth: 32 }}
+                        />
+                      ) : (
+                        <span className="text-3xl">{logo}</span>
+                      )}
+                    </div>
+                    {/* Favorite and Tag right */}
+                    <div className="flex items-center gap-2">
+                      <FavoriteButton 
+                        item={{
+                          id: tool._id || tool.Name || '',
+                          title: tool.Name || '',
+                          type: 'tool',
+                          url: tool.Website || tool.AffiliateLink || '#'
+                        }}
+                        className="text-gray-400 hover:text-red-500"
                       />
-                    ) : (
-                      <span className="text-3xl">{logo}</span>
-                    )}
-                    {/* Tag right */}
-                    {tool.Badge && (
-                      <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-2 whitespace-nowrap">
-                        {cleanText(tool.Badge)}
-                      </span>
-                    )}
+                      {tool.Badge && (
+                        <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+                          {cleanText(tool.Badge)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {/* Name/title */}
                   <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>

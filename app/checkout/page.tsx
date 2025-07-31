@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
+import { useUser } from '../context/UserContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -30,6 +31,7 @@ interface PaymentInfo {
 
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
+  const { addOrder } = useUser()
   const router = useRouter()
 
   const [formData, setFormData] = useState<CheckoutForm>({
@@ -177,6 +179,18 @@ export default function CheckoutPage() {
 
       // Store in localStorage for the confirmation page
       localStorage.setItem('orderData', JSON.stringify(orderData))
+
+      // Add to user's order history
+      addOrder({
+        items: state.items.map(item => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        total: state.total,
+        status: 'completed'
+      })
 
       // Clear cart
       clearCart()
