@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Parser = require('rss-parser');
+import Parser from 'rss-parser';
 import { MediaStackResponse, NewsArticle, NewsFilters } from '../types/news';
 
 // Define a type for RSS items to avoid any types
