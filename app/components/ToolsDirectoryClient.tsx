@@ -251,7 +251,12 @@ export default function ToolsDirectoryClient({ featuredOnly = false, initialTool
     } else {
       setLoading(false);
     }
-  }, [initialTools.length]);
+  const [loading, setLoading] = useState(false);
+
+  // Remove fallback client-side fetching logic. If initialTools changes, update tools.
+  useEffect(() => {
+    setTools(initialTools);
+  }, [initialTools]);
 
   // Filter: Don'tShow, Featured
   const displayTools = useMemo(() => {
