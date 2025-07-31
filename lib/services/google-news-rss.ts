@@ -53,32 +53,35 @@ export class GoogleNewsRSSService {
   }
 
   private static extractImageFromContent(item: RSSItem): string | undefined {
-    // Try to extract image from various sources
+  // Try to extract a real image from various sources
 
-    // 1. Check media:content or media:thumbnail
-    if (item.mediaContent && item.mediaContent.$ && item.mediaContent.$.url) {
-      return item.mediaContent.$.url;
-    }
+  // 1. Check media:content or media:thumbnail
+  if (item.mediaContent && item.mediaContent.$ && item.mediaContent.$.url) {
+    return item.mediaContent.$.url;
+  }
 
-    if (item.mediaThumbnail && item.mediaThumbnail.$ && item.mediaThumbnail.$.url) {
-      return item.mediaThumbnail.$.url;
-    }
+  if (item.mediaThumbnail && item.mediaThumbnail.$ && item.mediaThumbnail.$.url) {
+    return item.mediaThumbnail.$.url;
+  }
 
-    // 2. Check enclosure for images
-    if (item.enclosure && item.enclosure.url && item.enclosure.type?.startsWith('image/')) {
-      return item.enclosure.url;
-    }
+  // 2. Check enclosure for images
+  if (item.enclosure && item.enclosure.url && item.enclosure.type?.startsWith('image/')) {
+    return item.enclosure.url;
+  }
 
-    // 3. Try to extract image from description or content
-    const content = item.contentEncoded || item.description || item.content || '';
-    if (content) {
-      // Look for img tags in the content
-      const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
-      const match = content.match(imgRegex);
-      if (match && match[1]) {
-        return match[1];
-      }
+  // 3. Try to extract image from description or content
+  const content = item.contentEncoded || item.description || item.content || '';
+  if (content) {
+    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
+    const match = content.match(imgRegex);
+    if (match && match[1]) {
+      return match[1];
     }
+  }
+
+  // 4. No valid image found
+  return undefined;
+}
 
     // 4. Fallback to a generic news placeholder image
     return `https://via.placeholder.com/${PLACEHOLDER_IMAGE_DIMENSIONS}/${PLACEHOLDER_IMAGE_COLOR}/FFFFFF?text=News+Article`;
