@@ -52,8 +52,13 @@ export default function ProfilePage() {
     }
   }
 
-  const handlePreferenceChange = (key: keyof typeof preferences, value: boolean) => {
-    updatePreferences({ [key]: value })
+  const handlePreferenceChange = async (key: keyof typeof preferences, value: boolean) => {
+    try {
+      await updatePreferences({ [key]: value })
+    } catch (error) {
+      console.error('Failed to update preference:', error)
+      // Could show an error message to the user here
+    }
   }
 
   if (status === 'loading') {

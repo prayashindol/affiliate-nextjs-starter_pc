@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { FaGoogle } from 'react-icons/fa'
+import { FaGoogle, FaGithub } from 'react-icons/fa'
 import Link from 'next/link'
 
 export default function LoginPage() {
@@ -25,6 +25,27 @@ export default function LoginPage() {
       setError('')
       
       const result = await signIn('google', {
+        callbackUrl: '/profile',
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Failed to sign in. Please try again.')
+      }
+    } catch (error) {
+      console.error('Sign in error:', error)
+      setError('An unexpected error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGitHubSignIn = async () => {
+    try {
+      setIsLoading(true)
+      setError('')
+      
+      const result = await signIn('github', {
         callbackUrl: '/profile',
         redirect: false,
       })
@@ -77,7 +98,7 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-6">
-            <div>
+            <div className="space-y-3">
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
@@ -85,6 +106,15 @@ export default function LoginPage() {
               >
                 <FaGoogle className="h-5 w-5 text-red-500" />
                 {isLoading ? 'Signing in...' : 'Continue with Google'}
+              </button>
+
+              <button
+                onClick={handleGitHubSignIn}
+                disabled={isLoading}
+                className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <FaGithub className="h-5 w-5 text-gray-800" />
+                {isLoading ? 'Signing in...' : 'Continue with GitHub'}
               </button>
             </div>
 

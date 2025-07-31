@@ -40,7 +40,7 @@ interface UserContextType {
   addOrder: (order: Omit<UserOrder, 'id' | 'date'>) => void
   addFavorite: (favorite: Omit<UserFavorite, 'id' | 'dateAdded'>) => void
   removeFavorite: (id: string) => void
-  updatePreferences: (prefs: Partial<UserPreferences>) => void
+  updatePreferences: (prefs: Partial<UserPreferences>) => Promise<void>
   deleteAccount: () => Promise<void>
   isLoading: boolean
 }
@@ -121,30 +121,61 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setFavorites(prev => prev.filter(fav => fav.itemId !== itemId))
   }
 
-  const updatePreferences = (prefs: Partial<UserPreferences>) => {
-    setPreferences(prev => ({ ...prev, ...prefs }))
+  const updatePreferences = async (prefs: Partial<UserPreferences>) => {
+    try {
+      const response = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ preferences: { ...preferences, ...prefs } }),
+      })
+
+      if (response.ok) {
+        setPreferences(prev => ({ ...prev, ...prefs }))
+      } else {
+        console.error('Failed to update preferences')
+      }
+    } catch (error) {
+      console.error('Error updating preferences:', error)
+      // Fallback to local update
+      setPreferences(prev => ({ ...prev, ...prefs }))
+    }
   }
 
   const deleteAccount = async () => {
-    if (session?.user?.id) {
-      const userId = session.user.id
-      // Clear all user data
-      localStorage.removeItem(`orders_${userId}`)
-      localStorage.removeItem(`favorites_${userId}`)
-      localStorage.removeItem(`preferences_${userId}`)
-      
-      // Reset state
-      setOrders([])
-      setFavorites([])
-      setPreferences({
-        newsletter: false,
-        emailNotifications: true,
-        marketingEmails: false,
+    try {
+      const response = await fetch('/api/user', {
+        method: 'DELETE',
       })
-      
-      // Sign out the user
-      const { signOut } = await import('next-auth/react')
-      await signOut({ callbackUrl: '/' })
+
+      if (response.ok) {
+        if (session?.user?.id) {
+          const userId = session.user.id
+          // Clear all user data
+          localStorage.removeItem(`orders_${userId}`)
+          localStorage.removeItem(`favorites_${userId}`)
+          localStorage.removeItem(`preferences_${userId}`)
+          
+          // Reset state
+          setOrders([])
+          setFavorites([])
+          setPreferences({
+            newsletter: false,
+            emailNotifications: true,
+            marketingEmails: false,
+          })
+        }
+        
+        // Sign out the user
+        const { signOut } = await import('next-auth/react')
+        await signOut({ callbackUrl: '/' })
+      } else {
+        throw new Error('Failed to delete account')
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error)
+      throw error
     }
   }
 
