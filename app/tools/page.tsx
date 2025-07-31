@@ -24,13 +24,22 @@ interface Tool {
 }
 
 async function getTools() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/tools`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch tools");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/tools`, {
+      // Use ISR with revalidation
+      next: { revalidate: 300 }, // Revalidate every 5 minutes
+    });
+    
+    if (!res.ok) {
+      throw new Error("Failed to fetch tools");
+    }
+    
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching tools:', error);
+    // Return empty array as fallback
+    return [];
   }
-  return res.json();
 }
 
 export default async function ToolsPage() {

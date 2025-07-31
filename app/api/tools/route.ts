@@ -10,18 +10,28 @@ export async function GET() {
     return NextResponse.json({ error: "Missing Airtable token" }, { status: 500 });
   }
 
-  const res = await fetch(AIRTABLE_API_URL, {
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-    },
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(AIRTABLE_API_URL, {
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+      },
+      // Cache for 5 minutes to improve performance
+      next: { revalidate: 300 },
+    });
 
-  if (!res.ok) {
-    return NextResponse.json({ error: "Failed to fetch Airtable data" }, { status: 500 });
+    if (!res.ok) {
+      return NextResponse.json({ error: "Failed to fetch Airtable data" }, { status: 500 });
+    }
+
+    const data = await res.json();
+
+    // Set cache headers for client-side caching
+    const response = NextResponse.json(data.records);
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    
+    return response;
+  } catch (error) {
+    console.error('Error fetching tools:', error);
+    return NextResponse.json({ error: "Failed to fetch tools data" }, { status: 500 });
   }
-
-  const data = await res.json();
-
-  return NextResponse.json(data.records);
 }

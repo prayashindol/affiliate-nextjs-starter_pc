@@ -4,6 +4,7 @@ const nextConfig = {
     domains: [
       'images.unsplash.com',
       'via.placeholder.com',
+      'logo.clearbit.com',
       // add any other domains you need for your remote images
     ],
   },
