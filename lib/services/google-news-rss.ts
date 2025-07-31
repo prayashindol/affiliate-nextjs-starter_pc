@@ -1,3 +1,6 @@
+const PLACEHOLDER_IMAGE_DIMENSIONS = "300x200"; // or whatever dimensions you want
+const PLACEHOLDER_IMAGE_COLOR = "CCCCCC"; // (also define this if it isn't already)
+
 import Parser from 'rss-parser';
 import sanitizeHtml from 'sanitize-html';
 import { MediaStackResponse, NewsArticle, NewsFilters } from '../types/news';
