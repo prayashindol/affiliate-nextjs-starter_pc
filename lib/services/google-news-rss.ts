@@ -27,7 +27,8 @@ interface RSSItem {
 // Google News RSS URL with vacation rental and Airbnb related keywords
 const GOOGLE_NEWS_RSS_BASE = 'https://news.google.com/rss/search';
 
-const DEFAULT_KEYWORDS = 'airbnb OR vrbo OR "short term rental" OR "vacation rental" OR "short-term rental" OR "rental property" OR "home sharing"';
+const DEFAULT_KEYWORDS =
+  'airbnb OR vrbo OR "short term rental" OR "vacation rental" OR "short-term rental" OR "rental property" OR "home sharing"';
 
 export class GoogleNewsRSSService {
   private static parser = new Parser({
@@ -36,9 +37,9 @@ export class GoogleNewsRSSService {
         ['media:content', 'mediaContent'],
         ['media:thumbnail', 'mediaThumbnail'],
         ['content:encoded', 'contentEncoded'],
-        ['description', 'description']
-      ]
-    }
+        ['description', 'description'],
+      ],
+    },
   });
 
   private static buildRSSUrl(keywords: string = DEFAULT_KEYWORDS): string {
@@ -46,53 +47,50 @@ export class GoogleNewsRSSService {
       q: keywords,
       hl: 'en-US',
       gl: 'US',
-      ceid: 'US:en'
+      ceid: 'US:en',
     });
 
     return `${GOOGLE_NEWS_RSS_BASE}?${params.toString()}`;
   }
 
   private static extractImageFromContent(item: RSSItem): string | undefined {
-  // Try to extract a real image from various sources
-
-  // 1. Check media:content or media:thumbnail
-  if (item.mediaContent && item.mediaContent.$ && item.mediaContent.$.url) {
-    return item.mediaContent.$.url;
-  }
-
-  if (item.mediaThumbnail && item.mediaThumbnail.$ && item.mediaThumbnail.$.url) {
-    return item.mediaThumbnail.$.url;
-  }
-
-  // 2. Check enclosure for images
-  if (item.enclosure && item.enclosure.url && item.enclosure.type?.startsWith('image/')) {
-    return item.enclosure.url;
-  }
-
-  // 3. Try to extract image from description or content
-  const content = item.contentEncoded || item.description || item.content || '';
-  if (content) {
-    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
-    const match = content.match(imgRegex);
-    if (match && match[1]) {
-      return match[1];
+    // 1. Check media:content or media:thumbnail
+    if (item.mediaContent && item.mediaContent.$ && item.mediaContent.$.url) {
+      return item.mediaContent.$.url;
     }
-  }
 
-  // 4. No valid image found
-  return undefined;
-}
+    if (item.mediaThumbnail && item.mediaThumbnail.$ && item.mediaThumbnail.$.url) {
+      return item.mediaThumbnail.$.url;
+    }
 
-    // 4. Fallback to a generic news placeholder image
-    return `https://via.placeholder.com/${PLACEHOLDER_IMAGE_DIMENSIONS}/${PLACEHOLDER_IMAGE_COLOR}/FFFFFF?text=News+Article`;
+    // 2. Check enclosure for images
+    if (item.enclosure && item.enclosure.url && item.enclosure.type?.startsWith('image/')) {
+      return item.enclosure.url;
+    }
+
+    // 3. Try to extract image from description or content
+    const content = item.contentEncoded || item.description || item.content || '';
+    if (content) {
+      const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
+      const match = content.match(imgRegex);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    // 4. No valid image found
+    return undefined;
   }
 
   private static cleanDescription(description: string): string {
     // Remove HTML tags and clean up the description using sanitize-html
-    return sanitizeHtml(description, { allowedTags: [], allowedAttributes: {} })
-      .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
-      .trim()
-      .substring(0, MAX_DESCRIPTION_LENGTH) + (description.length > MAX_DESCRIPTION_LENGTH ? '...' : '');
+    return (
+      sanitizeHtml(description, { allowedTags: [], allowedAttributes: {} })
+        .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
+        .trim()
+        .substring(0, MAX_DESCRIPTION_LENGTH) +
+      (description.length > MAX_DESCRIPTION_LENGTH ? '...' : '')
+    );
   }
 
   private static convertRSSItemToNewsArticle(item: RSSItem): NewsArticle {
@@ -107,7 +105,7 @@ export class GoogleNewsRSSService {
       language: 'en',
       country: 'us',
       published_at: item.pubDate || item.isoDate || new Date().toISOString(),
-      image: this.extractImageFromContent(item)
+      image: this.extractImageFromContent(item),
     };
   }
 
@@ -139,9 +137,9 @@ export class GoogleNewsRSSService {
           limit,
           offset,
           count: paginatedArticles.length,
-          total: articles.length
+          total: articles.length,
         },
-        data: paginatedArticles
+        data: paginatedArticles,
       };
     } catch (error) {
       console.error('Error fetching Google News RSS:', error);
@@ -152,8 +150,9 @@ export class GoogleNewsRSSService {
     }
   }
 
-  // RESTORED FULL IMPLEMENTATION BELOW
-  private static async getFallbackNews(filters: NewsFilters = {}): Promise<MediaStackResponse> {
+  private static async getFallbackNews(
+    filters: NewsFilters = {}
+  ): Promise<MediaStackResponse> {
     const FALLBACK_NEWS_DATA: NewsArticle[] = [
       {
         title: "Airbnb Reports Strong Q4 2024 Performance with Host Earnings Reaching $2B",
@@ -166,7 +165,6 @@ export class GoogleNewsRSSService {
         published_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
         image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=250&fit=crop&crop=faces"
       },
-      // ... (all the other fallback articles unchanged)
       {
         title: "Vacation Rental Photography: Tips for Stunning Property Listings",
         description: "Professional photography techniques help hosts showcase their properties effectively and attract more bookings.",
@@ -191,17 +189,22 @@ export class GoogleNewsRSSService {
         limit,
         offset,
         count: paginatedData.length,
-        total: FALLBACK_NEWS_DATA.length
+        total: FALLBACK_NEWS_DATA.length,
       },
-      data: paginatedData
+      data: paginatedData,
     };
   }
 
-  static async getLatestNews(limit: number = 6): Promise<MediaStackResponse> {
+  static async getLatestNews(
+    limit: number = 6
+  ): Promise<MediaStackResponse> {
     return this.fetchNews({ limit });
   }
 
-  static async getNewsByPage(page: number = 1, limit: number = 20): Promise<MediaStackResponse> {
+  static async getNewsByPage(
+    page: number = 1,
+    limit: number = 20
+  ): Promise<MediaStackResponse> {
     const offset = (page - 1) * limit;
     return this.fetchNews({ limit, offset });
   }
