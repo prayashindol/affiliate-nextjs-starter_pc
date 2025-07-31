@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 
 const fallbackEmojis: Record<string, string> = {
   "Property Management": "🏢",
@@ -132,10 +133,9 @@ function setCachedData(data: Tool[]): void {
   }
 }
 
-// Logo component with error handling and loading states
+// Logo component with error handling and loading states using Next.js Image
 function ToolLogo({ domain, category, name }: { domain?: string; category?: string; name?: string }) {
   const [logoError, setLogoError] = useState(false);
-  const [logoLoading, setLogoLoading] = useState(true);
   
   const logoUrl = getLogoUrl(domain, category);
   const isImageLogo = typeof logoUrl === "string" && logoUrl.startsWith("http");
@@ -149,19 +149,19 @@ function ToolLogo({ domain, category, name }: { domain?: string; category?: stri
   }
   
   return (
-    <div className="relative h-8 w-8" style={{ minWidth: 32 }}>
-      {logoLoading && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded" />
-      )}
-      <img
+    <div className="relative h-8 w-8 bg-gray-100 rounded overflow-hidden" style={{ minWidth: 32 }}>
+      <Image
         src={logoUrl}
         alt={name || 'Tool logo'}
-        className={`h-8 w-8 object-contain rounded bg-gray-100 ${logoLoading ? 'opacity-0' : 'opacity-100'}`}
-        onLoad={() => setLogoLoading(false)}
-        onError={() => {
-          setLogoError(true);
-          setLogoLoading(false);
-        }}
+        width={32}
+        height={32}
+        className="object-contain"
+        placeholder="blur"
+        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRjNGNEY2Ii8+Cjwvc3ZnPgo="
+        onError={() => setLogoError(true)}
+        loading="lazy"
+        sizes="32px"
+        unoptimized={false}
       />
     </div>
   );
@@ -283,7 +283,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTools = useCallback(async () => {
+  const fetchTools = useCallback(async (retryCount = 0) => {
     // Check cache first
     const cachedData = getCachedData();
     if (cachedData) {
@@ -296,12 +296,29 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       setLoading(true);
       setError(null);
       
-      const res = await fetch('/api/tools');
+      // Add timeout for client-side requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+      const res = await fetch('/api/tools', {
+        signal: controller.signal,
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
       if (!res.ok) {
-        throw new Error(`Failed to fetch tools: ${res.status}`);
+        throw new Error(`Failed to fetch tools: ${res.status} ${res.statusText}`);
       }
       
       const data = await res.json();
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received');
+      }
+      
       const transformedTools = data.map((rec: { fields: Tool; id: string }) => ({
         ...rec.fields,
         _id: rec.id
@@ -311,7 +328,21 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
       setCachedData(transformedTools);
     } catch (err) {
       console.error('Error fetching tools:', err);
-      setError('Failed to load tools. Please try again later.');
+      
+      // Retry logic for network errors (max 2 retries)
+      if (retryCount < 2 && (
+        err instanceof Error && (
+          err.name === 'AbortError' || 
+          err.message.includes('fetch') ||
+          err.message.includes('network')
+        )
+      )) {
+        console.log(`Retrying fetch tools (attempt ${retryCount + 1})`);
+        setTimeout(() => fetchTools(retryCount + 1), 1000 * (retryCount + 1)); // Progressive delay
+        return;
+      }
+      
+      setError('Failed to load tools. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -353,7 +384,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
             <button 
-              onClick={fetchTools}
+              onClick={() => fetchTools()}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
             >
               Retry
@@ -397,10 +428,32 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
             </button>
           ))}
         </div>
-        {/* Loading state */}
+        {/* Loading state with skeleton */}
         {loading ? (
-          <div className="text-center text-gray-400 py-20">
-            <div className="animate-pulse">Loading tools…</div>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 min-h-[440px]">
+                <div className="animate-pulse">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                    <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+                  </div>
+                  <div className="h-6 w-3/4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 w-1/2 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-16 w-full bg-gray-200 rounded mb-2"></div>
+                  <div className="flex gap-2 mb-2">
+                    <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-8 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="mt-auto pt-4">
+                    <div className="flex justify-between items-center">
+                      <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                      <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredTools.length === 0 ? (
           <div className="text-center text-gray-400 py-20">

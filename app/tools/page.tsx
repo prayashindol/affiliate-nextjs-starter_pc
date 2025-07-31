@@ -28,16 +28,30 @@ async function getTools() {
   try {
     // For server-side rendering, construct a full URL
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    
+    // Add timeout for server-side requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout for SSR
+    
     const res = await fetch(`${baseUrl}/api/tools`, {
       // Enable caching for static generation
-      next: { revalidate: 300 }
+      next: { revalidate: 300 },
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'NextJS-SSR/1.0',
+      }
     });
+    
+    clearTimeout(timeoutId);
+    
     if (!res.ok) {
-      throw new Error("Failed to fetch tools");
+      throw new Error(`HTTP error! status: ${res.status}`);
     }
-    return res.json();
+    
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.warn('Failed to fetch tools during build, will render client-side:', error);
+    console.warn('Failed to fetch tools during SSR, will render client-side:', error instanceof Error ? error.message : 'Unknown error');
     return [];
   }
 }
