@@ -1,5 +1,6 @@
 import { NewsArticle } from '@/lib/types/news';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CalendarIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 
 interface NewsCardProps {
@@ -27,14 +28,17 @@ export function NewsCard({ article, variant = 'default', showImage = true }: New
     `}>
       {showImage && article.image && (
         <div className={`relative ${isCompact ? 'h-32' : 'h-48'} overflow-hidden`}>
-          <img
+          <Image
             src={article.image}
             alt={article.title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
             }}
+            priority={!isCompact}
           />
         </div>
       )}
