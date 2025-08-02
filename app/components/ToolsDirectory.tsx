@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import Image from 'next/image';
 import FavoriteButton from './FavoriteButton';
 
 const fallbackEmojis: Record<string, string> = {
@@ -47,33 +48,11 @@ function generateStars(rating?: number) {
   );
 }
 
-function getLogoUrl(domain?: string, category?: string) {
-  if (domain && domain !== "N/A") {
-    const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
-    return `https://logo.clearbit.com/${cleanDomain}`;
-  }
-  return fallbackEmojis[category || "default"];
-}
-
-function getButtonLink(tool: Tool) {
-  const link = tool.AffiliateLink?.toString().trim() || tool.Website?.toString().trim() || tool.Domain?.toString().trim() || "";
-  if (!link) return "";
-  if (/^https?:\/\//i.test(link)) {
-    return link;
-  }
-  return `https://${link}`;
-}
-
 function cleanText(value: unknown): string {
   if (!value) return "";
   if (typeof value === "number" && isNaN(value)) return "";
   if (typeof value === "string" && (value === "NaN" || value === "N/A")) return "";
   return value as string;
-}
-
-function formatUserCount(userCount: unknown): string {
-  const cleaned = cleanText(userCount);
-  return cleaned && cleaned !== "N/A" ? `(${cleaned})` : "";
 }
 
 type ToolsDirectoryProps = {
@@ -90,34 +69,109 @@ function getUniqueCategoriesFromTools(tools: Tool[]): string[] {
   return Array.from(cats);
 }
 
-export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
+function ToolsDirectoryComponent({ featuredOnly = false }: ToolsDirectoryProps) {
   const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
+  // Pre-process all tools data in a single pass to reduce render-time calculations
+  const processToolsData = useCallback((rawTools: Tool[]) => {
+    return rawTools.map(tool => {
+      // Pre-calculate all expensive operations
+      const features = Array.isArray(tool.Features)
+        ? tool.Features
+        : (typeof tool.Features === "string"
+          ? tool.Features.split('|').map(f => f.trim()).filter(Boolean)
+          : []);
+      
+      const pros = Array.isArray(tool.Pros)
+        ? tool.Pros
+        : (typeof tool.Pros === "string"
+          ? tool.Pros.split('|').map(p => p.trim()).filter(Boolean)
+          : []);
+      
+      let rating = typeof tool.Rating === "number"
+        ? tool.Rating
+        : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
+      
+      if (!isFinite(rating)) rating = 0;
+      
+      const buttonLink = tool.AffiliateLink?.toString().trim() || tool.Website?.toString().trim() || tool.Domain?.toString().trim() || "";
+      const processedButtonLink = !buttonLink ? "" : (/^https?:\/\//i.test(buttonLink) ? buttonLink : `https://${buttonLink}`);
+      
+      const cleanedName = cleanText(tool.Name);
+      const cleanedDescription = cleanText(tool.Description);
+      const cleanedHighlight = cleanText(tool.Highlight);
+      const cleanedBadge = cleanText(tool.Badge);
+      const cleanedPricing = cleanText(tool.Pricing) || "—";
+      const formattedUserCount = tool.UserCount && cleanText(tool.UserCount) && cleanText(tool.UserCount) !== "N/A" ? `(${cleanText(tool.UserCount)})` : "";
+      
+      // Pre-calculate logo info
+      const domain = tool.Domain;
+      const category = tool.Category;
+      let logoUrl = null;
+      const fallbackEmoji = fallbackEmojis[category || "default"];
+      
+      if (domain && domain !== "N/A") {
+        const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        logoUrl = `https://logo.clearbit.com/${cleanDomain}`;
+      }
+      
+      return {
+        ...tool,
+        // Processed data
+        processedFeatures: features,
+        processedPros: pros,
+        processedRating: rating,
+        processedButtonLink,
+        showButton: !!processedButtonLink,
+        cleanedName,
+        cleanedDescription,
+        cleanedHighlight,
+        cleanedBadge,
+        cleanedPricing,
+        formattedUserCount,
+        logoUrl,
+        fallbackEmoji
+      };
+    });
+  }, []);
+
   useEffect(() => {
+    let isMounted = true;
     setLoading(true);
+    
     fetch('/api/tools')
       .then(res => res.json())
       .then(data => {
-        setTools(
-          (data as { fields: Tool; id: string }[]).map((rec) => ({
-            ...rec.fields,
-            _id: rec.id
-          }))
-        );
+        if (isMounted) {
+          setTools(
+            (data as { fields: Tool; id: string }[]).map((rec) => ({
+              ...rec.fields,
+              _id: rec.id
+            }))
+          );
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Filter: Don'tShow, Featured
+  // Filter: Don'tShow, Featured and process all data
   const displayTools = useMemo(() => {
     let result = tools.filter((tool) => !tool.DontShow);
     if (featuredOnly) {
       result = result.filter((tool) => !!tool.Featured);
     }
-    return result;
-  }, [tools, featuredOnly]);
+    return processToolsData(result);
+  }, [tools, featuredOnly, processToolsData]);
 
   // Dynamic categories: built from currently displayed tools (not filtered by category yet!)
   const dynamicCategories = useMemo(() => {
@@ -172,31 +226,7 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
           <div className="text-center text-gray-400 py-20">Loading tools…</div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredTools.map((tool: Tool) => {
-              const logo = getLogoUrl(tool.Domain, tool.Category);
-
-              const features = Array.isArray(tool.Features)
-                ? tool.Features
-                : (typeof tool.Features === "string"
-                  ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
-                  : []);
-
-              const pros = Array.isArray(tool.Pros)
-                ? tool.Pros
-                : (typeof tool.Pros === "string"
-                  ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
-                  : []);
-
-              let rating = typeof tool.Rating === "number"
-                ? tool.Rating
-                : parseFloat((tool.Rating || '').toString().replace(/[^\d.]/g, ''));
-
-if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 works for stars
-              const buttonLink = getButtonLink(tool);
-              const showButton = !!buttonLink;
-
-              const priceDisplay = cleanText(tool.Pricing) || "—";
-
+            {filteredTools.map((tool) => { // Using typed tool
               return (
                 <div
                   key={tool._id}
@@ -206,61 +236,73 @@ if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 work
                   <div className="flex items-center justify-between mb-3 min-h-[2.5rem]">
                     {/* Logo left */}
                     <div className="flex items-center gap-2">
-                      {typeof logo === "string" && logo.startsWith("http") ? (
-                        <img
-                          src={logo}
-                          alt={tool.Name}
-                          className="h-8 w-8 object-contain rounded bg-gray-100"
-                          style={{ minWidth: 32 }}
-                        />
+                      {tool.logoUrl ? (
+                        <div className="relative h-8 w-8 bg-gray-100 rounded overflow-hidden" style={{ minWidth: 32 }}>
+                          <Image
+                            src={tool.logoUrl}
+                            alt={tool.cleanedName}
+                            fill
+                            sizes="32px"
+                            className="object-contain"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const sibling = target.nextElementSibling as HTMLElement;
+                              if (sibling) {
+                                sibling.style.display = 'inline';
+                              }
+                            }}
+                          />
+                          <span className="text-3xl hidden absolute inset-0 flex items-center justify-center">{tool.fallbackEmoji}</span>
+                        </div>
                       ) : (
-                        <span className="text-3xl">{logo}</span>
+                        <span className="text-3xl">{tool.fallbackEmoji}</span>
                       )}
                     </div>
                     {/* Favorite and Tag right */}
                     <div className="flex items-center gap-2">
                       <FavoriteButton 
                         item={{
-                          id: tool._id || tool.Name || '',
-                          title: tool.Name || '',
+                          id: tool._id || tool.cleanedName || '',
+                          title: tool.cleanedName || '',
                           type: 'tool',
                           url: tool.Website || tool.AffiliateLink || '#'
                         }}
                         className="text-gray-400 hover:text-red-500"
                       />
-                      {tool.Badge && (
+                      {tool.cleanedBadge && (
                         <span className="inline-block bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full whitespace-nowrap">
-                          {cleanText(tool.Badge)}
+                          {tool.cleanedBadge}
                         </span>
                       )}
                     </div>
                   </div>
                   {/* Name/title */}
-                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{cleanText(tool.Name)}</h3>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">{tool.cleanedName}</h3>
                   {/* Highlight/subheadline */}
-                  {cleanText(tool.Highlight) && (
-                    <div className="text-base text-indigo-700 font-medium mb-2">{cleanText(tool.Highlight)}</div>
+                  {tool.cleanedHighlight && (
+                    <div className="text-base text-indigo-700 font-medium mb-2">{tool.cleanedHighlight}</div>
                   )}
                   {/* Description */}
-                  <p className="text-base text-gray-600 mb-2">{cleanText(tool.Description)}</p>
+                  <p className="text-base text-gray-600 mb-2">{tool.cleanedDescription}</p>
                   {/* Stars & User Count */}
                   <div className="flex items-center gap-2 mb-2">
-                    {generateStars(rating)}
-                    {rating && <span className="text-gray-900 font-medium text-base">{rating}</span>}
-                    <span className="ml-2 text-gray-400 text-base">{formatUserCount(tool.UserCount)}</span>
+                    {generateStars(tool.processedRating)}
+                    {tool.processedRating > 0 && <span className="text-gray-900 font-medium text-base">{tool.processedRating}</span>}
+                    <span className="ml-2 text-gray-400 text-base">{tool.formattedUserCount}</span>
                   </div>
                   {/* Pros */}
-                  {pros && pros.length > 0 && (
+                  {tool.processedPros && tool.processedPros.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {pros.map((pro: string) => (
+                      {tool.processedPros.map((pro: string) => (
                         <span key={pro} className="inline-block bg-gray-100 text-gray-700 text-base rounded-full px-2 py-0.5">✅ {pro}</span>
                       ))}
                     </div>
                   )}
                   {/* Features */}
-                  {features && features.length > 0 && (
+                  {tool.processedFeatures && tool.processedFeatures.length > 0 && (
                     <ul className="list-disc list-inside mb-2 text-gray-600 text-base space-y-0.5">
-                      {features.map((feature: string) => (
+                      {tool.processedFeatures.map((feature: string) => (
                         <li key={feature}>{feature}</li>
                       ))}
                     </ul>
@@ -269,21 +311,21 @@ if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 work
                   <div className="mt-auto flex flex-row justify-between items-center border-t border-gray-100 pt-2 gap-2">
                     <span
                       className="text-base text-gray-500 font-normal truncate max-w-[60%]"
-                      title={priceDisplay}
+                      title={tool.cleanedPricing}
                     >
-                      {priceDisplay.startsWith('From') ? (
-                        <>From <span className="text-indigo-700 font-bold">{priceDisplay.replace('From ', '')}</span></>
+                      {tool.cleanedPricing.startsWith('From') ? (
+                        <>From <span className="text-indigo-700 font-bold">{tool.cleanedPricing.replace('From ', '')}</span></>
                       ) : (
-                        <span className="text-indigo-700 font-bold">{priceDisplay}</span>
+                        <span className="text-indigo-700 font-bold">{tool.cleanedPricing}</span>
                       )}
                     </span>
                     <a
-                      href={showButton ? buttonLink : undefined}
+                      href={tool.showButton ? tool.processedButtonLink : undefined}
                       target="_blank"
                       rel="noopener"
-                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
-                      aria-disabled={!showButton}
-                      tabIndex={showButton ? 0 : -1}
+                      className={`px-5 py-2 rounded-full text-white font-semibold text-base shadow transition text-center whitespace-nowrap ${tool.showButton ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed pointer-events-none"}`}
+                      aria-disabled={!tool.showButton}
+                      tabIndex={tool.showButton ? 0 : -1}
                     >
                       Try Now →
                     </a>
@@ -297,3 +339,6 @@ if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 work
     </section>
   );
 }
+
+const ToolsDirectory = memo(ToolsDirectoryComponent);
+export default ToolsDirectory;
