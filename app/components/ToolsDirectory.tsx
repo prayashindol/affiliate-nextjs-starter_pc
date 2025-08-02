@@ -73,6 +73,8 @@ function ToolsDirectoryComponent({ featuredOnly = false }: ToolsDirectoryProps) 
   const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [isTestData, setIsTestData] = useState(false);
 
   // Pre-process all tools data in a single pass to reduce render-time calculations
   const processToolsData = useCallback((rawTools: Tool[]) => {
