@@ -14,7 +14,7 @@ export async function GET() {
     headers: {
       Authorization: `Bearer ${AIRTABLE_API_KEY}`,
     },
-    cache: "no-store",
+    next: { revalidate: 300 }, // Cache for 5 minutes instead of no-store
   });
 
   if (!res.ok) {

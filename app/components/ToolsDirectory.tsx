@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import FavoriteButton from './FavoriteButton';
 
 const fallbackEmojis: Record<string, string> = {
@@ -90,24 +90,36 @@ function getUniqueCategoriesFromTools(tools: Tool[]): string[] {
   return Array.from(cats);
 }
 
-export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryProps) {
+function ToolsDirectoryComponent({ featuredOnly = false }: ToolsDirectoryProps) {
   const [tools, setTools] = useState<Tool[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     setLoading(true);
+    
     fetch('/api/tools')
       .then(res => res.json())
       .then(data => {
-        setTools(
-          (data as { fields: Tool; id: string }[]).map((rec) => ({
-            ...rec.fields,
-            _id: rec.id
-          }))
-        );
+        if (isMounted) {
+          setTools(
+            (data as { fields: Tool; id: string }[]).map((rec) => ({
+              ...rec.fields,
+              _id: rec.id
+            }))
+          );
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Filter: Don'tShow, Featured
@@ -118,6 +130,23 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
     }
     return result;
   }, [tools, featuredOnly]);
+
+  // Memoize expensive text processing functions
+  const processFeatures = useCallback((features: unknown) => {
+    return Array.isArray(features)
+      ? features
+      : (typeof features === "string"
+        ? features.split('|').map((f: string) => f.trim()).filter(Boolean)
+        : []);
+  }, []);
+
+  const processPros = useCallback((pros: unknown) => {
+    return Array.isArray(pros)
+      ? pros
+      : (typeof pros === "string"
+        ? pros.split('|').map((p: string) => p.trim()).filter(Boolean)
+        : []);
+  }, []);
 
   // Dynamic categories: built from currently displayed tools (not filtered by category yet!)
   const dynamicCategories = useMemo(() => {
@@ -175,17 +204,8 @@ export default function ToolsDirectory({ featuredOnly = false }: ToolsDirectoryP
             {filteredTools.map((tool: Tool) => {
               const logo = getLogoUrl(tool.Domain, tool.Category);
 
-              const features = Array.isArray(tool.Features)
-                ? tool.Features
-                : (typeof tool.Features === "string"
-                  ? tool.Features.split('|').map((f: string) => f.trim()).filter(Boolean)
-                  : []);
-
-              const pros = Array.isArray(tool.Pros)
-                ? tool.Pros
-                : (typeof tool.Pros === "string"
-                  ? tool.Pros.split('|').map((p: string) => p.trim()).filter(Boolean)
-                  : []);
+              const features = processFeatures(tool.Features);
+              const pros = processPros(tool.Pros);
 
               let rating = typeof tool.Rating === "number"
                 ? tool.Rating
@@ -210,11 +230,23 @@ if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 work
                         <img
                           src={logo}
                           alt={tool.Name}
+                          loading="lazy"
                           className="h-8 w-8 object-contain rounded bg-gray-100"
                           style={{ minWidth: 32 }}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const sibling = target.nextElementSibling as HTMLElement;
+                            if (sibling) {
+                              sibling.style.display = 'inline';
+                            }
+                          }}
                         />
                       ) : (
                         <span className="text-3xl">{logo}</span>
+                      )}
+                      {typeof logo === "string" && logo.startsWith("http") && (
+                        <span className="text-3xl hidden">{fallbackEmojis[tool.Category || "default"]}</span>
                       )}
                     </div>
                     {/* Favorite and Tag right */}
@@ -297,3 +329,6 @@ if (!isFinite(rating)) rating = 0; // or another fallback, like null, but 0 work
     </section>
   );
 }
+
+const ToolsDirectory = memo(ToolsDirectoryComponent);
+export default ToolsDirectory;
