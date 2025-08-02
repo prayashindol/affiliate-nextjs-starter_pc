@@ -224,6 +224,15 @@ function ToolsDirectoryComponent({ featuredOnly = false }: ToolsDirectoryProps) 
         {/* Loading state */}
         {loading ? (
           <div className="text-center text-gray-400 py-20">Loading tools…</div>
+        ) : filteredTools.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-gray-400 text-lg mb-4">
+              {featuredOnly ? "No featured tools available" : "No tools available"}
+            </div>
+            <p className="text-gray-500 text-sm">
+              Tools data is configured to load from Airtable. Please ensure the Airtable integration is properly set up.
+            </p>
+          </div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredTools.map((tool) => { // Using typed tool
