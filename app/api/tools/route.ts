@@ -16,8 +16,101 @@ export async function GET() {
       AIRTABLE_TABLE_ID: !!AIRTABLE_TABLE_ID
     });
     
-    // Return empty array instead of mock data to avoid showing test tools
-    return NextResponse.json([]);
+    // Return test tools when Airtable is not configured
+    const testTools = [
+      {
+        id: "test1",
+        fields: {
+          Name: "PriceLabs",
+          CleanedName: "PriceLabs",
+          Description: "AI-powered dynamic pricing for vacation rentals. Optimize your rates automatically based on demand, competition, and market trends.",
+          Category: "Pricing",
+          Website: "https://pricelabs.co",
+          AffiliateLink: "https://pricelabs.co",
+          Featured: true,
+          DontShow: false,
+          logoUrl: null,
+          fallbackEmoji: "💰"
+        }
+      },
+      {
+        id: "test2", 
+        fields: {
+          Name: "Hostfully",
+          CleanedName: "Hostfully",
+          Description: "Complete property management solution with unified inbox, automated messaging, and guest experience tools.",
+          Category: "Property Management",
+          Website: "https://hostfully.com",
+          AffiliateLink: "https://hostfully.com",
+          Featured: true,
+          DontShow: false,
+          logoUrl: null,
+          fallbackEmoji: "🏠"
+        }
+      },
+      {
+        id: "test3",
+        fields: {
+          Name: "Smartbnb",
+          CleanedName: "Smartbnb", 
+          Description: "Automated messaging and guest communication platform. Save time with smart templates and instant responses.",
+          Category: "Communication",
+          Website: "https://smartbnb.io",
+          AffiliateLink: "https://smartbnb.io",
+          Featured: false,
+          DontShow: false,
+          logoUrl: null,
+          fallbackEmoji: "💬"
+        }
+      },
+      {
+        id: "test4",
+        fields: {
+          Name: "Wheelhouse",
+          CleanedName: "Wheelhouse",
+          Description: "Revenue management and market intelligence platform for short-term rental hosts and property managers.",
+          Category: "Pricing",
+          Website: "https://usewheelhouse.com",
+          AffiliateLink: "https://usewheelhouse.com",
+          Featured: false,
+          DontShow: false,
+          logoUrl: null,
+          fallbackEmoji: "📊"
+        }
+      },
+      {
+        id: "test5",
+        fields: {
+          Name: "Host Tools",
+          CleanedName: "Host Tools",
+          Description: "Comprehensive property management suite with cleaning schedules, maintenance tracking, and financial reporting.",
+          Category: "Property Management", 
+          Website: "https://hosttools.com",
+          AffiliateLink: "https://hosttools.com",
+          Featured: true,
+          DontShow: false,
+          logoUrl: null,
+          fallbackEmoji: "🔧"
+        }
+      },
+      {
+        id: "test6",
+        fields: {
+          Name: "Awning",
+          CleanedName: "Awning",
+          Description: "Full-service property management for Airbnb. From listing optimization to guest services and cleaning coordination.",
+          Category: "Property Management",
+          Website: "https://awning.com",
+          AffiliateLink: "https://awning.com", 
+          Featured: false,
+          DontShow: false,
+          logoUrl: null,
+          fallbackEmoji: "⛱️"
+        }
+      }
+    ];
+    
+    return NextResponse.json(testTools);
   }
 
   try {
