@@ -19,31 +19,46 @@ function cleanContentHtml(html, mainImage, permalink) {
     return text.includes("affiliate") || text.includes("disclosure");
   }).first().remove();
 
-  // ======= NEW: Remove all inline styles and class attributes =======
+  // Remove all inline styles and class attributes
   $('[style]').removeAttr('style');
   $('[class]').removeAttr('class');
 
-  // ======= OPTIONAL: Add Tailwind classes to tables for better style =======
-  $('table').addClass('min-w-full mt-8 border border-gray-200 rounded-lg overflow-hidden bg-white');
-  $('th').addClass('bg-gray-100 text-gray-900 px-4 py-3 text-left font-semibold text-base');
-  $('td').addClass('border-t border-gray-200 px-4 py-2 align-top');
-  $('tr').addClass('even:bg-gray-50');
+  // --- PROFESSIONAL TABLE STYLING ---
+  // Wrap each table for horizontal scrolling on mobile
+  $("table").each((i, el) => {
+    $(el).wrap('<div class="overflow-x-auto"></div>');
+  });
+  // Table/card appearance
+  $("table").addClass("min-w-full mt-8 shadow-sm rounded-xl overflow-hidden bg-white border border-gray-200");
+  $("th").addClass("bg-gray-100 text-gray-900 px-6 py-4 text-left font-semibold text-base first:rounded-tl-xl last:rounded-tr-xl");
+  $("td").addClass("px-6 py-4 border-t border-gray-200 text-gray-800 align-top");
+  $("tr").addClass("odd:bg-gray-50 hover:bg-indigo-50 transition-colors");
+  $("tr:last-child td:first-child").addClass("rounded-bl-xl");
+  $("tr:last-child td:last-child").addClass("rounded-br-xl");
+  // Right-align numbers/currencies/hours
+  $("td").each((i, el) => {
+    const text = $(el).text().trim();
+    if (/^\d+([.,]?\d+)?$/.test(text) || text.endsWith("EUR") || text.endsWith("hours")) {
+      $(el).addClass("text-right");
+    }
+  });
 
-  // ======= Move Banner after section 6 as before =======
-  const section6 = $('h2, h3, h4, h5').filter((i, el) =>
+  // --- Banner injection after section 6 ---
+  const section6 = $("h2, h3, h4, h5").filter((i, el) =>
     $(el).text().trim().toLowerCase().startsWith("6. ready to simplify airbnb cleaning")
   ).first();
 
-  const bannerHtml = (mainImage && permalink)
-    ? `<div class="my-12 flex justify-center">
-        <a href="${permalink}" target="_blank" rel="noopener sponsored">
-          <img src="${mainImage}" alt="Sponsored banner" class="w-full max-w-3xl object-cover rounded-xl transition hover:shadow-lg" />
-        </a>
-      </div>`
-    : "";
+  const bannerHtml =
+    mainImage && permalink
+      ? `<div class="my-12 flex justify-center">
+          <a href="${permalink}" target="_blank" rel="noopener sponsored">
+            <img src="${mainImage}" alt="Sponsored banner" class="w-full max-w-3xl object-cover rounded-xl transition hover:shadow-lg" />
+          </a>
+        </div>`
+      : "";
 
   if (section6.length) {
-    const nextPara = section6.nextAll('p').first();
+    const nextPara = section6.nextAll("p").first();
     if (nextPara.length) {
       nextPara.after(bannerHtml);
     } else {
@@ -55,7 +70,6 @@ function cleanContentHtml(html, mainImage, permalink) {
 
   return $.html();
 }
-
 
 export default function SeoGenPost({ post }) {
   return (
@@ -87,7 +101,9 @@ export default function SeoGenPost({ post }) {
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
-          dangerouslySetInnerHTML={{ __html: cleanContentHtml(post.contentHtml, post.mainImage, post.permalink) }}
+          dangerouslySetInnerHTML={{
+            __html: cleanContentHtml(post.contentHtml, post.mainImage, post.permalink),
+          }}
         />
       )}
 
