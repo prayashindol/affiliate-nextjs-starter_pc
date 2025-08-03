@@ -47,22 +47,32 @@ export default function SeoGenPost({ post }) {
         )}
       </div>
 
-      {/* Main Image */}
-      {post.mainImage && (
-        <img
-          src={post.mainImage}
-          alt={post.title}
-          className="w-full max-h-[32rem] object-cover rounded-xl mb-10"
-        />
-      )}
-
-      {/* Cleaned Content HTML */}
+      {/* Main content (cleaned HTML) */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
           dangerouslySetInnerHTML={{ __html: cleanContentHtml(post.contentHtml) }}
         />
+      )}
+
+      {/* Ad Banner at the Bottom */}
+      {(post.mainImage && post.permalink) && (
+        <div className="flex justify-center my-12">
+          <a
+            href={post.permalink}
+            target="_blank"
+            rel="noopener sponsored"
+            aria-label="Visit our sponsor (opens in a new tab)"
+            className="block"
+          >
+            <img
+              src={post.mainImage}
+              alt="Sponsored banner"
+              className="w-full max-w-3xl object-cover rounded-xl transition hover:shadow-lg"
+            />
+          </a>
+        </div>
       )}
 
       {/* Callout / Description */}
