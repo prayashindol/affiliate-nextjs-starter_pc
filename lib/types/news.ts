@@ -10,7 +10,7 @@ export interface NewsArticle {
   image?: string;
 }
 
-export interface MediaStackResponse {
+export interface NewsResponse {
   pagination: {
     limit: number;
     offset: number;
