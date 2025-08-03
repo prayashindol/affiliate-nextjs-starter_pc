@@ -1,9 +1,24 @@
 import React from "react";
 import { load } from "cheerio";
 
-function stripFirstH1(html) {
+// Custom cleaner for your specific post content
+function cleanContentHtml(html) {
   const $ = load(html || "");
+
+  // Remove first H1 (as before)
   $("h1").first().remove();
+
+  // Remove first blockquote or the affiliate disclosure (tweak selector as needed)
+  // Example: Remove the block that contains "affiliate links" or similar wording
+  $('*').filter((i, el) => $(el).text().toLowerCase().includes("affiliate link")).remove();
+
+  // Remove any <ul> or <div> that contains your author/date info (Amazon, etc.)
+  $('*').filter((i, el) => $(el).text().toLowerCase().includes("amazon associate")).remove();
+  $('*').filter((i, el) => $(el).text().toLowerCase().includes("airbnb tips")).remove();
+
+  // Optionally: Remove ALL <blockquote> tags (if you only use them for disclosure)
+  // $('blockquote').remove();
+
   return $.html();
 }
 
@@ -46,12 +61,12 @@ export default function SeoGenPost({ post }) {
         <p className="text-2xl text-gray-600 font-light mb-10">{post.excerpt}</p>
       )}
 
-      {/* Content HTML (robust H1 removal) */}
+      {/* Cleaned Content HTML */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
-          dangerouslySetInnerHTML={{ __html: stripFirstH1(post.contentHtml) }}
+          dangerouslySetInnerHTML={{ __html: cleanContentHtml(post.contentHtml) }}
         />
       )}
 
