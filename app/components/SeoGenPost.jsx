@@ -1,23 +1,23 @@
 import React from "react";
 import { load } from "cheerio";
 
-// Custom cleaner for your specific post content
 function cleanContentHtml(html) {
   const $ = load(html || "");
 
-  // Remove first H1 (as before)
+  // Remove first H1
   $("h1").first().remove();
 
-  // Remove first blockquote or the affiliate disclosure (tweak selector as needed)
-  // Example: Remove the block that contains "affiliate links" or similar wording
-  $('*').filter((i, el) => $(el).text().toLowerCase().includes("affiliate link")).remove();
+  // Remove the first <p> that contains "affiliate" or "disclosure"
+  $("p").filter((i, el) => {
+    const text = $(el).text().toLowerCase();
+    return text.includes("affiliate") || text.includes("disclosure");
+  }).first().remove();
 
-  // Remove any <ul> or <div> that contains your author/date info (Amazon, etc.)
-  $('*').filter((i, el) => $(el).text().toLowerCase().includes("amazon associate")).remove();
-  $('*').filter((i, el) => $(el).text().toLowerCase().includes("airbnb tips")).remove();
+  // Remove the first <ul> (the unwanted post info block)
+  $("ul").first().remove();
 
-  // Optionally: Remove ALL <blockquote> tags (if you only use them for disclosure)
-  // $('blockquote').remove();
+  // OPTIONAL: If needed, also remove the first <div>
+  // $("div").first().remove();
 
   return $.html();
 }
@@ -54,11 +54,6 @@ export default function SeoGenPost({ post }) {
           alt={post.title}
           className="w-full max-h-[32rem] object-cover rounded-xl mb-10"
         />
-      )}
-
-      {/* Excerpt */}
-      {post.excerpt && (
-        <p className="text-2xl text-gray-600 font-light mb-10">{post.excerpt}</p>
       )}
 
       {/* Cleaned Content HTML */}
