@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { useSession } from 'next-auth/react'
 
 export interface UserOrder {
   id: string
@@ -48,7 +47,8 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { data: session, status } = useSession()
+  // Simulate an "anonymous user" (not logged in)
+  const [user, setUser] = useState<{ id: string } | null>(null)
   const [orders, setOrders] = useState<UserOrder[]>([])
   const [favorites, setFavorites] = useState<UserFavorite[]>([])
   const [preferences, setPreferences] = useState<UserPreferences>({
@@ -57,13 +57,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
     marketingEmails: false,
   })
 
+  // Use a hardcoded guest userId for localStorage, or generate one on first use
+  useEffect(() => {
+    let uid = localStorage.getItem('guest_user_id')
+    if (!uid) {
+      uid = Date.now().toString()
+      localStorage.setItem('guest_user_id', uid)
+    }
+    setUser({ id: uid })
+  }, [])
+
   // Load user data from localStorage on mount
   useEffect(() => {
-    if (session?.user?.id) {
-      const userId = session.user.id
-      const storedOrders = localStorage.getItem(`orders_${userId}`)
-      const storedFavorites = localStorage.getItem(`favorites_${userId}`)
-      const storedPreferences = localStorage.getItem(`preferences_${userId}`)
+    if (user?.id) {
+      const storedOrders = localStorage.getItem(`orders_${user.id}`)
+      const storedFavorites = localStorage.getItem(`favorites_${user.id}`)
+      const storedPreferences = localStorage.getItem(`preferences_${user.id}`)
 
       if (storedOrders) {
         setOrders(JSON.parse(storedOrders))
@@ -75,29 +84,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setPreferences(JSON.parse(storedPreferences))
       }
     }
-  }, [session?.user?.id])
+  }, [user?.id])
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
-    if (session?.user?.id) {
-      const userId = session.user.id
-      localStorage.setItem(`orders_${userId}`, JSON.stringify(orders))
+    if (user?.id) {
+      localStorage.setItem(`orders_${user.id}`, JSON.stringify(orders))
     }
-  }, [orders, session?.user?.id])
+  }, [orders, user?.id])
 
   useEffect(() => {
-    if (session?.user?.id) {
-      const userId = session.user.id
-      localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites))
+    if (user?.id) {
+      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites))
     }
-  }, [favorites, session?.user?.id])
+  }, [favorites, user?.id])
 
   useEffect(() => {
-    if (session?.user?.id) {
-      const userId = session.user.id
-      localStorage.setItem(`preferences_${userId}`, JSON.stringify(preferences))
+    if (user?.id) {
+      localStorage.setItem(`preferences_${user.id}`, JSON.stringify(preferences))
     }
-  }, [preferences, session?.user?.id])
+  }, [preferences, user?.id])
 
   const addOrder = (orderData: Omit<UserOrder, 'id' | 'date'>) => {
     const newOrder: UserOrder = {
@@ -122,68 +128,34 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const updatePreferences = async (prefs: Partial<UserPreferences>) => {
-    try {
-      const response = await fetch('/api/user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ preferences: { ...preferences, ...prefs } }),
-      })
-
-      if (response.ok) {
-        setPreferences(prev => ({ ...prev, ...prefs }))
-      } else {
-        console.error('Failed to update preferences')
-      }
-    } catch (error) {
-      console.error('Error updating preferences:', error)
-      // Fallback to local update
-      setPreferences(prev => ({ ...prev, ...prefs }))
-    }
+    // You can expand this for API use later
+    setPreferences(prev => ({ ...prev, ...prefs }))
   }
 
   const deleteAccount = async () => {
-    try {
-      const response = await fetch('/api/user', {
-        method: 'DELETE',
+    if (user?.id) {
+      // Clear all user data
+      localStorage.removeItem(`orders_${user.id}`)
+      localStorage.removeItem(`favorites_${user.id}`)
+      localStorage.removeItem(`preferences_${user.id}`)
+      setOrders([])
+      setFavorites([])
+      setPreferences({
+        newsletter: false,
+        emailNotifications: true,
+        marketingEmails: false,
       })
-
-      if (response.ok) {
-        if (session?.user?.id) {
-          const userId = session.user.id
-          // Clear all user data
-          localStorage.removeItem(`orders_${userId}`)
-          localStorage.removeItem(`favorites_${userId}`)
-          localStorage.removeItem(`preferences_${userId}`)
-          
-          // Reset state
-          setOrders([])
-          setFavorites([])
-          setPreferences({
-            newsletter: false,
-            emailNotifications: true,
-            marketingEmails: false,
-          })
-        }
-        
-        // Sign out the user
-        const { signOut } = await import('next-auth/react')
-        await signOut({ callbackUrl: '/' })
-      } else {
-        throw new Error('Failed to delete account')
-      }
-    } catch (error) {
-      console.error('Error deleting account:', error)
-      throw error
+      // Optionally clear the guest_user_id and "logout" the guest user:
+      // localStorage.removeItem('guest_user_id')
+      // setUser(null)
     }
   }
 
   return (
     <UserContext.Provider
       value={{
-        isAuthenticated: !!session?.user,
-        user: session?.user || null,
+        isAuthenticated: false, // No real user session
+        user,
         orders,
         favorites,
         preferences,
@@ -192,7 +164,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         removeFavorite,
         updatePreferences,
         deleteAccount,
-        isLoading: status === 'loading',
+        isLoading: false,
       }}
     >
       {children}
