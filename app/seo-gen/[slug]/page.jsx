@@ -1,6 +1,6 @@
 import { sanityClient } from "@/lib/sanity";
 import SeoGenPost from "@/components/SeoGenPost";
-import { sanityClient } from "@/lib/sanity";
+//import { sanityClient } from "@/lib/sanity";
 
 // Re-use this to fetch post for meta too
 async function getSeoGenPost(slug) {
