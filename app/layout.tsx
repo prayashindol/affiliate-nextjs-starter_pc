@@ -3,7 +3,6 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
-import { SessionProvider } from "./components/SessionProvider";
 import { UserProvider } from "./context/UserContext";
 
 export const metadata: Metadata = {
@@ -19,17 +18,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased bg-white">
-        <SessionProvider>
-          <UserProvider>
-            <CartProvider>
-              <Header />
-              <div className="container mx-auto px-4">
-                {children}
-              </div>
-              <Footer />
-            </CartProvider>
-          </UserProvider>
-        </SessionProvider>
+        <UserProvider>
+          <CartProvider>
+            <Header />
+            <div className="container mx-auto px-4">
+              {children}
+            </div>
+            <Footer />
+          </CartProvider>
+        </UserProvider>
       </body>
     </html>
   );
