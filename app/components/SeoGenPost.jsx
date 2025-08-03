@@ -1,8 +1,12 @@
 import React from "react";
 
+function stripFirstH1(html) {
+  return html.replace(/^<h1[^>]*>.*?<\/h1>/i, '');
+}
+
 export default function SeoGenPost({ post }) {
   return (
-    <article className="max-w-2xl mx-auto py-12 px-4 sm:px-6 lg:px-0">
+    <article className="max-w-4xl mx-auto py-12 px-4 sm:px-8 lg:px-0">
       {/* Title */}
       <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{post.title}</h1>
 
@@ -39,12 +43,12 @@ export default function SeoGenPost({ post }) {
         <p className="text-2xl text-gray-600 font-light mb-10">{post.excerpt}</p>
       )}
 
-      {/* Content HTML */}
+      {/* Content HTML (removes first H1 if present) */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: '1.14rem', lineHeight: '2.1' }}
-          dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+          dangerouslySetInnerHTML={{ __html: stripFirstH1(post.contentHtml) }}
         />
       )}
 
