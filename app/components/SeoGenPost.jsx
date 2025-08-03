@@ -1,23 +1,39 @@
 import React from "react";
 import { load } from "cheerio";
 
-function cleanContentHtml(html) {
+function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
-  // Remove first H1
   $("h1").first().remove();
-
-  // Remove the first two <p> tags (usually category/location in these posts)
   $("p").slice(0, 2).remove();
-
-  // Remove the first <ul> (for the meta info box, if ever present)
   $("ul").first().remove();
-
-  // Remove the first <p> that contains "affiliate" or "disclosure" just in case
   $("p").filter((i, el) => {
     const text = $(el).text().toLowerCase();
     return text.includes("affiliate") || text.includes("disclosure");
   }).first().remove();
+
+  const section6 = $('h2, h3, h4, h5').filter((i, el) =>
+    $(el).text().trim().toLowerCase().startsWith("6. ready to simplify airbnb cleaning")
+  ).first();
+
+  const bannerHtml = (mainImage && permalink)
+    ? `<div class="my-12 flex justify-center">
+        <a href="${permalink}" target="_blank" rel="noopener sponsored">
+          <img src="${mainImage}" alt="Sponsored banner" class="w-full max-w-3xl object-cover rounded-xl transition hover:shadow-lg" />
+        </a>
+      </div>`
+    : "";
+
+  if (section6.length) {
+    const nextPara = section6.nextAll('p').first();
+    if (nextPara.length) {
+      nextPara.after(bannerHtml);
+    } else {
+      section6.after(bannerHtml);
+    }
+  } else {
+    $.root().append(bannerHtml);
+  }
 
   return $.html();
 }
@@ -47,32 +63,13 @@ export default function SeoGenPost({ post }) {
         )}
       </div>
 
-      {/* Main content (cleaned HTML) */}
+      {/* Cleaned Content HTML, banner injected after section 6 */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
-          dangerouslySetInnerHTML={{ __html: cleanContentHtml(post.contentHtml) }}
+          dangerouslySetInnerHTML={{ __html: cleanContentHtml(post.contentHtml, post.mainImage, post.permalink) }}
         />
-      )}
-
-      {/* Ad Banner at the Bottom */}
-      {(post.mainImage && post.permalink) && (
-        <div className="flex justify-center my-12">
-          <a
-            href={post.permalink}
-            target="_blank"
-            rel="noopener sponsored"
-            aria-label="Visit our sponsor (opens in a new tab)"
-            className="block"
-          >
-            <img
-              src={post.mainImage}
-              alt="Sponsored banner"
-              className="w-full max-w-3xl object-cover rounded-xl transition hover:shadow-lg"
-            />
-          </a>
-        </div>
       )}
 
       {/* Callout / Description */}
