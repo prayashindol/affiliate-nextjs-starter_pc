@@ -23,25 +23,19 @@ function cleanContentHtml(html, mainImage, permalink) {
   $('[style]').removeAttr('style');
   $('[class]').removeAttr('class');
 
-  // --- PROFESSIONAL TABLE STYLING ---
+  // --- PROFESSIONAL TABLE STYLING WITH CENTERED TEXT ---
   // Wrap each table for horizontal scrolling on mobile
   $("table").each((i, el) => {
     $(el).wrap('<div class="overflow-x-auto"></div>');
   });
-  // Table/card appearance
+  // Table/card appearance, CENTERED alignment
   $("table").addClass("min-w-full mt-8 shadow-sm rounded-xl overflow-hidden bg-white border border-gray-200");
-  $("th").addClass("bg-gray-100 text-gray-900 px-6 py-4 text-left font-semibold text-base first:rounded-tl-xl last:rounded-tr-xl");
-  $("td").addClass("px-6 py-4 border-t border-gray-200 text-gray-800 align-top");
+  $("th").addClass("bg-gray-100 text-gray-900 px-6 py-4 text-center font-semibold text-base first:rounded-tl-xl last:rounded-tr-xl");
+  $("td").addClass("px-6 py-4 border-t border-gray-200 text-gray-800 align-top text-center");
   $("tr").addClass("odd:bg-gray-50 hover:bg-indigo-50 transition-colors");
   $("tr:last-child td:first-child").addClass("rounded-bl-xl");
   $("tr:last-child td:last-child").addClass("rounded-br-xl");
-  // Right-align numbers/currencies/hours
-  $("td").each((i, el) => {
-    const text = $(el).text().trim();
-    if (/^\d+([.,]?\d+)?$/.test(text) || text.endsWith("EUR") || text.endsWith("hours")) {
-      $(el).addClass("text-right");
-    }
-  });
+  // (Removed right-align code)
 
   // --- Banner injection after section 6 ---
   const section6 = $("h2, h3, h4, h5").filter((i, el) =>
