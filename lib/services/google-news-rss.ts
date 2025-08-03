@@ -1,10 +1,8 @@
-const PLACEHOLDER_IMAGE_DIMENSIONS = "300x200";
-const PLACEHOLDER_IMAGE_COLOR = "CCCCCC";
 const MAX_DESCRIPTION_LENGTH = 260;
 
 import Parser from 'rss-parser';
 import sanitizeHtml from 'sanitize-html';
-import { MediaStackResponse, NewsArticle, NewsFilters } from '../types/news';
+import { NewsResponse, NewsArticle, NewsFilters } from '../types/news';
 
 // Define a type for RSS items to avoid any types
 interface RSSItem {
@@ -109,7 +107,7 @@ export class GoogleNewsRSSService {
     };
   }
 
-  static async fetchNews(filters: NewsFilters = {}): Promise<MediaStackResponse> {
+  static async fetchNews(filters: NewsFilters = {}): Promise<NewsResponse> {
     try {
       const keywords = filters.keywords || DEFAULT_KEYWORDS;
       const rssUrl = this.buildRSSUrl(keywords);
@@ -152,7 +150,7 @@ export class GoogleNewsRSSService {
 
   private static async getFallbackNews(
     filters: NewsFilters = {}
-  ): Promise<MediaStackResponse> {
+  ): Promise<NewsResponse> {
     const FALLBACK_NEWS_DATA: NewsArticle[] = [
       {
         title: "Airbnb Reports Strong Q4 2024 Performance with Host Earnings Reaching $2B",
@@ -197,14 +195,14 @@ export class GoogleNewsRSSService {
 
   static async getLatestNews(
     limit: number = 6
-  ): Promise<MediaStackResponse> {
+  ): Promise<NewsResponse> {
     return this.fetchNews({ limit });
   }
 
   static async getNewsByPage(
     page: number = 1,
     limit: number = 20
-  ): Promise<MediaStackResponse> {
+  ): Promise<NewsResponse> {
     const offset = (page - 1) * limit;
     return this.fetchNews({ limit, offset });
   }
