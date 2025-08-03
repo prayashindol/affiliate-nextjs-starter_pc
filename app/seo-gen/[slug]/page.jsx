@@ -1,42 +1,8 @@
-import { sanityClient } from "@/lib/sanity";
-import SeoGenPost from "@/components/SeoGenPost";
-//import { sanityClient } from "@/lib/sanity";
+import { sanityClient } from "../../../lib/sanity";
+import SeoGenPost from "../../../components/SeoGenPost";
 
-// Re-use this to fetch post for meta too
-async function getSeoGenPost(slug) {
-  const query = `
-    *[_type == "seoGenPost" && slug.current == $slug][0] {
-      title,
-      description,
-      excerpt,
-      permalink,
-      mainImage
-    }
-  `;
-  return await sanityClient.fetch(query, { slug });
-}
 
-export async function generateMetadata({ params }) {
-  const post = await getSeoGenPost(params.slug);
-  if (!post) return {};
-
-  return {
-    title: post.title,
-    description: post.description || post.excerpt || "",
-    openGraph: {
-      title: post.title,
-      description: post.description || post.excerpt || "",
-      images: post.mainImage ? [{ url: post.mainImage }] : [],
-      type: "article",
-      url: post.permalink || `https://strspecialist.com/seo-gen/${params.slug}`,
-    },
-    alternates: {
-      canonical: post.permalink || `https://strspecialist.com/seo-gen/${params.slug}`,
-    },
-  };
-}
-
-// Fetch the post by slug
+// Fetch the post by slug (used for both metadata and page)
 async function getSeoGenPost(slug) {
   const query = `
     *[_type == "seoGenPost" && slug.current == $slug][0] {
@@ -67,12 +33,37 @@ async function getPrevNextPosts(dateModified, slug) {
   return await sanityClient.fetch(query, { dateModified, slug });
 }
 
+// Dynamic meta tags for SEO
+export async function generateMetadata({ params }) {
+  const post = await getSeoGenPost(params.slug);
+  if (!post) return {};
+
+  return {
+    title: post.title,
+    description: post.description || post.excerpt || "",
+    openGraph: {
+      title: post.title,
+      description: post.description || post.excerpt || "",
+      images: post.mainImage ? [{ url: post.mainImage }] : [],
+      type: "article",
+      url: post.permalink || `https://strspecialist.com/seo-gen/${params.slug}`,
+    },
+    alternates: {
+      canonical: post.permalink || `https://strspecialist.com/seo-gen/${params.slug}`,
+    },
+  };
+}
 
 export default async function SeoGenPostPage({ params }) {
   const post = await getSeoGenPost(params.slug);
 
   if (!post) {
-    // ...not found message
+    return (
+      <div className="max-w-2xl mx-auto py-16 text-center text-gray-700">
+        <h2 className="text-2xl font-bold mb-4">Post not found</h2>
+        <p>The SEO Gen post you are looking for does not exist.</p>
+      </div>
+    );
   }
 
   // Fetch next and previous posts
