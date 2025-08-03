@@ -1,10 +1,10 @@
-import { MediaStackService } from '@/lib/services/mediastack';
+import { GoogleNewsRSSService } from '@/lib/services/google-news-rss';
 import { NewsCard } from './NewsCard';
 import Link from 'next/link';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 export async function NewsTicker() {
-  const newsResponse = await MediaStackService.getLatestNews(6);
+  const newsResponse = await GoogleNewsRSSService.getLatestNews(6);
   const articles = newsResponse.data || [];
 
   if (articles.length === 0) {
