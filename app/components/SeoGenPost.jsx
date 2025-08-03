@@ -7,17 +7,17 @@ function cleanContentHtml(html) {
   // Remove first H1
   $("h1").first().remove();
 
-  // Remove the first <p> that contains "affiliate" or "disclosure"
+  // Remove the first two <p> tags (usually category/location in these posts)
+  $("p").slice(0, 2).remove();
+
+  // Remove the first <ul> (for the meta info box, if ever present)
+  $("ul").first().remove();
+
+  // Remove the first <p> that contains "affiliate" or "disclosure" just in case
   $("p").filter((i, el) => {
     const text = $(el).text().toLowerCase();
     return text.includes("affiliate") || text.includes("disclosure");
   }).first().remove();
-
-  // Remove the first <ul> (the unwanted post info block)
-  $("ul").first().remove();
-
-  // OPTIONAL: If needed, also remove the first <div>
-  // $("div").first().remove();
 
   return $.html();
 }
