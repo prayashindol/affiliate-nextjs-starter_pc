@@ -1,7 +1,11 @@
 import React from "react";
+import cheerio from "cheerio";
 
 function stripFirstH1(html) {
-  return html.replace(/^<h1[^>]*>.*?<\/h1>/i, '');
+  // This works server-side and client-side!
+  const $ = cheerio.load(html || "");
+  $("h1").first().remove();
+  return $.html();
 }
 
 export default function SeoGenPost({ post }) {
@@ -43,11 +47,11 @@ export default function SeoGenPost({ post }) {
         <p className="text-2xl text-gray-600 font-light mb-10">{post.excerpt}</p>
       )}
 
-      {/* Content HTML (removes first H1 if present) */}
+      {/* Content HTML (robust H1 removal) */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
-          style={{ fontSize: '1.14rem', lineHeight: '2.1' }}
+          style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
           dangerouslySetInnerHTML={{ __html: stripFirstH1(post.contentHtml) }}
         />
       )}

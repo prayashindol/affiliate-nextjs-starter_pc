@@ -16,6 +16,7 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.16",
     "airtable": "^0.12.2",
+    "cheerio": "^1.1.2",
     "dotenv": "^17.2.1",
     "groq": "^4.1.1",
     "next": "15.4.4",
