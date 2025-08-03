@@ -1,9 +1,8 @@
 import React from "react";
-import cheerio from "cheerio";
+import { load } from "cheerio";
 
 function stripFirstH1(html) {
-  // This works server-side and client-side!
-  const $ = cheerio.load(html || "");
+  const $ = load(html || "");
   $("h1").first().remove();
   return $.html();
 }
