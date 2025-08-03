@@ -4,14 +4,32 @@ import { load } from "cheerio";
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
+  // Remove first H1
   $("h1").first().remove();
+
+  // Remove the first two <p> tags (usually category/location)
   $("p").slice(0, 2).remove();
+
+  // Remove the first <ul>
   $("ul").first().remove();
+
+  // Remove the first <p> with affiliate/disclosure
   $("p").filter((i, el) => {
     const text = $(el).text().toLowerCase();
     return text.includes("affiliate") || text.includes("disclosure");
   }).first().remove();
 
+  // ======= NEW: Remove all inline styles and class attributes =======
+  $('[style]').removeAttr('style');
+  $('[class]').removeAttr('class');
+
+  // ======= OPTIONAL: Add Tailwind classes to tables for better style =======
+  $('table').addClass('min-w-full mt-8 border border-gray-200 rounded-lg overflow-hidden bg-white');
+  $('th').addClass('bg-gray-100 text-gray-900 px-4 py-3 text-left font-semibold text-base');
+  $('td').addClass('border-t border-gray-200 px-4 py-2 align-top');
+  $('tr').addClass('even:bg-gray-50');
+
+  // ======= Move Banner after section 6 as before =======
   const section6 = $('h2, h3, h4, h5').filter((i, el) =>
     $(el).text().trim().toLowerCase().startsWith("6. ready to simplify airbnb cleaning")
   ).first();
@@ -37,6 +55,7 @@ function cleanContentHtml(html, mainImage, permalink) {
 
   return $.html();
 }
+
 
 export default function SeoGenPost({ post }) {
   return (
