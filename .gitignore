@@ -43,3 +43,5 @@ next-env.d.ts
 .env
 .env.local
 .env.*.local
+posts.csv
+csv_to_ndjson.py
