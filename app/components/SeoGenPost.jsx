@@ -6,7 +6,7 @@ import { urlFor } from "../../lib/sanity";
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
-  // Remove unwanted content (headers, first p's, etc)
+  // Remove unwanted content at the start (as before)
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
@@ -21,42 +21,48 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // --- Remove Elementor widget-image (bottom promo images), and adjacent links ---
-  $(".elementor-widget-image").remove();
-  $(".nsg-adjacent-links").remove();
+  // ---- REMOVE nsg-adjacent-links (bottom prev/next/overview links) ----
+  $('div.nsg-adjacent-links').remove();
 
-  // -- Remove any banner image injected by permalink or mainImage url --
-  if (permalink) {
-    $(`div:has(a[href="${permalink}"] img)`).remove();
-    $(`a[href="${permalink}"] > img`).each(function () {
-      $(this).parent().remove();
-    });
-  }
-  if (mainImage) {
-    $(`img[src="${mainImage}"]`).each(function () {
-      if ($(this).parent().is('a')) {
-        $(this).parent().remove();
-      } else {
-        $(this).remove();
-      }
-    });
-  }
+  // ---- REMOVE "extra" images/hyperlinks at the bottom ----
+  // Remove all trailing <div> or <a> that ONLY contain <img> or nothing else
+  function removeTrailingImageBlocks() {
+    let root = $.root();
+    let found = false;
 
-  // -- Remove trailing hyperlinks at the bottom (if they're only links) --
-  let last = $.root().children().last();
-  while (last.length && last.is('a')) {
-    let prev = last.prev();
-    last.remove();
-    last = prev;
-  }
-  $.root().children('p,div').each(function() {
-    const children = $(this).children();
-    if (children.length && children.filter('a').length === children.length) {
-      $(this).remove();
+    // Remove all <div> or <a> at the very end of the HTML if their only child is an <img>
+    let last = root.children().last();
+    while (
+      last.length &&
+      (
+        (last.is('div') && last.find('img').length > 0 && last.find('img').parent().is(last)) || // <div><img></div>
+        (last.is('a') && last.children('img').length === last.children().length && last.children().length > 0) // <a><img></a>
+      )
+    ) {
+      found = true;
+      let prev = last.prev();
+      last.remove();
+      last = prev;
     }
-  });
+    // Also: Remove <div> at the bottom with only <a> or <img> or nothing
+    last = root.children().last();
+    while (
+      last.length &&
+      last.is('div') &&
+      (last.children().length === 0 ||
+        last.children().filter((i, el) => $(el).is('a,img')).length === last.children().length)
+    ) {
+      found = true;
+      let prev = last.prev();
+      last.remove();
+      last = prev;
+    }
+    return found;
+  }
+  // Call it multiple times to be sure (sometimes HTML has more than one such block stacked)
+  for (let i = 0; i < 3; i++) removeTrailingImageBlocks();
 
-  // Style all tables
+  // ---- TABLE STYLING (unchanged) ----
   $("table").each((tableIdx, table) => {
     $(table).wrap('<div class="overflow-x-auto"></div>');
     $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
@@ -66,7 +72,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // --- Banner (injected after section 6) ---
+  // --- Banner Injection after section 6 ---
   const section6 = $("h2, h3, h4, h5")
     .filter((i, el) =>
       $(el)
@@ -93,7 +99,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     } else {
       section6.after(bannerHtml);
     }
-  } else if (bannerHtml) {
+  } else {
     $.root().append(bannerHtml);
   }
 
