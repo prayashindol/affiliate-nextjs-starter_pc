@@ -21,14 +21,44 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // 1. Remove any <a> wrapping an <img> whose href matches the permalink
+  // -- REMOVE any existing banner at bottom (by permalink or by mainImage URL) --
   if (permalink) {
+    // Remove: <div><a href="PERMALINK"><img ...></a></div>
+    $(`div:has(a[href="${permalink}"] img)`).remove();
+    // Also: <a href="PERMALINK"><img ...></a>
     $(`a[href="${permalink}"] > img`).each(function () {
       $(this).parent().remove();
     });
   }
+  if (mainImage) {
+    // Remove any img with same src as mainImage, just in case
+    $(`img[src="${mainImage}"]`).each(function () {
+      // Remove parent <a> if exists, else just img
+      if ($(this).parent().is('a')) {
+        $(this).parent().remove();
+      } else {
+        $(this).remove();
+      }
+    });
+  }
 
-  // Style all tables (same as before)
+  // -- REMOVE trailing hyperlinks at the bottom (if they are only links) --
+  // Find all <a> tags at the very end of the content
+  let last = $.root().children().last();
+  while (last.length && last.is('a')) {
+    let prev = last.prev();
+    last.remove();
+    last = prev;
+  }
+  // If they're wrapped in a <p> or <div> with only <a> children:
+  $.root().children('p,div').each(function() {
+    const children = $(this).children();
+    if (children.length && children.filter('a').length === children.length) {
+      $(this).remove();
+    }
+  });
+
+  // Style all tables
   $("table").each((tableIdx, table) => {
     $(table).wrap('<div class="overflow-x-auto"></div>');
     $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
@@ -71,6 +101,7 @@ function cleanContentHtml(html, mainImage, permalink) {
 
   return $.html();
 }
+
 
 
 export default function SeoGenPost({ post }) {
