@@ -6,12 +6,23 @@ import { Bars3Icon, XMarkIcon, ChevronDownIcon, ShoppingCartIcon } from '@heroic
 import Link from 'next/link'
 import { useCart } from '../context/CartContext'
 
-// === NEW NAVIGATION STRUCTURE ===
+// === WORKING NAVIGATION STRUCTURE ===
 const navigation = [
-  // ... (your navigation array, unchanged)
-]
+  { name: "Home", href: "/" },
+  { name: "SEO Generator", href: "/seo-gen" },
+  { name: "Blog", href: "/blog" },
+  { name: "Tools", href: "/tools" },
+  {
+    name: "Guides",
+    children: [
+      { name: "Pricing Guide", href: "/guides/pricing" },
+      { name: "Cleaning Checklist", href: "/guides/cleaning" },
+      // Add more if needed
+    ],
+  },
+];
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -135,7 +146,6 @@ export default function Header() {
               </span>
             )}
           </Link>
-          {/* No login/profile UI */}
         </div>
       </nav>
 
@@ -213,7 +223,6 @@ export default function Header() {
                   ) : null
                 )
               )}
-              {/* No mobile user section, just navigation */}
             </nav>
           </div>
         </Dialog>
