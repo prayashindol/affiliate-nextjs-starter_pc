@@ -1,29 +1,57 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { NewsArticle } from '@/lib/types/news';
-import { NewsCard } from '../components/NewsCard';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ErrorBoundary, NewsErrorFallback } from '../components/ErrorBoundary';
 
-export default function NewsPage() {
+// Dynamic imports to reduce initial bundle size
+const NewsCard = dynamic(() => import('../components/NewsCard').then(mod => ({ default: mod.NewsCard })), {
+  loading: () => <div className="animate-pulse bg-gray-200 rounded-lg h-64"></div>,
+  ssr: false
+});
+
+const ChevronLeftIcon = dynamic(() => import('@heroicons/react/24/outline').then(mod => ({ default: mod.ChevronLeftIcon })), {
+  loading: () => <div className="h-4 w-4"></div>,
+  ssr: false
+});
+
+const ChevronRightIcon = dynamic(() => import('@heroicons/react/24/outline').then(mod => ({ default: mod.ChevronRightIcon })), {
+  loading: () => <div className="h-4 w-4"></div>,
+  ssr: false
+});
+
+function NewsPageContent() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   const articlesPerPage = 20;
+  const maxRetries = 3;
 
   useEffect(() => {
     fetchNews(currentPage);
   }, [currentPage]);
 
-  const fetchNews = async (page: number) => {
+  const fetchNews = async (page: number, retry = 0) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`/api/news?page=${page}&limit=${articlesPerPage}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`/api/news?page=${page}&limit=${articlesPerPage}`, {
+        signal: controller.signal,
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -32,17 +60,35 @@ export default function NewsPage() {
       const data = await response.json();
       setArticles(data.data || []);
       setTotalPages(Math.ceil((data.pagination?.total || 0) / articlesPerPage));
+      setRetryCount(0); // Reset retry count on success
     } catch (err) {
-      setError('Failed to load news. Please try again later.');
       console.error('Error fetching news:', err);
+      
+      if (retry < maxRetries) {
+        setRetryCount(retry + 1);
+        // Exponential backoff: wait 1s, 2s, 4s before retrying
+        const delay = Math.pow(2, retry) * 1000;
+        setTimeout(() => fetchNews(page, retry + 1), delay);
+        setError(`Loading news... (attempt ${retry + 1}/${maxRetries + 1})`);
+      } else {
+        setError('Failed to load news. Please try refreshing the page.');
+        setRetryCount(0);
+      }
     } finally {
-      setLoading(false);
+      if (retry === 0) { // Only set loading to false on final attempt
+        setLoading(false);
+      }
     }
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleRetry = () => {
+    setRetryCount(0);
+    fetchNews(currentPage);
   };
 
   const getVisiblePages = () => {
@@ -89,45 +135,67 @@ export default function NewsPage() {
       <div className="container mx-auto px-4 py-12">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-8">
-            {error}
+            <div className="flex items-center justify-between">
+              <span>{error}</span>
+              {retryCount === 0 && (
+                <button
+                  onClick={handleRetry}
+                  className="ml-4 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors"
+                >
+                  Retry
+                </button>
+              )}
+            </div>
           </div>
         )}
 
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            <p className="mt-4 text-gray-600">Loading latest news...</p>
+            <p className="mt-4 text-gray-600">
+              {retryCount > 0 ? `Retrying... (${retryCount}/${maxRetries})` : 'Loading latest news...'}
+            </p>
           </div>
         ) : articles.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 text-lg">No news articles found at the moment.</p>
             <p className="text-gray-500 mt-2">Please check back later for the latest industry updates.</p>
+            <button
+              onClick={handleRetry}
+              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+            >
+              Refresh
+            </button>
           </div>
         ) : (
           <>
             {/* Articles Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {articles.map((article, index) => (
-                <NewsCard
-                  key={`${article.url}-${index}`}
-                  article={article}
-                  variant="default"
-                  showImage={true}
-                />
-              ))}
+              <Suspense fallback={<div className="animate-pulse bg-gray-200 rounded-lg h-64"></div>}>
+                {articles.map((article, index) => (
+                  <NewsCard
+                    key={`${article.url}-${index}`}
+                    article={article}
+                    variant="default"
+                    showImage={true}
+                  />
+                ))}
+              </Suspense>
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center items-center space-x-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="flex items-center px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeftIcon className="h-4 w-4 mr-1" />
-                  Previous
-                </button>
+                <Suspense fallback={<div className="w-20 h-10 bg-gray-200 rounded"></div>}>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeftIcon className="h-4 w-4 mr-1" />
+                    Previous
+                  </button>
+                </Suspense>
 
                 {getVisiblePages().map((page, index) => (
                   <button
@@ -146,19 +214,29 @@ export default function NewsPage() {
                   </button>
                 ))}
 
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="flex items-center px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                  <ChevronRightIcon className="h-4 w-4 ml-1" />
-                </button>
+                <Suspense fallback={<div className="w-16 h-10 bg-gray-200 rounded"></div>}>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRightIcon className="h-4 w-4 ml-1" />
+                  </button>
+                </Suspense>
               </div>
             )}
           </>
         )}
       </div>
     </div>
+  );
+}
+
+export default function NewsPage() {
+  return (
+    <ErrorBoundary fallback={NewsErrorFallback}>
+      <NewsPageContent />
+    </ErrorBoundary>
   );
 }
