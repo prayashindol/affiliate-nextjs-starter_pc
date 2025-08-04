@@ -20,17 +20,19 @@ body {
   font-family: var(--font-inter, Inter, Arial, Helvetica, sans-serif);
 }
 
-/* Prose/table overrides for editorial look */
+/* --------- TABLE & PROSE OVERRIDES --------- */
 .prose table {
   @apply min-w-full mt-10 bg-white border border-gray-200;
   box-shadow: none !important;
   border-radius: 0 !important;
+  overflow: hidden;
 }
 .prose th {
-  @apply bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg;
+  @apply bg-indigo-50 text-indigo-900 px-6 py-5 font-bold text-lg text-left;
 }
 .prose td {
-  @apply px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base;
+  @apply px-6 py-5 border-t border-gray-200 text-gray-800 align-middle text-base;
+  vertical-align: middle !important;
 }
 .prose tr {
   @apply odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150;
@@ -38,4 +40,47 @@ body {
 .prose tr:last-child td:first-child,
 .prose tr:last-child td:last-child {
   border-radius: 0 !important;
+}
+.prose h1 {
+  @apply text-center;
+}
+.prose .overflow-x-auto {
+  @apply -mx-4 sm:-mx-0;
+  margin-top: 0 !important; /* Remove gap above tables by default */
+}
+.prose table,
+.prose th,
+.prose td {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Force all first and last td/th in each row to have padding (for edge cases) */
+.prose table tr > td:first-child,
+.prose table tr > th:first-child {
+  padding-left: 1.5rem !important;  /* px-6 */
+}
+.prose table tr > td:last-child,
+.prose table tr > th:last-child {
+  padding-right: 1.5rem !important; /* px-6 */
+}
+@media (max-width: 640px) {
+  .prose th, .prose td {
+    @apply px-3 py-3 text-sm;
+  }
+  .prose table tr > td:first-child,
+  .prose table tr > th:first-child,
+  .prose table tr > td:last-child,
+  .prose table tr > th:last-child {
+    padding-left: 0.75rem !important;   /* px-3 */
+    padding-right: 0.75rem !important;  /* px-3 */
+  }
+}
+
+/* Reduce gap between heading and tables */
+.prose h2 + table,
+.prose h2 + .overflow-x-auto,
+.prose h3 + table,
+.prose h3 + .overflow-x-auto {
+  margin-top: 2rem !important;
 }

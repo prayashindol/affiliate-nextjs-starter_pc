@@ -17,6 +17,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     })
     .first()
     .remove();
+
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
@@ -25,19 +26,15 @@ function cleanContentHtml(html, mainImage, permalink) {
     // Wrap for mobile scroll
     $(table).wrap('<div class="overflow-x-auto"></div>');
 
-    // Headers
+    // Headers (all columns, all tables)
     $(table)
       .find("th")
-      .each((i, el) => {
-        $(el).addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
-      });
+      .addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
 
-    // Cells (ALL get px-6 py-5)
+    // Cells (all columns, all tables)
     $(table)
       .find("td")
-      .each((i, el) => {
-        $(el).addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
-      });
+      .addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
 
     // Row hover/zebra/rounded
     $(table)
@@ -114,7 +111,7 @@ export default function SeoGenPost({ post }) {
       )}
 
       {/* Meta */}
-      <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4 justify-center">
+<div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
         {post.location && (
           <span>
             <span className="font-semibold">Location:</span> {post.location}
