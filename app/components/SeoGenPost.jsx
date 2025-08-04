@@ -11,8 +11,18 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
 
-  // >>> REMOVE THE FIRST IMAGE <<<
-  $("img").first().remove();
+  // Remove first image ONLY if it matches the featured image url
+  if (mainImage) {
+    $("img").each(function(i, el) {
+      const imgSrc = $(el).attr("src");
+      if (imgSrc && imgSrc.includes(mainImage)) {
+        $(el).remove();
+        return false; // break after first match
+      }
+    });
+  } else {
+    $("img").first().remove();
+  }
 
   $("p")
     .filter((i, el) => {
@@ -27,20 +37,13 @@ function cleanContentHtml(html, mainImage, permalink) {
 
   // Style all tables
   $("table").each((tableIdx, table) => {
-    // Wrap for mobile scroll
     $(table).wrap('<div class="overflow-x-auto"></div>');
-
-    // Headers (all columns, all tables)
     $(table)
       .find("th")
       .addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
-
-    // Cells (all columns, all tables)
     $(table)
       .find("td")
       .addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
-
-    // Row hover/zebra/rounded
     $(table)
       .find("tr")
       .addClass("odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150");
@@ -85,6 +88,7 @@ function cleanContentHtml(html, mainImage, permalink) {
 
   return $.html();
 }
+
 
 export default function SeoGenPost({ post }) {
   const mainImageUrl =
