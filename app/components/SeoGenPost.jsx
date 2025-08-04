@@ -10,6 +10,10 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
+
+  // >>> REMOVE THE FIRST IMAGE <<<
+  $("img").first().remove();
+
   $("p")
     .filter((i, el) => {
       const text = $(el).text().toLowerCase();
@@ -111,7 +115,7 @@ export default function SeoGenPost({ post }) {
       )}
 
       {/* Meta */}
-<div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
+      <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
         {post.location && (
           <span>
             <span className="font-semibold">Location:</span> {post.location}
