@@ -1,5 +1,6 @@
 import React from "react";
 import { load } from "cheerio";
+import { urlFor } from "../lib/sanity"; // adjust if your path is different
 
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
@@ -14,33 +15,46 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("ul").first().remove();
 
   // Remove the first <p> with affiliate/disclosure
-  $("p").filter((i, el) => {
-    const text = $(el).text().toLowerCase();
-    return text.includes("affiliate") || text.includes("disclosure");
-  }).first().remove();
+  $("p")
+    .filter((i, el) => {
+      const text = $(el).text().toLowerCase();
+      return text.includes("affiliate") || text.includes("disclosure");
+    })
+    .first()
+    .remove();
 
   // Remove all inline styles and class attributes
-  $('[style]').removeAttr('style');
-  $('[class]').removeAttr('class');
+  $("[style]").removeAttr("style");
+  $("[class]").removeAttr("class");
 
   // --- PROFESSIONAL TABLE STYLING WITH CENTERED TEXT ---
   // Wrap each table for horizontal scrolling on mobile
   $("table").each((i, el) => {
     $(el).wrap('<div class="overflow-x-auto"></div>');
   });
-  // Table/card appearance, CENTERED alignment
-  $("table").addClass("min-w-full mt-8 shadow-sm rounded-xl overflow-hidden bg-white border border-gray-200");
-  $("th").addClass("bg-gray-100 text-gray-900 px-6 py-4 text-center font-semibold text-base first:rounded-tl-xl last:rounded-tr-xl");
-  $("td").addClass("px-6 py-4 border-t border-gray-200 text-gray-800 align-top text-center");
+  $("table").addClass(
+    "min-w-full mt-8 shadow-sm rounded-xl overflow-hidden bg-white border border-gray-200"
+  );
+  $("th").addClass(
+    "bg-gray-100 text-gray-900 px-6 py-4 text-center font-semibold text-base first:rounded-tl-xl last:rounded-tr-xl"
+  );
+  $("td").addClass(
+    "px-6 py-4 border-t border-gray-200 text-gray-800 align-top text-center"
+  );
   $("tr").addClass("odd:bg-gray-50 hover:bg-indigo-50 transition-colors");
   $("tr:last-child td:first-child").addClass("rounded-bl-xl");
   $("tr:last-child td:last-child").addClass("rounded-br-xl");
-  // (Removed right-align code)
 
   // --- Banner injection after section 6 ---
-  const section6 = $("h2, h3, h4, h5").filter((i, el) =>
-    $(el).text().trim().toLowerCase().startsWith("6. ready to simplify airbnb cleaning")
-  ).first();
+  const section6 = $("h2, h3, h4, h5")
+    .filter((i, el) =>
+      $(el)
+        .text()
+        .trim()
+        .toLowerCase()
+        .startsWith("6. ready to simplify airbnb cleaning")
+    )
+    .first();
 
   const bannerHtml =
     mainImage && permalink
@@ -66,10 +80,32 @@ function cleanContentHtml(html, mainImage, permalink) {
 }
 
 export default function SeoGenPost({ post }) {
+  // Prepare mainImageUrl for banner and for display after h1
+  const mainImageUrl =
+    post.mainImageAsset && post.mainImageAsset.asset
+      ? urlFor(post.mainImageAsset).width(1200).height(630).fit("max").auto("format").url()
+      : null;
+  const mainImageAlt =
+    post.mainImageAsset && post.mainImageAsset.alt
+      ? post.mainImageAsset.alt
+      : post.title;
+
   return (
     <article className="max-w-4xl mx-auto py-12 px-4 sm:px-8 lg:px-0">
       {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{post.title}</h1>
+      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+        {post.title}
+      </h1>
+
+      {/* FEATURED IMAGE just after h1 */}
+      {mainImageUrl && (
+        <img
+          src={mainImageUrl}
+          alt={mainImageAlt}
+          className="rounded-2xl shadow-lg my-8 w-full h-auto object-cover"
+          loading="eager"
+        />
+      )}
 
       {/* Meta */}
       <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
@@ -80,7 +116,8 @@ export default function SeoGenPost({ post }) {
         )}
         {post.dateModified && (
           <span>
-            <span className="font-semibold">Last updated:</span> {new Date(post.dateModified).toLocaleDateString()}
+            <span className="font-semibold">Last updated:</span>{" "}
+            {new Date(post.dateModified).toLocaleDateString()}
           </span>
         )}
         {post.author && (
@@ -96,7 +133,7 @@ export default function SeoGenPost({ post }) {
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
           dangerouslySetInnerHTML={{
-            __html: cleanContentHtml(post.contentHtml, post.mainImage, post.permalink),
+            __html: cleanContentHtml(post.contentHtml, mainImageUrl, post.permalink),
           }}
         />
       )}
