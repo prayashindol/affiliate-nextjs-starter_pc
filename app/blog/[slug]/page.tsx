@@ -230,7 +230,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
 // Generate static params for better performance
 export async function generateStaticParams() {
-  const posts = await BlogService.getAllPosts({ limit: 50 });
+  const posts = await BlogService.getAllPosts({ limit: 50 }); // Generate for first 50 posts
 
   return posts.posts.map((post) => ({
     params: { slug: post.slug },
@@ -238,8 +238,8 @@ export async function generateStaticParams() {
 }
 
 // Add metadata for SEO
-export async function generateMetadata({ params }: BlogPostPageProps) {
-  const { slug } = params; // <-- Fixed!
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const post = await BlogService.getPostBySlug(slug);
 
   if (!post) {
