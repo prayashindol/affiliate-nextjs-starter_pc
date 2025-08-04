@@ -6,7 +6,36 @@ import { urlFor } from "../../lib/sanity";
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
-  // Remove unwanted content
+  // 1. Remove empty containers & empty widgets
+  $('[data-widget_type="image.default"]').each(function () {
+    // Remove the entire image widget div (the Elementor block for extra images)
+    $(this).closest('[data-element_type="widget"]').remove();
+  });
+
+  // 2. Remove "link farm" divs at the bottom
+  $('div').each(function () {
+    // Remove divs that are just a bunch of links (next/prev links etc)
+    const children = $(this).children();
+    if (children.length && children.filter('a').length === children.length) {
+      $(this).remove();
+    }
+  });
+
+  // 3. Remove banner if duplicated
+  if (permalink) {
+    $(`a[href="${permalink}"]`).closest("div").remove();
+  }
+  if (mainImage) {
+    $(`img[src="${mainImage}"]`).each(function () {
+      if ($(this).parent().is("a")) {
+        $(this).parent().remove();
+      } else {
+        $(this).remove();
+      }
+    });
+  }
+
+  // 4. Continue cleaning as before
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
@@ -21,38 +50,7 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // REMOVE any existing banner at bottom (by permalink or by mainImage URL)
-  if (permalink) {
-    $(`div:has(a[href="${permalink}"] img)`).remove();
-    $(`a[href="${permalink}"] > img`).each(function () {
-      $(this).parent().remove();
-    });
-  }
-  if (mainImage) {
-    $(`img[src="${mainImage}"]`).each(function () {
-      if ($(this).parent().is('a')) {
-        $(this).parent().remove();
-      } else {
-        $(this).remove();
-      }
-    });
-  }
-
-  // REMOVE trailing hyperlinks at the bottom (if they are only links)
-  let last = $.root().children().last();
-  while (last.length && last.is('a')) {
-    let prev = last.prev();
-    last.remove();
-    last = prev;
-  }
-  $.root().children('p,div').each(function() {
-    const children = $(this).children();
-    if (children.length && children.filter('a').length === children.length) {
-      $(this).remove();
-    }
-  });
-
-  // Style all tables
+  // Style tables (same as before)
   $("table").each((tableIdx, table) => {
     $(table).wrap('<div class="overflow-x-auto"></div>');
     $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
@@ -62,7 +60,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // --- Banner (unchanged) ---
+  // Re-inject your banner (unchanged)
   const section6 = $("h2, h3, h4, h5")
     .filter((i, el) =>
       $(el)
@@ -95,6 +93,7 @@ function cleanContentHtml(html, mainImage, permalink) {
 
   return $.html();
 }
+
 
 export default function SeoGenPost({ post }) {
   const mainImageUrl =
