@@ -230,11 +230,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
 // Generate static params for better performance
 export async function generateStaticParams() {
-  // In a real implementation, you might want to limit this or use ISR
-  const posts = await BlogService.getAllPosts({ limit: 50 }); // Generate for first 50 posts
+  const posts = await BlogService.getAllPosts({ limit: 50 });
 
   return posts.posts.map((post) => ({
-    slug: post.slug,
+    params: { slug: post.slug },
   }));
 }
 
