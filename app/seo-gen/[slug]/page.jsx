@@ -23,17 +23,15 @@ async function getSeoGenPost(slug) {
   return await sanityClient.fetch(query, { slug });
 }
 
-// Add this function to your /app/seo-gen/[slug]/page.jsx
-
+// --- Fixed: Static Params must return { params: { slug } } ---
 export async function generateStaticParams() {
   // Fetch all slugs from Sanity
   const query = `*[_type == "seoGenPost" && defined(slug.current)]{ "slug": slug.current }`;
   const posts = await sanityClient.fetch(query);
   return posts.map(post => ({
-    slug: post.slug,
+    params: { slug: post.slug },
   }));
 }
-
 
 async function getPrevNextPosts(dateModified, slug) {
   const query = `
@@ -46,6 +44,7 @@ async function getPrevNextPosts(dateModified, slug) {
 }
 
 // --- Dynamic meta tags for SEO ---
+// Fixed: Use inline type for { params }
 export async function generateMetadata({ params }) {
   const post = await getSeoGenPost(params.slug);
   if (!post) return {};
@@ -84,6 +83,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
+// Fixed: Page receives { params: { slug } }
 export default async function SeoGenPostPage({ params }) {
   const post = await getSeoGenPost(params.slug);
 
