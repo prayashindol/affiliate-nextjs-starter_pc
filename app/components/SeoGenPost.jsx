@@ -1,20 +1,15 @@
 import React from "react";
 import { load } from "cheerio";
-import { urlFor } from "../lib/sanity"; // adjust if your path is different
+import { urlFor } from "../../lib/sanity";
 
+// -- Clean Content Function --
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
-  // Remove first H1
+  // Remove unwanted content
   $("h1").first().remove();
-
-  // Remove the first two <p> tags (usually category/location)
   $("p").slice(0, 2).remove();
-
-  // Remove the first <ul>
   $("ul").first().remove();
-
-  // Remove the first <p> with affiliate/disclosure
   $("p")
     .filter((i, el) => {
       const text = $(el).text().toLowerCase();
@@ -22,30 +17,41 @@ function cleanContentHtml(html, mainImage, permalink) {
     })
     .first()
     .remove();
-
-  // Remove all inline styles and class attributes
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // --- PROFESSIONAL TABLE STYLING WITH CENTERED TEXT ---
-  // Wrap each table for horizontal scrolling on mobile
-  $("table").each((i, el) => {
-    $(el).wrap('<div class="overflow-x-auto"></div>');
-  });
-  $("table").addClass(
-    "min-w-full mt-8 shadow-sm rounded-xl overflow-hidden bg-white border border-gray-200"
-  );
-  $("th").addClass(
-    "bg-gray-100 text-gray-900 px-6 py-4 text-center font-semibold text-base first:rounded-tl-xl last:rounded-tr-xl"
-  );
-  $("td").addClass(
-    "px-6 py-4 border-t border-gray-200 text-gray-800 align-top text-center"
-  );
-  $("tr").addClass("odd:bg-gray-50 hover:bg-indigo-50 transition-colors");
-  $("tr:last-child td:first-child").addClass("rounded-bl-xl");
-  $("tr:last-child td:last-child").addClass("rounded-br-xl");
+  // Style all tables
+  $("table").each((tableIdx, table) => {
+    // Wrap for mobile scroll
+    $(table).wrap('<div class="overflow-x-auto"></div>');
 
-  // --- Banner injection after section 6 ---
+    // Headers
+    $(table)
+      .find("th")
+      .each((i, el) => {
+        $(el).addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
+      });
+
+    // Cells (ALL get px-6 py-5)
+    $(table)
+      .find("td")
+      .each((i, el) => {
+        $(el).addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
+      });
+
+    // Row hover/zebra/rounded
+    $(table)
+      .find("tr")
+      .addClass("odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150");
+    $(table)
+      .find("tr:last-child td:first-child")
+      .addClass("rounded-bl-xl");
+    $(table)
+      .find("tr:last-child td:last-child")
+      .addClass("rounded-br-xl");
+  });
+
+  // --- Banner (unchanged) ---
   const section6 = $("h2, h3, h4, h5")
     .filter((i, el) =>
       $(el)
@@ -80,20 +86,20 @@ function cleanContentHtml(html, mainImage, permalink) {
 }
 
 export default function SeoGenPost({ post }) {
-  // Prepare mainImageUrl for banner and for display after h1
   const mainImageUrl =
     post.mainImageAsset && post.mainImageAsset.asset
       ? urlFor(post.mainImageAsset).width(1200).height(630).fit("max").auto("format").url()
       : null;
+
   const mainImageAlt =
     post.mainImageAsset && post.mainImageAsset.alt
       ? post.mainImageAsset.alt
       : post.title;
 
   return (
-    <article className="max-w-4xl mx-auto py-12 px-4 sm:px-8 lg:px-0">
+    <article className="max-w-5xl mx-auto py-12 px-4 sm:px-8 lg:px-0">
       {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight text-center">
         {post.title}
       </h1>
 
@@ -108,7 +114,7 @@ export default function SeoGenPost({ post }) {
       )}
 
       {/* Meta */}
-      <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
+      <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4 justify-center">
         {post.location && (
           <span>
             <span className="font-semibold">Location:</span> {post.location}
