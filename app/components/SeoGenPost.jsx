@@ -10,20 +10,6 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
-
-  // Remove first image ONLY if it matches the featured image url
-  if (mainImage) {
-    $("img").each(function(i, el) {
-      const imgSrc = $(el).attr("src");
-      if (imgSrc && imgSrc.includes(mainImage)) {
-        $(el).remove();
-        return false; // break after first match
-      }
-    });
-  } else {
-    $("img").first().remove();
-  }
-
   $("p")
     .filter((i, el) => {
       const text = $(el).text().toLowerCase();
@@ -35,24 +21,21 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // Style all tables
+  // 1. Remove any <a> wrapping an <img> whose href matches the permalink
+  if (permalink) {
+    $(`a[href="${permalink}"] > img`).each(function () {
+      $(this).parent().remove();
+    });
+  }
+
+  // Style all tables (same as before)
   $("table").each((tableIdx, table) => {
     $(table).wrap('<div class="overflow-x-auto"></div>');
-    $(table)
-      .find("th")
-      .addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
-    $(table)
-      .find("td")
-      .addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
-    $(table)
-      .find("tr")
-      .addClass("odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150");
-    $(table)
-      .find("tr:last-child td:first-child")
-      .addClass("rounded-bl-xl");
-    $(table)
-      .find("tr:last-child td:last-child")
-      .addClass("rounded-br-xl");
+    $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
+    $(table).find("td").addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
+    $(table).find("tr").addClass("odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150");
+    $(table).find("tr:last-child td:first-child").addClass("rounded-bl-xl");
+    $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
   // --- Banner (unchanged) ---
