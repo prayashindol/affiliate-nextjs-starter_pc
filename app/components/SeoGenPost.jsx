@@ -3,7 +3,6 @@ import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 
 // -- Clean Content Function --
-import { load } from "cheerio";
 
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
