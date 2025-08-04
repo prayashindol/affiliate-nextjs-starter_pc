@@ -7,10 +7,8 @@ import { BlogCard } from '@/app/components/BlogCard';
 import { ScrollToTopButton } from '@/app/components/ScrollToTopButton';
 
 interface BlogPostPageProps {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }
-
-
 
 // Post navigation component
 function PostNavigation({ previousPost, nextPost }: {
@@ -57,18 +55,18 @@ function PostNavigation({ previousPost, nextPost }: {
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params;
-  
+  const { slug } = params; // <-- Fixed!
+
   // Get the blog post
   const post = await BlogService.getPostBySlug(slug);
-  
+
   if (!post) {
     notFound();
   }
 
   // Get navigation posts
   const navigation = await BlogService.getPostNavigation(slug);
-  
+
   // Get related posts
   const relatedPosts = await BlogService.getRelatedPosts(post.id, 3);
 
@@ -129,12 +127,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 )}
                 <span>{post.author.name}</span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <CalendarDaysIcon className="h-5 w-5" />
                 <span>{formatDate(post.published_at)}</span>
               </div>
-              
+
               {post.read_time && (
                 <div className="flex items-center gap-2">
                   <ClockIcon className="h-5 w-5" />
@@ -162,7 +160,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="max-w-4xl mx-auto">
           {/* Article Content */}
           <article className="prose prose-lg max-w-none">
-            <div 
+            <div
               className="text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
@@ -186,9 +184,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           {/* Post Navigation */}
-          <PostNavigation 
-            previousPost={navigation.previousPost} 
-            nextPost={navigation.nextPost} 
+          <PostNavigation
+            previousPost={navigation.previousPost}
+            nextPost={navigation.nextPost}
           />
 
           {/* Related Posts */}
@@ -234,7 +232,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 export async function generateStaticParams() {
   // In a real implementation, you might want to limit this or use ISR
   const posts = await BlogService.getAllPosts({ limit: 50 }); // Generate for first 50 posts
-  
+
   return posts.posts.map((post) => ({
     slug: post.slug,
   }));
@@ -242,7 +240,7 @@ export async function generateStaticParams() {
 
 // Add metadata for SEO
 export async function generateMetadata({ params }: BlogPostPageProps) {
-  const { slug } = await params;
+  const { slug } = params; // <-- Fixed!
   const post = await BlogService.getPostBySlug(slug);
 
   if (!post) {
