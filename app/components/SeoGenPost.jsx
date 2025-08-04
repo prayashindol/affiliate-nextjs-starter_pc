@@ -6,7 +6,7 @@ import { urlFor } from "../../lib/sanity";
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
-  // Remove unwanted content
+  // Remove unwanted content (headers, first p's, etc)
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
@@ -21,19 +21,19 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // -- REMOVE any existing banner at bottom (by permalink or by mainImage URL) --
+  // --- Remove Elementor widget-image (bottom promo images), and adjacent links ---
+  $(".elementor-widget-image").remove();
+  $(".nsg-adjacent-links").remove();
+
+  // -- Remove any banner image injected by permalink or mainImage url --
   if (permalink) {
-    // Remove: <div><a href="PERMALINK"><img ...></a></div>
     $(`div:has(a[href="${permalink}"] img)`).remove();
-    // Also: <a href="PERMALINK"><img ...></a>
     $(`a[href="${permalink}"] > img`).each(function () {
       $(this).parent().remove();
     });
   }
   if (mainImage) {
-    // Remove any img with same src as mainImage, just in case
     $(`img[src="${mainImage}"]`).each(function () {
-      // Remove parent <a> if exists, else just img
       if ($(this).parent().is('a')) {
         $(this).parent().remove();
       } else {
@@ -42,15 +42,13 @@ function cleanContentHtml(html, mainImage, permalink) {
     });
   }
 
-  // -- REMOVE trailing hyperlinks at the bottom (if they are only links) --
-  // Find all <a> tags at the very end of the content
+  // -- Remove trailing hyperlinks at the bottom (if they're only links) --
   let last = $.root().children().last();
   while (last.length && last.is('a')) {
     let prev = last.prev();
     last.remove();
     last = prev;
   }
-  // If they're wrapped in a <p> or <div> with only <a> children:
   $.root().children('p,div').each(function() {
     const children = $(this).children();
     if (children.length && children.filter('a').length === children.length) {
@@ -68,7 +66,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // --- Banner (unchanged) ---
+  // --- Banner (injected after section 6) ---
   const section6 = $("h2, h3, h4, h5")
     .filter((i, el) =>
       $(el)
@@ -95,14 +93,12 @@ function cleanContentHtml(html, mainImage, permalink) {
     } else {
       section6.after(bannerHtml);
     }
-  } else {
+  } else if (bannerHtml) {
     $.root().append(bannerHtml);
   }
 
   return $.html();
 }
-
-
 
 export default function SeoGenPost({ post }) {
   const mainImageUrl =
