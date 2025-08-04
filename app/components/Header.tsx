@@ -6,7 +6,6 @@ import { Bars3Icon, XMarkIcon, ChevronDownIcon, ShoppingCartIcon } from '@heroic
 import Link from 'next/link'
 import { useCart } from '../context/CartContext'
 
-// === WORKING NAVIGATION STRUCTURE ===
 const navigation = [
   { name: "Home", href: "/" },
   { name: "SEO Generator", href: "/seo-gen" },
@@ -17,7 +16,6 @@ const navigation = [
     children: [
       { name: "Pricing Guide", href: "/guides/pricing" },
       { name: "Cleaning Checklist", href: "/guides/cleaning" },
-      // Add more if needed
     ],
   },
 ];
@@ -33,7 +31,6 @@ export default function Header() {
   return (
     <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
-        {/* Logo */}
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 flex items-center">
             <img
@@ -45,9 +42,7 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Hamburger for mobile */}
         <div className="flex lg:hidden items-center gap-4">
-          {/* Mobile Cart Icon */}
           <Link href="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
             <ShoppingCartIcon className="h-6 w-6" />
             {state.itemCount > 0 && (
@@ -65,7 +60,6 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Desktop navigation */}
         <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) =>
             item.children ? (
@@ -78,25 +72,26 @@ export default function Header() {
                   <Menu.Items className="absolute left-0 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                     <div className="py-1">
                       {item.children.map((child) =>
-                        "children" in child && child.children ? (
+                        "children" in child && Array.isArray(child.children) ? (
                           <div key={child.name} className="border-b border-gray-100 px-4 py-2">
                             <span className="font-semibold text-gray-700">{child.name}</span>
                             <div className="ml-2 mt-1 flex flex-col gap-1">
-                              {child.children.map((sub) => (
-                                <Menu.Item key={sub.name}>
-                                  {({ active }) => (
-                                    <Link
-                                      href={sub.href}
-                                      className={classNames(
-                                        active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
-                                        'block px-2 py-1 rounded'
-                                      )}
-                                    >
-                                      {sub.name}
-                                    </Link>
-                                  )}
-                                </Menu.Item>
-                              ))}
+                              {Array.isArray(child.children) &&
+                                child.children.map((sub) => (
+                                  <Menu.Item key={sub.name}>
+                                    {({ active }) => (
+                                      <Link
+                                        href={sub.href}
+                                        className={classNames(
+                                          active ? 'bg-gray-100 text-indigo-700' : 'text-gray-700',
+                                          'block px-2 py-1 rounded'
+                                        )}
+                                      >
+                                        {sub.name}
+                                      </Link>
+                                    )}
+                                  </Menu.Item>
+                                ))}
                             </div>
                           </div>
                         ) : (
@@ -135,9 +130,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* Right side - Cart */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-4">
-          {/* Cart Icon */}
           <Link href="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
             <ShoppingCartIcon className="h-6 w-6" />
             {state.itemCount > 0 && (
@@ -149,7 +142,6 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile Drawer */}
       <Transition.Root show={mobileOpen} as={Fragment}>
         <Dialog as="div" className="lg:hidden" onClose={setMobileOpen}>
           <Transition.Child
@@ -191,15 +183,16 @@ export default function Header() {
                         <Disclosure.Panel>
                           <div className="pl-4 flex flex-col gap-2">
                             {item.children.map((child) =>
-                              "children" in child && child.children ? (
+                              "children" in child && Array.isArray(child.children) ? (
                                 <div key={child.name}>
                                   <span className="font-semibold">{child.name}</span>
                                   <div className="ml-2 mt-1 flex flex-col gap-1">
-                                    {child.children.map((sub) => (
-                                      <Link key={sub.name} href={sub.href} className="block text-gray-600 py-1">
-                                        {sub.name}
-                                      </Link>
-                                    ))}
+                                    {Array.isArray(child.children) &&
+                                      child.children.map((sub) => (
+                                        <Link key={sub.name} href={sub.href} className="block text-gray-600 py-1">
+                                          {sub.name}
+                                        </Link>
+                                      ))}
                                   </div>
                                 </div>
                               ) : (
