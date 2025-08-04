@@ -6,10 +6,6 @@ import { CalendarDaysIcon, ClockIcon, UserIcon, ChevronLeftIcon, ChevronRightIco
 import { BlogCard } from '@/app/components/BlogCard';
 import { ScrollToTopButton } from '@/app/components/ScrollToTopButton';
 
-interface BlogPostPageProps {
-  params: { slug: string };
-}
-
 // Post navigation component
 function PostNavigation({ previousPost, nextPost }: {
   previousPost: BlogPost | null;
@@ -54,8 +50,8 @@ function PostNavigation({ previousPost, nextPost }: {
   );
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = params; // <-- Fixed!
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
 
   // Get the blog post
   const post = await BlogService.getPostBySlug(slug);
@@ -230,7 +226,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
 // Generate static params for better performance
 export async function generateStaticParams() {
-  const posts = await BlogService.getAllPosts({ limit: 50 }); // Generate for first 50 posts
+  const posts = await BlogService.getAllPosts({ limit: 50 });
 
   return posts.posts.map((post) => ({
     params: { slug: post.slug },
