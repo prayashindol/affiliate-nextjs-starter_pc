@@ -3,25 +3,36 @@ import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 
 // -- Clean Content Function --
+import { load } from "cheerio";
+
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
-  // 1. Remove empty containers & empty widgets
+  // Remove Elementor image widgets anywhere
   $('[data-widget_type="image.default"]').each(function () {
-    // Remove the entire image widget div (the Elementor block for extra images)
     $(this).closest('[data-element_type="widget"]').remove();
   });
 
-  // 2. Remove "link farm" divs at the bottom
-  $('div').each(function () {
-    // Remove divs that are just a bunch of links (next/prev links etc)
-    const children = $(this).children();
-    if (children.length && children.filter('a').length === children.length) {
-      $(this).remove();
-    }
+  // Remove Elementor author widgets anywhere (optional)
+  $('[data-widget_type="author-box.default"]').each(function () {
+    $(this).closest('[data-element_type="widget"]').remove();
   });
 
-  // 3. Remove banner if duplicated
+  // Remove all divs at the root that contain only links (link farm blocks at bottom)
+  $("body > div").each(function () {
+    const onlyLinks =
+      $(this).children().length > 0 &&
+      $(this)
+        .children()
+        .toArray()
+        .every((el) => el.tagName === "a" || el.tagName === "br");
+    if (onlyLinks) $(this).remove();
+  });
+
+  // Remove any <a> or <img> at the root (catch-all for bad Elementor exports)
+  $("body > a, body > img").remove();
+
+  // Remove duplicate banner/image if present (by permalink or mainImage)
   if (permalink) {
     $(`a[href="${permalink}"]`).closest("div").remove();
   }
@@ -35,7 +46,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     });
   }
 
-  // 4. Continue cleaning as before
+  // Continue cleaning as before
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
@@ -50,7 +61,7 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // Style tables (same as before)
+  // Table styling
   $("table").each((tableIdx, table) => {
     $(table).wrap('<div class="overflow-x-auto"></div>');
     $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
@@ -60,7 +71,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // Re-inject your banner (unchanged)
+  // Add custom banner after section 6 as before
   const section6 = $("h2, h3, h4, h5")
     .filter((i, el) =>
       $(el)
@@ -88,10 +99,11 @@ function cleanContentHtml(html, mainImage, permalink) {
       section6.after(bannerHtml);
     }
   } else {
-    $.root().append(bannerHtml);
+    $("body").append(bannerHtml);
   }
 
-  return $.html();
+  // Only return the inner body HTML (not the <html><head><body> wrappers)
+  return $("body").html();
 }
 
 
