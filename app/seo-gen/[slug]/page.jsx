@@ -44,7 +44,6 @@ async function getPrevNextPosts(dateModified, slug) {
 }
 
 // --- Dynamic meta tags for SEO ---
-// Fixed: Use inline type for { params }
 export async function generateMetadata({ params }) {
   const post = await getSeoGenPost(params.slug);
   if (!post) return {};
@@ -83,7 +82,6 @@ export async function generateMetadata({ params }) {
   };
 }
 
-// Fixed: Page receives { params: { slug } }
 export default async function SeoGenPostPage({ params }) {
   const post = await getSeoGenPost(params.slug);
 
