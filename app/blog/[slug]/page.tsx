@@ -227,9 +227,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 // Generate static params for better performance
 export async function generateStaticParams() {
   const posts = await BlogService.getAllPosts({ limit: 50 });
-
   return posts.posts.map((post) => ({
-    params: { slug: post.slug },
+    slug: post.slug,
   }));
 }
 
