@@ -4,19 +4,34 @@ import { urlFor } from "../../lib/sanity";
 
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
-  const bodyHtml = $("body").html();
-  const cutIdx = bodyHtml.indexOf('<div class="nsg-adjacent-links"');
-  if (cutIdx !== -1) {
-    $("body").html(bodyHtml.slice(0, cutIdx));
-  }
 
-  $('[data-widget_type="image.default"]').each(function () {
-    $(this).closest('[data-element_type="widget"]').remove();
-  });
+  // --- NEW: Clean up navigation, author box, lone links, and empty divs ---
+
+  // Remove "Prev/Next" navigation footer block
+  $('.nsg-adjacent-links, .nsg-adjacent-links-wrapper').remove();
+
+  // Remove Elementor/WordPress author box widget
+  $('.elementor-widget-author-box').remove();
   $('[data-widget_type="author-box.default"]').each(function () {
     $(this).closest('[data-element_type="widget"]').remove();
   });
-  $("body > div").each(function () {
+
+  // Remove lone navigation links at the end (direct <a> children of body)
+  $('body > a').each(function () {
+    const linkText = $(this).text().toLowerCase();
+    if (
+      linkText.includes('previous') ||
+      linkText.includes('next') ||
+      linkText.includes('overview') ||
+      linkText.includes('prev post') ||
+      linkText.includes('next post')
+    ) {
+      $(this).remove();
+    }
+  });
+
+  // Remove divs at the end of body that only contain links or brs (safety net)
+  $('body > div').each(function () {
     const onlyLinks =
       $(this).children().length > 0 &&
       $(this)
@@ -25,6 +40,20 @@ function cleanContentHtml(html, mainImage, permalink) {
         .every((el) => el.tagName === "a" || el.tagName === "br");
     if (onlyLinks) $(this).remove();
   });
+
+  // Remove any empty divs left behind
+  $('body div').each(function () {
+    if ($(this).text().trim() === "" && $(this).children().length === 0) {
+      $(this).remove();
+    }
+  });
+
+  // --- Original cleaning and formatting rules ---
+
+  $('[data-widget_type="image.default"]').each(function () {
+    $(this).closest('[data-element_type="widget"]').remove();
+  });
+
   $("body > a, body > img").remove();
   if (permalink) {
     $(`a[href="${permalink}"]`).closest("div").remove();
