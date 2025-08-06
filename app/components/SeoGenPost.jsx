@@ -10,6 +10,10 @@ function cleanContentHtml(html, mainImage, permalink) {
   // Remove "Prev/Next" navigation footer block
   $('.nsg-adjacent-links, .nsg-adjacent-links-wrapper').remove();
 
+  // Remove the entire navigation block and all its links in one shot!
+$('.nsg-adjacent-links').remove();
+
+
   // Remove Elementor/WordPress author box widget
   $('.elementor-widget-author-box').remove();
   $('[data-widget_type="author-box.default"]').each(function () {
