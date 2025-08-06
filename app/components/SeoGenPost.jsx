@@ -6,12 +6,12 @@ function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
 
   // --- NEW: Clean up navigation, author box, lone links, and empty divs ---
-
+$('.nsg-adjacent-links').remove();
   // Remove "Prev/Next" navigation footer block
   $('.nsg-adjacent-links, .nsg-adjacent-links-wrapper').remove();
 
   // Remove the entire navigation block and all its links in one shot!
-$('.nsg-adjacent-links').remove();
+
 
 
   // Remove Elementor/WordPress author box widget
