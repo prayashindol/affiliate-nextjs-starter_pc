@@ -77,40 +77,13 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // Add custom banner after section 6 as before
-  const section6 = $("h2, h3, h4, h5")
-    .filter((i, el) =>
-      $(el)
-        .text()
-        .trim()
-        .toLowerCase()
-        .startsWith("6. ready to simplify airbnb cleaning")
-    )
-    .first();
-
-  const bannerHtml =
-    mainImage && permalink
-      ? `<div class="my-12 flex justify-center">
-          <a href="${permalink}" target="_blank" rel="noopener sponsored">
-            <img src="${mainImage}" alt="Sponsored banner" class="w-full max-w-3xl object-cover rounded-xl transition hover:shadow-lg" />
-          </a>
-        </div>`
-      : "";
-
-  if (section6.length) {
-    const nextPara = section6.nextAll("p").first();
-    if (nextPara.length) {
-      nextPara.after(bannerHtml);
-    } else {
-      section6.after(bannerHtml);
-    }
-  } else {
-    $("body").append(bannerHtml);
-  }
+  // ----- REMOVE: Banner injection -----
+  // No banner/image injection into the cleaned HTML!
 
   // Only return the inner body HTML (not the <html><head><body> wrappers)
   return $("body").html();
 }
+
 
 export default function SeoGenPost({ post }) {
   const mainImageUrl =
