@@ -67,7 +67,7 @@ function cleanContentHtml(html, mainImage, permalink) {
 export default function SeoGenPost({ post }) {
   console.log("********* SeoGenPost RENDERED *********");
   console.log("POST OBJECT:", post);
-  console.log("POST TYPE:", post && post.type);
+  console.log("POST TYPE:", post && post.postType);
 
   if (!post) {
     return <div>NO POST DATA</div>;
@@ -115,7 +115,7 @@ export default function SeoGenPost({ post }) {
     // Add other post types if needed
   };
 
-  const selectedBanner = bannersByType[post.type] || null;
+  const selectedBanner = bannersByType[post.postType] || null;
   console.log("selectedBanner:", selectedBanner);
 
   return (

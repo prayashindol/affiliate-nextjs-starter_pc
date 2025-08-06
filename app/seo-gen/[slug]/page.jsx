@@ -17,7 +17,8 @@ async function getSeoGenPost(slug) {
       mainImageAsset,
       contentHtml,
       location,
-      category
+      category,
+    postType
     }
   `;
   return await sanityClient.fetch(query, { slug });
