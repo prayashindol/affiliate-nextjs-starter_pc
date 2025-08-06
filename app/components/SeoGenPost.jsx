@@ -106,6 +106,37 @@ export default function SeoGenPost({ post }) {
       console.log("CLEANED HTML:", cleanedHtml);
     }
   }
+
+  // Banner logic by post type
+const bannersByType = {
+  Cleaner: (
+    <a
+      href="https://strspecialist.com/recommends/turnoverbnb/"
+      target="_blank"
+      rel="noopener sponsored"
+      style={{ outline: 'none', border: 'none', display: 'inline-block' }}
+    >
+      <img
+        src="https://ambassador-api.s3.amazonaws.com/uploads/marketing/26557/2023_07_18_21_32_24.png"
+        alt="Turno"
+        style={{
+          border: 0,
+          maxWidth: '100%',
+          borderRadius: '1rem',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
+          margin: '0 auto',
+        }}
+      />
+    </a>
+  ),
+  // You can add other post types here later, e.g.:
+  // Price: <div>Banner for Price</div>,
+  // Furnishing: <div>Banner for Furnishing</div>,
+  // etc.
+};
+
+const selectedBanner = bannersByType[post.type] || null;
+
   // ----------------------------------------------
 
   return (
@@ -155,6 +186,13 @@ export default function SeoGenPost({ post }) {
           }}
         />
       )}
+      {/* Banner by post type */}
+{selectedBanner && (
+  <div className="flex justify-center my-12">
+    {selectedBanner}
+  </div>
+)}
+
     </article>
   );
 }
