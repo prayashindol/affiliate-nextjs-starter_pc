@@ -77,17 +77,20 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // ----- REMOVE: Banner injection -----
-  // No banner/image injection into the cleaned HTML!
+  // No banner injection into HTML!
 
   // Only return the inner body HTML (not the <html><head><body> wrappers)
   return $("body").html();
 }
 
-
 export default function SeoGenPost({ post }) {
-  // LOG POST TYPE HERE (inside your component, after imports)
-  console.log('POST TYPE:', post.type);
+  // ---- Debugging: See if component and post data is coming in ----
+  console.log("********* SeoGenPost RENDERED *********");
+  console.log("POST TYPE:", post && post.type);
+
+  if (!post) {
+    return <div>NO POST DATA</div>;
+  }
 
   const mainImageUrl =
     post.mainImageAsset && post.mainImageAsset.asset
@@ -99,13 +102,10 @@ export default function SeoGenPost({ post }) {
       ? post.mainImageAsset.alt
       : post.title;
 
-  // ----------- DEBUG: Log cleaned HTML ----------
   let cleanedHtml = "";
   if (post.contentHtml) {
     cleanedHtml = cleanContentHtml(post.contentHtml, mainImageUrl, post.permalink);
     if (typeof window === "undefined") {
-      // This will print on the server (Vercel build or Next.js dev server)
-      // For Vercel, see "Vercel logs" in the dashboard
       console.log("CLEANED HTML:", cleanedHtml);
     }
   }
@@ -117,30 +117,30 @@ export default function SeoGenPost({ post }) {
         href="https://strspecialist.com/recommends/turnoverbnb/"
         target="_blank"
         rel="noopener sponsored"
-        style={{ outline: 'none', border: 'none', display: 'inline-block' }}
+        style={{ outline: "none", border: "none", display: "inline-block" }}
       >
         <img
           src="https://ambassador-api.s3.amazonaws.com/uploads/marketing/26557/2023_07_18_21_32_24.png"
           alt="Turno"
           style={{
             border: 0,
-            maxWidth: '100%',
-            borderRadius: '1rem',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
-            margin: '0 auto',
+            maxWidth: "100%",
+            borderRadius: "1rem",
+            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.1)",
+            margin: "0 auto",
           }}
         />
       </a>
     ),
-    // You can add other post types here later, e.g.:
+    // Add other post types if needed, e.g.
     // Price: <div>Banner for Price</div>,
-    // Furnishing: <div>Banner for Furnishing</div>,
     // etc.
   };
 
   const selectedBanner = bannersByType[post.type] || null;
 
-  // ----------------------------------------------
+  // Debug banner rendering
+  console.log("selectedBanner:", selectedBanner);
 
   return (
     <article className="max-w-5xl mx-auto py-12 px-4 sm:px-8 lg:px-0">
@@ -196,7 +196,6 @@ export default function SeoGenPost({ post }) {
           {selectedBanner}
         </div>
       )}
-
     </article>
   );
 }
