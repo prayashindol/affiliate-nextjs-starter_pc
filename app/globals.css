@@ -58,26 +58,31 @@ body {
 .prose .overflow-x-auto.show-scroll-arrow::before {
   content: '→';
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.5rem;
-  color: #aaa;
-  background: rgba(230, 230, 230, 0.85);
-  border-radius: 1.2em;
-  padding: 0.18em 0.45em;
+  font-size: 1.1rem;
+  color: #bbb;
+  background: rgba(230,230,230,0.64);
+  border-radius: 1.3em;
+  padding: 0.10em 0.38em;
   z-index: 3;
-  opacity: 0.88;
+  opacity: 0.72;
   pointer-events: none;
-  box-shadow: 0 0 6px 0 rgba(0,0,0,0.04);
+  box-shadow: 0 1px 8px 0 rgba(0,0,0,0.05);
   display: block;
+  transition: opacity 0.25s;
 }
-
+/* Fades the arrow away when user has scrolled horizontally */
+.prose .overflow-x-auto.user-has-scrolled::before {
+  opacity: 0;
+  pointer-events: none;
+}
 @media (prefers-color-scheme: dark) {
   .prose .overflow-x-auto.show-scroll-arrow::before {
-    color: #bbb;
-    background: rgba(30,30,30,0.88);
-    box-shadow: 0 0 6px 0 rgba(0,0,0,0.25);
+    color: #888;
+    background: rgba(30,30,30,0.72);
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,0.18);
   }
 }
 
