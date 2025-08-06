@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "./components/Header";
@@ -5,7 +7,6 @@ import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
 import React, { useEffect } from "react";
-
 
 // Add Inter font (Google) globally
 import { Inter } from "next/font/google";
@@ -17,7 +18,9 @@ export const metadata: Metadata = {
     "Your central reliable resource for essential tools, templates, and training to maximize your hosting success",
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   useEffect(() => {
     function updateScrollArrows() {
       document.querySelectorAll('.prose .overflow-x-auto').forEach(el => {
@@ -29,27 +32,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
     updateScrollArrows();
     window.addEventListener('resize', updateScrollArrows);
-
-    // Optional: rerun when user navigates (Next.js app router only)
-    // If you use client-side navigation and new content, you may want to
-    // listen for navigation events and re-run the function.
     return () => window.removeEventListener('resize', updateScrollArrows);
   }, []);
 
-  return <>{children}</>;
-}
-
-
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable}>
       <body className="antialiased bg-white font-sans">
         <UserProvider>
           <CartProvider>
             <Header />
-              <div className="container mx-auto px-4 max-w-6xl">
+            <div className="container mx-auto px-4 max-w-6xl">
               {children}
             </div>
             <Footer />
