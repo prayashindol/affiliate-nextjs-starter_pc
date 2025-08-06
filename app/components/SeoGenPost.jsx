@@ -182,27 +182,6 @@ export default function SeoGenPost({ post }) {
           }}
         />
       )}
-
-      {/* Callout / Description */}
-      {post.description && (
-        <div className="my-12 py-6 px-6 bg-indigo-50/60 rounded-xl text-indigo-900 font-semibold text-center text-lg">
-          {post.description}
-        </div>
-      )}
-
-      {/* Permalink Button */}
-      {post.permalink && (
-        <div className="flex justify-center mt-12">
-          <a
-            href={post.permalink}
-            className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full transition"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Original Permalink
-          </a>
-        </div>
-      )}
     </article>
   );
 }
