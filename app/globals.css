@@ -158,37 +158,11 @@ body {
 .prose .overflow-x-auto::before {
   display: none;
 }
-.prose .overflow-x-auto.show-scroll-arrow::before {
-  content: '→';
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2.2em;
-  height: 2.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #fff;
-  background: rgba(24, 24, 28, 0.98);
-  border-radius: 50%;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
-  z-index: 3;
-  opacity: 0.93;
-  pointer-events: none;
-  transition: opacity 0.25s;
-  /* Remove any padding so it's a perfect circle */
-  padding: 0;
+.scroll-arrow-btn {
+  /* These styles are inlined by JS, but you can add hover effect or more here */
+  transition: opacity 0.25s, background 0.15s;
 }
-.prose .overflow-x-auto.user-has-scrolled::before {
-  opacity: 0;
-  pointer-events: none;
+.scroll-arrow-btn:hover {
+  background: rgba(24,24,28,0.99);
 }
-@media (prefers-color-scheme: dark) {
-  .prose .overflow-x-auto.show-scroll-arrow::before {
-    background: rgba(70, 70, 90, 0.97);
-    color: #fff;
-  }
-}
+

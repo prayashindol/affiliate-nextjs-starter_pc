@@ -5,9 +5,49 @@ export default function ScrollArrowEffect() {
   useEffect(() => {
     function updateScrollArrows() {
       document.querySelectorAll('.prose .overflow-x-auto').forEach(el => {
+        // Remove any previous arrow button
+        el.querySelectorAll('.scroll-arrow-btn').forEach(btn => btn.remove());
+
         el.classList.remove('show-scroll-arrow');
+        el.classList.remove('user-has-scrolled');
+
+        // Only show arrow if scrollable
         if ((el as HTMLElement).scrollWidth > (el as HTMLElement).clientWidth + 2) {
           el.classList.add('show-scroll-arrow');
+
+          // Create the clickable button
+          const btn = document.createElement('button');
+          btn.type = "button";
+          btn.className = 'scroll-arrow-btn';
+          btn.setAttribute("aria-label", "Scroll table right");
+          btn.style.position = "absolute";
+          btn.style.right = "1rem";
+          btn.style.top = "50%";
+          btn.style.transform = "translateY(-50%)";
+          btn.style.width = "2.2em";
+          btn.style.height = "2.2em";
+          btn.style.display = "flex";
+          btn.style.alignItems = "center";
+          btn.style.justifyContent = "center";
+          btn.style.fontSize = "1.2em";
+          btn.style.fontWeight = "bold";
+          btn.style.color = "#fff";
+          btn.style.background = "rgba(24, 24, 28, 0.98)";
+          btn.style.border = "none";
+          btn.style.borderRadius = "50%";
+          btn.style.boxShadow = "0 2px 12px 0 rgba(0,0,0,0.18)";
+          btn.style.zIndex = "4";
+          btn.style.opacity = "0.93";
+          btn.style.cursor = "pointer";
+          btn.style.transition = "opacity 0.25s";
+          btn.innerText = "→";
+
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            (el as HTMLElement).scrollBy({ left: (el as HTMLElement).clientWidth * 0.7, behavior: "smooth" });
+          };
+
+          el.appendChild(btn);
         }
       });
     }
@@ -15,23 +55,33 @@ export default function ScrollArrowEffect() {
     window.addEventListener('resize', updateScrollArrows);
 
     // Listen for user scroll on each .overflow-x-auto
-    const elements = document.querySelectorAll('.prose .overflow-x-auto');
-    function scrollListener(this: HTMLElement) {
+    function onScroll(this: HTMLElement) {
+      // Hide button and arrow when user scrolls right
       if (this.scrollLeft > 10) {
         this.classList.add('user-has-scrolled');
+        this.querySelectorAll('.scroll-arrow-btn').forEach(btn => {
+          (btn as HTMLElement).style.opacity = "0";
+          (btn as HTMLElement).style.pointerEvents = "none";
+        });
       } else {
         this.classList.remove('user-has-scrolled');
+        this.querySelectorAll('.scroll-arrow-btn').forEach(btn => {
+          (btn as HTMLElement).style.opacity = "0.93";
+          (btn as HTMLElement).style.pointerEvents = "auto";
+        });
       }
     }
+    const elements = document.querySelectorAll('.prose .overflow-x-auto');
     elements.forEach(el => {
-      el.addEventListener('scroll', scrollListener);
+      el.addEventListener('scroll', onScroll);
     });
 
-    // Clean up listeners
+    // Clean up listeners and remove arrows
     return () => {
       window.removeEventListener('resize', updateScrollArrows);
       elements.forEach(el => {
-        el.removeEventListener('scroll', scrollListener);
+        el.removeEventListener('scroll', onScroll);
+        el.querySelectorAll('.scroll-arrow-btn').forEach(btn => btn.remove());
       });
     };
   }, []);
