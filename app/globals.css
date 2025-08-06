@@ -78,12 +78,8 @@ body {
 }
 
 /* Remove extra margin/padding above tables that directly follow a heading in .prose content */
-.prose h1 + div > table,
-.prose h2 + div > table,
-.prose h3 + div > table,
-.prose h4 + div > table,
-.prose h5 + div > table,
-.prose h6 + div > table,
+/* ----- Fix: Remove gap between heading and table ONLY ----- */
+/* Table directly after heading */
 .prose h1 + table,
 .prose h2 + table,
 .prose h3 + table,
@@ -94,17 +90,7 @@ body {
   padding-top: 0 !important;
 }
 
-.prose h1 + div,
-.prose h2 + div,
-.prose h3 + div,
-.prose h4 + div,
-.prose h5 + div,
-.prose h6 + div {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Remove ALL margin and padding above tables that follow any heading inside prose */
+/* .overflow-x-auto directly after heading */
 .prose h1 + .overflow-x-auto,
 .prose h2 + .overflow-x-auto,
 .prose h3 + .overflow-x-auto,
@@ -115,23 +101,26 @@ body {
   padding-top: 0 !important;
 }
 
-.prose h1 + table,
-.prose h2 + table,
-.prose h3 + table,
-.prose h4 + table,
-.prose h5 + table,
-.prose h6 + table {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* This targets any table *inside* the overflow-x-auto when it's right after a heading */
+/* Table inside .overflow-x-auto directly after heading */
 .prose h1 + .overflow-x-auto > table,
 .prose h2 + .overflow-x-auto > table,
 .prose h3 + .overflow-x-auto > table,
 .prose h4 + .overflow-x-auto > table,
 .prose h5 + .overflow-x-auto > table,
 .prose h6 + .overflow-x-auto > table {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* --- Optionally, remove this if not needed: --- */
+/* If for some reason a <div> (not overflow-x-auto) wraps the table after a heading,
+   and causes a gap, you can keep this: */
+.prose h1 + div,
+.prose h2 + div,
+.prose h3 + div,
+.prose h4 + div,
+.prose h5 + div,
+.prose h6 + div {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
