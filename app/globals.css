@@ -28,11 +28,13 @@ body {
   overflow: hidden;
 }
 
-/* --- NEW: Let long content wrap in table cells --- */
+/* --- PROFESSIONAL TABLE SCROLL: HEADERS AND CELLS SINGLE-LINE, ELLIPSIS --- */
 .prose th,
 .prose td {
-  white-space: normal !important;
-  word-break: break-word !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 200px; /* Adjust as needed */
 }
 
 .prose th {
@@ -53,7 +55,7 @@ body {
   @apply text-center;
 }
 
-/* --- NEW: More visible scroll on wide tables --- */
+/* --- More visible scroll on wide tables --- */
 .prose .overflow-x-auto {
   @apply -mx-4 sm:-mx-0;
   margin-top: 0 !important;
@@ -86,7 +88,7 @@ body {
   padding-right: 1.5rem !important; /* px-6 */
 }
 
-/* --- IMPROVED: Tighter table cells on mobile --- */
+/* --- IMPROVED: Tighter table cells on mobile, and allow wrap for data --- */
 @media (max-width: 640px) {
   .prose th, .prose td {
     @apply px-2 py-2 text-sm;
@@ -97,6 +99,14 @@ body {
   .prose table tr > th:last-child {
     padding-left: 0.5rem !important;   /* px-2 */
     padding-right: 0.5rem !important;  /* px-2 */
+  }
+  .prose td {
+    white-space: normal !important;
+    word-break: break-word !important;
+    max-width: none !important;
+  }
+  .prose th {
+    font-size: 0.9rem;
   }
 }
 
