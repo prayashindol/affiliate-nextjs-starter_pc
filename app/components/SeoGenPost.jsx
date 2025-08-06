@@ -66,6 +66,7 @@ function cleanContentHtml(html, mainImage, permalink) {
 
 export default function SeoGenPost({ post }) {
   console.log("********* SeoGenPost RENDERED *********");
+  console.log("POST OBJECT:", post);
   console.log("POST TYPE:", post && post.type);
 
   if (!post) {
