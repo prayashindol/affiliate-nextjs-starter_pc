@@ -1,4 +1,3 @@
-console.log('POST TYPE:', post.type);
 import React from "react";
 import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
@@ -87,6 +86,9 @@ function cleanContentHtml(html, mainImage, permalink) {
 
 
 export default function SeoGenPost({ post }) {
+  // LOG POST TYPE HERE (inside your component, after imports)
+  console.log('POST TYPE:', post.type);
+
   const mainImageUrl =
     post.mainImageAsset && post.mainImageAsset.asset
       ? urlFor(post.mainImageAsset).width(1200).height(630).fit("max").auto("format").url()
@@ -109,34 +111,34 @@ export default function SeoGenPost({ post }) {
   }
 
   // Banner logic by post type
-const bannersByType = {
-  Cleaner: (
-    <a
-      href="https://strspecialist.com/recommends/turnoverbnb/"
-      target="_blank"
-      rel="noopener sponsored"
-      style={{ outline: 'none', border: 'none', display: 'inline-block' }}
-    >
-      <img
-        src="https://ambassador-api.s3.amazonaws.com/uploads/marketing/26557/2023_07_18_21_32_24.png"
-        alt="Turno"
-        style={{
-          border: 0,
-          maxWidth: '100%',
-          borderRadius: '1rem',
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
-          margin: '0 auto',
-        }}
-      />
-    </a>
-  ),
-  // You can add other post types here later, e.g.:
-  // Price: <div>Banner for Price</div>,
-  // Furnishing: <div>Banner for Furnishing</div>,
-  // etc.
-};
+  const bannersByType = {
+    Cleaner: (
+      <a
+        href="https://strspecialist.com/recommends/turnoverbnb/"
+        target="_blank"
+        rel="noopener sponsored"
+        style={{ outline: 'none', border: 'none', display: 'inline-block' }}
+      >
+        <img
+          src="https://ambassador-api.s3.amazonaws.com/uploads/marketing/26557/2023_07_18_21_32_24.png"
+          alt="Turno"
+          style={{
+            border: 0,
+            maxWidth: '100%',
+            borderRadius: '1rem',
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
+            margin: '0 auto',
+          }}
+        />
+      </a>
+    ),
+    // You can add other post types here later, e.g.:
+    // Price: <div>Banner for Price</div>,
+    // Furnishing: <div>Banner for Furnishing</div>,
+    // etc.
+  };
 
-const selectedBanner = bannersByType[post.type] || null;
+  const selectedBanner = bannersByType[post.type] || null;
 
   // ----------------------------------------------
 
@@ -177,7 +179,7 @@ const selectedBanner = bannersByType[post.type] || null;
         )}
       </div>
 
-      {/* Cleaned Content HTML, banner injected after section 6 */}
+      {/* Cleaned Content HTML */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
@@ -187,12 +189,13 @@ const selectedBanner = bannersByType[post.type] || null;
           }}
         />
       )}
+
       {/* Banner by post type */}
-{selectedBanner && (
-  <div className="flex justify-center my-12">
-    {selectedBanner}
-  </div>
-)}
+      {selectedBanner && (
+        <div className="flex justify-center my-12">
+          {selectedBanner}
+        </div>
+      )}
 
     </article>
   );
