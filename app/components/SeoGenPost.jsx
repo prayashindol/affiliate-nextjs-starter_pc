@@ -1,3 +1,4 @@
+console.log('POST TYPE:', post.type);
 import React from "react";
 import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
