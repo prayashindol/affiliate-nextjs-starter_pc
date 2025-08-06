@@ -77,14 +77,6 @@ body {
   }
 }
 
-/* Reduce gap between heading and tables */
-.prose h2 + table,
-.prose h2 + .overflow-x-auto,
-.prose h3 + table,
-.prose h3 + .overflow-x-auto {
-  margin-top: 2rem !important;
-}
-
 /* Remove extra margin/padding above tables that directly follow a heading in .prose content */
 .prose h1 + div > table,
 .prose h2 + div > table,
