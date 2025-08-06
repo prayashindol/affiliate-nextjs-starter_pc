@@ -2,29 +2,20 @@ import React from "react";
 import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 
-// -- Clean Content Function --
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
-
-  // -------- CUT OFF AT <div class="nsg-adjacent-links"> ----------
   const bodyHtml = $("body").html();
   const cutIdx = bodyHtml.indexOf('<div class="nsg-adjacent-links"');
   if (cutIdx !== -1) {
     $("body").html(bodyHtml.slice(0, cutIdx));
   }
-  // --------------------------------------------------------------
 
-  // Remove Elementor image widgets anywhere
   $('[data-widget_type="image.default"]').each(function () {
     $(this).closest('[data-element_type="widget"]').remove();
   });
-
-  // Remove Elementor author widgets anywhere (optional)
   $('[data-widget_type="author-box.default"]').each(function () {
     $(this).closest('[data-element_type="widget"]').remove();
   });
-
-  // Remove all divs at the root that contain only links (link farm blocks at bottom)
   $("body > div").each(function () {
     const onlyLinks =
       $(this).children().length > 0 &&
@@ -34,11 +25,7 @@ function cleanContentHtml(html, mainImage, permalink) {
         .every((el) => el.tagName === "a" || el.tagName === "br");
     if (onlyLinks) $(this).remove();
   });
-
-  // Remove any <a> or <img> at the root (catch-all for bad Elementor exports)
   $("body > a, body > img").remove();
-
-  // Remove duplicate banner/image if present (by permalink or mainImage)
   if (permalink) {
     $(`a[href="${permalink}"]`).closest("div").remove();
   }
@@ -51,8 +38,6 @@ function cleanContentHtml(html, mainImage, permalink) {
       }
     });
   }
-
-  // Continue cleaning as before
   $("h1").first().remove();
   $("p").slice(0, 2).remove();
   $("ul").first().remove();
@@ -67,7 +52,6 @@ function cleanContentHtml(html, mainImage, permalink) {
   $("[style]").removeAttr("style");
   $("[class]").removeAttr("class");
 
-  // Table styling
   $("table").each((tableIdx, table) => {
     $(table).wrap('<div class="overflow-x-auto"></div>');
     $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
@@ -77,14 +61,10 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
   });
 
-  // No banner injection into HTML!
-
-  // Only return the inner body HTML (not the <html><head><body> wrappers)
   return $("body").html();
 }
 
 export default function SeoGenPost({ post }) {
-  // ---- Debugging: See if component and post data is coming in ----
   console.log("********* SeoGenPost RENDERED *********");
   console.log("POST TYPE:", post && post.type);
 
@@ -110,7 +90,6 @@ export default function SeoGenPost({ post }) {
     }
   }
 
-  // Banner logic by post type
   const bannersByType = {
     Cleaner: (
       <a
@@ -132,24 +111,17 @@ export default function SeoGenPost({ post }) {
         />
       </a>
     ),
-    // Add other post types if needed, e.g.
-    // Price: <div>Banner for Price</div>,
-    // etc.
+    // Add other post types if needed
   };
 
   const selectedBanner = bannersByType[post.type] || null;
-
-  // Debug banner rendering
   console.log("selectedBanner:", selectedBanner);
 
   return (
     <article className="max-w-5xl mx-auto py-12 px-4 sm:px-8 lg:px-0">
-      {/* Title */}
       <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight text-center">
         {post.title}
       </h1>
-
-      {/* FEATURED IMAGE just after h1 */}
       {mainImageUrl && (
         <img
           src={mainImageUrl}
@@ -158,8 +130,6 @@ export default function SeoGenPost({ post }) {
           loading="eager"
         />
       )}
-
-      {/* Meta */}
       <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
         {post.location && (
           <span>
@@ -178,8 +148,6 @@ export default function SeoGenPost({ post }) {
           </span>
         )}
       </div>
-
-      {/* Cleaned Content HTML */}
       {post.contentHtml && (
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
@@ -189,8 +157,6 @@ export default function SeoGenPost({ post }) {
           }}
         />
       )}
-
-      {/* Banner by post type */}
       {selectedBanner && (
         <div className="flex justify-center my-12">
           {selectedBanner}
