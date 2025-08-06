@@ -20,99 +20,70 @@ body {
   font-family: var(--font-inter, Inter, Arial, Helvetica, sans-serif);
 }
 
-/* --------- TABLE & PROSE OVERRIDES --------- */
+/* --------- TABLE & PROSE OVERRIDES: "SPREADSHEET STYLE" --------- */
 .prose table {
   @apply min-w-full mt-10 bg-white border border-gray-200;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-/* --- PROFESSIONAL TABLE SCROLL: HEADERS AND CELLS SINGLE-LINE, ELLIPSIS --- */
 .prose th,
 .prose td {
   white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: 200px; /* Adjust as needed */
+  font-size: 0.93rem;        /* Compact font size */
+  padding: 0.48rem 0.7rem;   /* Less padding for density */
+  font-weight: 500;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  max-width: unset !important;
 }
 
 .prose th {
-  @apply bg-indigo-50 text-indigo-900 px-6 py-5 font-bold text-lg text-left;
-}
-.prose td {
-  @apply px-6 py-5 border-t border-gray-200 text-gray-800 align-middle text-base;
-  vertical-align: middle !important;
-}
-.prose tr {
-  @apply odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150;
-}
-.prose tr:last-child td:first-child,
-.prose tr:last-child td:last-child {
-  border-radius: 0 !important;
-}
-.prose h1 {
-  @apply text-center;
+  background: #f5ede3;
+  color: #b5542c;
+  font-size: 1.04rem;
+  font-weight: 700;
+  text-align: left;
 }
 
-/* --- More visible scroll on wide tables --- */
+.prose td {
+  color: #222;
+  background: #faf9f7;
+}
+
+.prose tr:nth-child(even) td {
+  background: #f2edea;
+}
+
+.prose tr {
+  border-bottom: 1px solid #e6e0da;
+}
+
 .prose .overflow-x-auto {
   @apply -mx-4 sm:-mx-0;
   margin-top: 0 !important;
-  position: relative;
-}
-.prose .overflow-x-auto::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; width: 2rem; height: 100%;
-  pointer-events: none;
-  background: linear-gradient(to left, #fff 70%, transparent 100%);
-  display: block;
-}
-
-/* Keep old box-shadow & border-radius removal for consistency */
-.prose table,
-.prose th,
-.prose td {
+  overflow-x: auto !important;
   box-shadow: none !important;
   border-radius: 0 !important;
+  position: relative;
 }
 
-/* Force all first and last td/th in each row to have padding (for edge cases) */
-.prose table tr > td:first-child,
-.prose table tr > th:first-child {
-  padding-left: 1.5rem !important;  /* px-6 */
+.prose .overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
 }
-.prose table tr > td:last-child,
-.prose table tr > th:last-child {
-  padding-right: 1.5rem !important; /* px-6 */
+.prose .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #e0cbb8;
+  border-radius: 4px;
 }
 
-/* --- IMPROVED: Tighter table cells on mobile, and allow wrap for data --- */
 @media (max-width: 640px) {
   .prose th, .prose td {
-    @apply px-2 py-2 text-sm;
-  }
-  .prose table tr > td:first-child,
-  .prose table tr > th:first-child,
-  .prose table tr > td:last-child,
-  .prose table tr > th:last-child {
-    padding-left: 0.5rem !important;   /* px-2 */
-    padding-right: 0.5rem !important;  /* px-2 */
-  }
-  .prose td {
-    white-space: normal !important;
-    word-break: break-word !important;
-    max-width: none !important;
-  }
-  .prose th {
-    font-size: 0.9rem;
+    font-size: 0.87rem;
+    padding: 0.32rem 0.4rem;
   }
 }
 
 /* ===== FIX: Remove unwanted gap above/below table after heading ===== */
-
-/* For your exact structure: h2 + div > .overflow-x-auto > table */
 .prose h1 + div,
 .prose h2 + div,
 .prose h3 + div,
@@ -122,7 +93,6 @@ body {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
-
 .prose h1 + div > .overflow-x-auto,
 .prose h2 + div > .overflow-x-auto,
 .prose h3 + div > .overflow-x-auto,
@@ -132,7 +102,6 @@ body {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
-
 .prose h1 + div > .overflow-x-auto > table,
 .prose h2 + div > .overflow-x-auto > table,
 .prose h3 + div > .overflow-x-auto > table,
