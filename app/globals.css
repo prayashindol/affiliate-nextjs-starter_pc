@@ -51,37 +51,33 @@ body {
   overflow-x: auto !important;
 }
 
-/* ===== Scroll hint: fade and arrow (fixed for background color) ===== */
-.prose .overflow-x-auto::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; width: 2.5rem; height: 100%;
-  pointer-events: none;
-  z-index: 2;
-  background: linear-gradient(to left, #fff 80%, rgba(255,255,255,0) 100%);
-  display: block;
-}
+/* ===== Scroll hint: arrow only, on subtle gray oval, appears only if .show-scroll-arrow is present ===== */
 .prose .overflow-x-auto::before {
+  display: none;
+}
+.prose .overflow-x-auto.show-scroll-arrow::before {
   content: '→';
   position: absolute;
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.6rem;
-  color: #b5b5b5;
+  font-size: 1.5rem;
+  color: #aaa;
+  background: rgba(230, 230, 230, 0.85);
+  border-radius: 1.2em;
+  padding: 0.18em 0.45em;
   z-index: 3;
-  opacity: 0.7;
+  opacity: 0.88;
   pointer-events: none;
-  text-shadow: 0 0 6px #fff;
+  box-shadow: 0 0 6px 0 rgba(0,0,0,0.04);
+  display: block;
 }
 
 @media (prefers-color-scheme: dark) {
-  .prose .overflow-x-auto::after {
-    background: linear-gradient(to left, #0a0a0a 80%, rgba(10,10,10,0) 100%);
-  }
-  .prose .overflow-x-auto::before {
-    color: #999;
-    text-shadow: 0 0 8px #0a0a0a;
+  .prose .overflow-x-auto.show-scroll-arrow::before {
+    color: #bbb;
+    background: rgba(30,30,30,0.88);
+    box-shadow: 0 0 6px 0 rgba(0,0,0,0.25);
   }
 }
 
