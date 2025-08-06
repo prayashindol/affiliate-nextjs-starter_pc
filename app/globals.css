@@ -27,6 +27,14 @@ body {
   border-radius: 0 !important;
   overflow: hidden;
 }
+
+/* --- NEW: Let long content wrap in table cells --- */
+.prose th,
+.prose td {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
 .prose th {
   @apply bg-indigo-50 text-indigo-900 px-6 py-5 font-bold text-lg text-left;
 }
@@ -44,10 +52,23 @@ body {
 .prose h1 {
   @apply text-center;
 }
+
+/* --- NEW: More visible scroll on wide tables --- */
 .prose .overflow-x-auto {
   @apply -mx-4 sm:-mx-0;
-  margin-top: 0 !important; /* Remove gap above tables by default */
+  margin-top: 0 !important;
+  position: relative;
 }
+.prose .overflow-x-auto::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; width: 2rem; height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to left, #fff 70%, transparent 100%);
+  display: block;
+}
+
+/* Keep old box-shadow & border-radius removal for consistency */
 .prose table,
 .prose th,
 .prose td {
@@ -64,16 +85,18 @@ body {
 .prose table tr > th:last-child {
   padding-right: 1.5rem !important; /* px-6 */
 }
+
+/* --- IMPROVED: Tighter table cells on mobile --- */
 @media (max-width: 640px) {
   .prose th, .prose td {
-    @apply px-3 py-3 text-sm;
+    @apply px-2 py-2 text-sm;
   }
   .prose table tr > td:first-child,
   .prose table tr > th:first-child,
   .prose table tr > td:last-child,
   .prose table tr > th:last-child {
-    padding-left: 0.75rem !important;   /* px-3 */
-    padding-right: 0.75rem !important;  /* px-3 */
+    padding-left: 0.5rem !important;   /* px-2 */
+    padding-right: 0.5rem !important;  /* px-2 */
   }
 }
 
@@ -90,7 +113,6 @@ body {
   padding-top: 0 !important;
 }
 
-/* Remove margin/padding from the inner overflow-x-auto directly after the div */
 .prose h1 + div > .overflow-x-auto,
 .prose h2 + div > .overflow-x-auto,
 .prose h3 + div > .overflow-x-auto,
@@ -101,7 +123,6 @@ body {
   padding-top: 0 !important;
 }
 
-/* Remove margin/padding from the table itself (above and below) */
 .prose h1 + div > .overflow-x-auto > table,
 .prose h2 + div > .overflow-x-auto > table,
 .prose h3 + div > .overflow-x-auto > table,
