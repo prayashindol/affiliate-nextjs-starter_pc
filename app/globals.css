@@ -47,45 +47,7 @@ body {
 .prose .overflow-x-auto {
   @apply -mx-4 sm:-mx-0;
   margin-top: 0 !important; /* Remove gap above tables by default */
-  position: relative;
-  overflow-x: auto !important;
 }
-
-/* ===== Scroll hint: fade and arrow ===== */
-.prose .overflow-x-auto::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; width: 2.5rem; height: 100%;
-  pointer-events: none;
-  z-index: 2;
-  background: linear-gradient(to left, #fff 70%, transparent 100%);
-  display: block;
-}
-.prose .overflow-x-auto::before {
-  content: '→';
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.6rem;
-  color: #b5b5b5;
-  z-index: 3;
-  opacity: 0.7;
-  pointer-events: none;
-  text-shadow: 0 0 6px #fff;
-}
-
-@media (prefers-color-scheme: dark) {
-  .prose .overflow-x-auto::after {
-    background: linear-gradient(to left, #0a0a0a 70%, transparent 100%);
-  }
-  .prose .overflow-x-auto::before {
-    color: #999;
-    text-shadow: 0 0 8px #0a0a0a;
-  }
-}
-
-/* Keep old box-shadow & border-radius removal for consistency */
 .prose table,
 .prose th,
 .prose td {
