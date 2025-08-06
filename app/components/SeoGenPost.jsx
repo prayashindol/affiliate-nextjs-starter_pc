@@ -3,9 +3,16 @@ import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 
 // -- Clean Content Function --
-
 function cleanContentHtml(html, mainImage, permalink) {
   const $ = load(html || "");
+
+  // -------- CUT OFF AT <div class="nsg-adjacent-links"> ----------
+  const bodyHtml = $("body").html();
+  const cutIdx = bodyHtml.indexOf('<div class="nsg-adjacent-links"');
+  if (cutIdx !== -1) {
+    $("body").html(bodyHtml.slice(0, cutIdx));
+  }
+  // --------------------------------------------------------------
 
   // Remove Elementor image widgets anywhere
   $('[data-widget_type="image.default"]').each(function () {
@@ -104,7 +111,6 @@ function cleanContentHtml(html, mainImage, permalink) {
   // Only return the inner body HTML (not the <html><head><body> wrappers)
   return $("body").html();
 }
-
 
 export default function SeoGenPost({ post }) {
   const mainImageUrl =
