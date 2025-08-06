@@ -104,3 +104,35 @@ body {
   padding-top: 0 !important;
 }
 
+/* Remove ALL margin and padding above tables that follow any heading inside prose */
+.prose h1 + .overflow-x-auto,
+.prose h2 + .overflow-x-auto,
+.prose h3 + .overflow-x-auto,
+.prose h4 + .overflow-x-auto,
+.prose h5 + .overflow-x-auto,
+.prose h6 + .overflow-x-auto {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.prose h1 + table,
+.prose h2 + table,
+.prose h3 + table,
+.prose h4 + table,
+.prose h5 + table,
+.prose h6 + table {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* This targets any table *inside* the overflow-x-auto when it's right after a heading */
+.prose h1 + .overflow-x-auto > table,
+.prose h2 + .overflow-x-auto > table,
+.prose h3 + .overflow-x-auto > table,
+.prose h4 + .overflow-x-auto > table,
+.prose h5 + .overflow-x-auto > table,
+.prose h6 + .overflow-x-auto > table {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
