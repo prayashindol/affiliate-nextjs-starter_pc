@@ -24,6 +24,16 @@ const nextConfig = {
       }
     ],
   },
+  // Redirect old seo-gen URLs to new structure
+  async redirects() {
+    return [
+      {
+        source: '/seo-gen/:slug*',
+        destination: '/:slug*',
+        permanent: true,
+      },
+    ];
+  },
   // Optimize chunks to prevent loading failures
   experimental: {
     optimizePackageImports: [
