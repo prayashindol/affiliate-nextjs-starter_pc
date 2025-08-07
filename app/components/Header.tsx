@@ -184,7 +184,6 @@ export default function Header() {
               </Link>
               <button 
                 onClick={() => setMobileOpen(false)} 
-                onTouchStart={() => setMobileOpen(false)}
                 className="relative z-50 p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 touch-manipulation"
                 aria-label="Close main menu"
               >
