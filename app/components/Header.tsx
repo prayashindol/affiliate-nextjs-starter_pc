@@ -157,7 +157,19 @@ export default function Header() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25 touch-manipulation" onClick={() => setMobileOpen(false)} />
+            <div
+              className="fixed inset-0 bg-black bg-opacity-25 touch-manipulation"
+              role="button"
+              aria-label="Close menu"
+              tabIndex={0}
+              onClick={() => setMobileOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setMobileOpen(false);
+                }
+              }}
+            />
           </Transition.Child>
 
           <div className="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white shadow-lg overflow-y-auto touch-manipulation">
