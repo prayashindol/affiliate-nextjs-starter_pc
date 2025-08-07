@@ -25,7 +25,7 @@ export default async function SeoGenListingPage() {
         {posts.map((post) => (
           <Link
             key={post.slug.current}
-            href={`/seo-gen/${post.slug.current}`}
+            href={`/${post.slug.current}`}
             className="block bg-white shadow-lg rounded-xl overflow-hidden hover:scale-[1.02] transition"
           >
             {post.mainImage && (

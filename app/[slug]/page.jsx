@@ -1,5 +1,5 @@
-import { sanityClient } from "../../../lib/sanity";
-import SeoGenPost from "../../components/SeoGenPost";
+import { sanityClient } from "../../lib/sanity";
+import SeoGenPost from "../components/SeoGenPost";
 
 // --- Fetch post by slug, including mainImageAsset ---
 async function getSeoGenPost(slug) {
@@ -26,7 +26,7 @@ async function getSeoGenPost(slug) {
 
 // --- Fixed: Static Params must return { params: { slug } } ---
 export async function generateStaticParams() {
-  // Fetch all slugs from Sanity
+  // Fetch all slugs from Sanity for SEO posts only
   const query = `*[_type == "seoGenPost" && defined(slug.current)]{ "slug": slug.current }`;
   const posts = await sanityClient.fetch(query);
   return posts.map(post => ({
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
 
   let ogImages = [];
   if (post.mainImageAsset && post.mainImageAsset.asset) {
-    const { urlFor } = await import("../../../lib/sanity");
+    const { urlFor } = await import("../../lib/sanity");
     ogImages = [
       {
         url: urlFor(post.mainImageAsset)
@@ -75,10 +75,10 @@ export async function generateMetadata({ params }) {
       description: post.description || post.excerpt || "",
       images: ogImages,
       type: "article",
-      url: post.permalink || `https://strspecialist.com/seo-gen/${params.slug}`,
+      url: post.permalink || `https://strspecialist.com/${params.slug}`,
     },
     alternates: {
-      canonical: post.permalink || `https://strspecialist.com/seo-gen/${params.slug}`,
+      canonical: post.permalink || `https://strspecialist.com/${params.slug}`,
     },
   };
 }
@@ -103,7 +103,7 @@ export default async function SeoGenPostPage({ params }) {
       <div className="flex justify-between mt-16 max-w-3xl mx-auto font-sans">
         {nav.prev ? (
           <a
-            href={`/seo-gen/${nav.prev.slug.current}`}
+            href={`/${nav.prev.slug.current}`}
             className="text-indigo-600 hover:underline text-lg"
           >
             ← Previous: {nav.prev.title}
@@ -111,7 +111,7 @@ export default async function SeoGenPostPage({ params }) {
         ) : <span />}
         {nav.next ? (
           <a
-            href={`/seo-gen/${nav.next.slug.current}`}
+            href={`/${nav.next.slug.current}`}
             className="text-indigo-600 hover:underline text-lg ml-auto"
           >
             Next: {nav.next.title} →
