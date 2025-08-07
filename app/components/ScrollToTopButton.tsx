@@ -1,12 +1,95 @@
 'use client';
 
 import { ArrowUpIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState } from 'react';
 
 export function ScrollToTopButton() {
+  const [showButton, setShowButton] = useState(false);
+  const [hasOverflowingTables, setHasOverflowingTables] = useState(false);
+
+  useEffect(() => {
+    function checkForOverflowingTables() {
+      // Look for overflow-x-auto divs anywhere in the prose content, not just direct children
+      const tables = document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto');
+      let hasOverflow = false;
+      
+      tables.forEach(el => {
+        const element = el as HTMLElement;
+        // More robust check for horizontal scroll with larger tolerance
+        // Account for browser rendering differences and ensure we only detect truly overflowing content
+        const scrollDifference = element.scrollWidth - element.clientWidth;
+        
+        // Only consider it overflowing if there's a significant difference (>15px)
+        // This prevents false positives from minor browser rendering differences
+        if (scrollDifference > 15) {
+          // Additional verification: try to scroll slightly to confirm scrollability
+          const originalScrollLeft = element.scrollLeft;
+          element.scrollLeft = Math.min(1, scrollDifference);
+          const didScroll = element.scrollLeft !== originalScrollLeft;
+          element.scrollLeft = originalScrollLeft; // Reset to original position
+          
+          // Only set overflow if both conditions are met:
+          // 1. Significant size difference (>15px)
+          // 2. Element actually scrolled when we tried to scroll it
+          if (didScroll) {
+            hasOverflow = true;
+          }
+        }
+      });
+      
+      setHasOverflowingTables(hasOverflow);
+    }
+
+    function handleScroll() {
+      const scrollY = window.scrollY;
+      // Show button when scrolled down AND there are overflowing tables
+      const shouldShow = scrollY > 300 && hasOverflowingTables;
+      setShowButton(shouldShow);
+    }
+
+    // Initial check when component mounts
+    const initialCheck = () => {
+      checkForOverflowingTables();
+      handleScroll();
+    };
+
+    // Use setTimeout to ensure DOM is fully rendered
+    const timeoutId = setTimeout(initialCheck, 100);
+    
+    // Create a MutationObserver to watch for DOM changes
+    const observer = new MutationObserver(() => {
+      setTimeout(checkForOverflowingTables, 50);
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style']
+    });
+
+    // Listen for scroll events
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', () => {
+      setTimeout(checkForOverflowingTables, 100);
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', checkForOverflowingTables);
+      observer.disconnect();
+    };
+  }, [hasOverflowingTables]);
+
+  if (!showButton) {
+    return null;
+  }
+
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-colors duration-200 z-50"
+      className="scroll-to-top-button fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-50 opacity-90 hover:opacity-100 transform hover:scale-110"
       aria-label="Scroll to top"
     >
       <ArrowUpIcon className="h-6 w-6" />

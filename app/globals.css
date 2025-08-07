@@ -158,6 +158,23 @@ body {
 .prose .overflow-x-auto::before {
   display: none;
 }
+/* ===== SCROLL TO TOP BUTTON STYLES ===== */
+.scroll-to-top-button {
+  position: fixed !important;
+  bottom: 2rem !important;
+  right: 2rem !important;
+  z-index: 9999 !important;
+  opacity: 0.9 !important;
+  visibility: visible !important;
+  display: block !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.scroll-to-top-button:hover {
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+}
+
 .scroll-arrow-btn {
   /* These styles are inlined by JS, but you can add hover effect or more here */
   transition: opacity 0.25s, background 0.15s;
