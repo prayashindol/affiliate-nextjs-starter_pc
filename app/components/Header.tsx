@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext'
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "SEO Generator", href: "/seo-gen" },
+  { name: "Posts", href: "/posts" },
   { name: "Blog", href: "/blog" },
   { name: "Tools", href: "/tools" },
   {

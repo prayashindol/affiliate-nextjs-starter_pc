@@ -15,17 +15,17 @@ async function getAllSeoGenPosts() {
   return await sanityClient.fetch(query);
 }
 
-export default async function SeoGenListingPage() {
+export default async function PostsListingPage() {
   const posts = await getAllSeoGenPosts();
 
   return (
     <div className="max-w-4xl mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center">All SEO Gen Posts</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center">All Posts</h1>
       <div className="grid gap-8 md:grid-cols-2">
         {posts.map((post) => (
           <Link
             key={post.slug.current}
-            href={`/seo-gen/${post.slug.current}`}
+            href={`/${post.slug.current}`}
             className="block bg-white shadow-lg rounded-xl overflow-hidden hover:scale-[1.02] transition"
           >
             {post.mainImage && (

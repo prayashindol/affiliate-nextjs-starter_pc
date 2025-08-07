@@ -46,7 +46,7 @@ All necessary env variables (Sanity project ID, dataset, etc.) should be defined
 Sanity Studio (if present) is usually in /sanity and runs with npm run sanity or npx sanity start.
 Project Layout and Architecture
 Directory/Key File Structure
-• /app: All main Next.js routes and pages (e.g., /app/seo-gen/[slug]/page.jsx)
+• /app: All main Next.js routes and pages (e.g., /app/[slug]/page.jsx)
 • /components: Common React components (UI, layout, banners, SEO, etc.)
 • /lib/sanity.js: Sanity client, asset builder (urlFor)
 • /styles/global.css: Main Tailwind/global CSS file
@@ -55,7 +55,7 @@ Directory/Key File Structure
 • tailwind.config.js: Tailwind CSS setup
 Important Facts
 • Affiliate/CTA banners: Added based on the post’s type (postType field from Sanity).
-See /app/seo-gen/[slug]/page.jsx or similar for logic.
+See /app/[slug]/page.jsx or similar for logic.
 • Content HTML: Cleaned and injected using cheerio in code, then rendered with dangerouslySetInnerHTML.
 • Tables: Styled in /styles/global.css using Tailwind and custom prose overrides.
 • Sanity Integration: All post content, images, and metadata come from Sanity via the API.
@@ -118,7 +118,7 @@ All necessary env variables (Sanity project ID, dataset, etc.) should be defined
 Sanity Studio (if present) is usually in /sanity and runs with npm run sanity or npx sanity start.
 Project Layout and Architecture
 Directory/Key File Structure
-• /app: All main Next.js routes and pages (e.g., /app/seo-gen/[slug]/page.jsx)
+• /app: All main Next.js routes and pages (e.g., /app/[slug]/page.jsx)
 • /components: Common React components (UI, layout, banners, SEO, etc.)
 • /lib/sanity.js: Sanity client, asset builder (urlFor)
 • /styles/global.css: Main Tailwind/global CSS file
@@ -127,7 +127,7 @@ Directory/Key File Structure
 • tailwind.config.js: Tailwind CSS setup
 Important Facts
 • Affiliate/CTA banners: Added based on the post’s type (postType field from Sanity).
-See /app/seo-gen/[slug]/page.jsx or similar for logic.
+See /app/[slug]/page.jsx or similar for logic.
 • Content HTML: Cleaned and injected using cheerio in code, then rendered with dangerouslySetInnerHTML.
 • Tables: Styled in /styles/global.css using Tailwind and custom prose overrides.
 • Sanity Integration: All post content, images, and metadata come from Sanity via the API.
