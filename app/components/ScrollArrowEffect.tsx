@@ -4,7 +4,7 @@ import { useEffect } from "react";
 export default function ScrollArrowEffect() {
   useEffect(() => {
     function updateScrollArrows() {
-      document.querySelectorAll('.prose .overflow-x-auto').forEach(el => {
+      document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto').forEach(el => {
         // Remove any previous arrow button
         el.querySelectorAll('.scroll-arrow-btn').forEach(btn => btn.remove());
 
@@ -71,7 +71,7 @@ export default function ScrollArrowEffect() {
         });
       }
     }
-    const elements = document.querySelectorAll('.prose .overflow-x-auto');
+    const elements = document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto');
     elements.forEach(el => {
       el.addEventListener('scroll', onScroll);
     });

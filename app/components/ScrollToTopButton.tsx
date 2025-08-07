@@ -9,7 +9,8 @@ export function ScrollToTopButton() {
 
   useEffect(() => {
     function checkForOverflowingTables() {
-      const tables = document.querySelectorAll('.prose .overflow-x-auto');
+      // Look for overflow-x-auto divs anywhere in the prose content, not just direct children
+      const tables = document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto');
       let hasOverflow = false;
       
       tables.forEach(el => {
