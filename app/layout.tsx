@@ -6,9 +6,8 @@ import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
 import ScrollArrowEffect from "./components/ScrollArrowEffect";
 
-// Add Inter font (Google) globally
-import { Inter } from "next/font/google";
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+// Use system fonts for better reliability
+const inter = { variable: "--font-inter" };
 
 export const metadata: Metadata = {
   title: "STR Specialist - Airbnb Host Resources",
