@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
 import ScrollArrowEffect from "./components/ScrollArrowEffect";
+import { ScrollToTopButton } from "./components/ScrollToTopButton";
 
 export const metadata: Metadata = {
   title: "STR Specialist - Airbnb Host Resources",
@@ -30,6 +31,7 @@ export default function RootLayout({
           <CartProvider>
             <Header />
             <ScrollArrowEffect /> {/* <-- Add this here! */}
+            <ScrollToTopButton />
             <div className="container mx-auto px-4 max-w-6xl">
               {children}
             </div>
