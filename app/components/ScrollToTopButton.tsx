@@ -14,7 +14,9 @@ export function ScrollToTopButton() {
       let hasOverflow = false;
       
       tables.forEach(el => {
-        if ((el as HTMLElement).scrollWidth > (el as HTMLElement).clientWidth + 2) {
+        const element = el as HTMLElement;
+        // Check if element has horizontal scroll
+        if (element.scrollWidth > element.clientWidth + 2) {
           hasOverflow = true;
         }
       });
@@ -28,27 +30,35 @@ export function ScrollToTopButton() {
       setShowButton(shouldShow);
     }
 
-    // Check for overflowing tables on load and when DOM changes
-    checkForOverflowingTables();
+    // Initial check when component mounts
+    const initialCheck = () => {
+      checkForOverflowingTables();
+      handleScroll();
+    };
+
+    // Use setTimeout to ensure DOM is fully rendered
+    const timeoutId = setTimeout(initialCheck, 100);
     
     // Create a MutationObserver to watch for DOM changes
     const observer = new MutationObserver(() => {
-      checkForOverflowingTables();
+      setTimeout(checkForOverflowingTables, 50);
     });
     
     observer.observe(document.body, {
       childList: true,
       subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style']
     });
 
     // Listen for scroll events
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', checkForOverflowingTables);
-
-    // Initial check
-    handleScroll();
+    window.addEventListener('resize', () => {
+      setTimeout(checkForOverflowingTables, 100);
+    });
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', checkForOverflowingTables);
       observer.disconnect();
@@ -62,7 +72,7 @@ export function ScrollToTopButton() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-50 opacity-90 hover:opacity-100"
+      className="scroll-to-top-button fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-50 opacity-90 hover:opacity-100 transform hover:scale-110"
       aria-label="Scroll to top"
     >
       <ArrowUpIcon className="h-6 w-6" />
