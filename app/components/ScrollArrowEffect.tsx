@@ -3,6 +3,19 @@ import { useEffect } from "react";
 
 export default function ScrollArrowEffect() {
   useEffect(() => {
+    // Debounce function for better performance
+    function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
+      let timeout: NodeJS.Timeout;
+      return function executedFunction(...args: Parameters<T>) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
     function updateScrollArrows() {
       document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto').forEach(el => {
         // Remove any previous arrow button
@@ -66,8 +79,13 @@ export default function ScrollArrowEffect() {
         }
       });
     }
+
+    // Initial update
     updateScrollArrows();
-    window.addEventListener('resize', updateScrollArrows);
+    
+    // Debounced resize handler for better performance
+    const debouncedUpdate = debounce(updateScrollArrows, 250);
+    window.addEventListener('resize', debouncedUpdate);
 
     // Listen for user scroll on each .overflow-x-auto
     function onScroll(this: HTMLElement) {
@@ -86,18 +104,61 @@ export default function ScrollArrowEffect() {
         });
       }
     }
-    const elements = document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto');
-    elements.forEach(el => {
-      el.addEventListener('scroll', onScroll);
+
+    // Set up scroll listeners for existing elements
+    function setupScrollListeners() {
+      const elements = document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto');
+      elements.forEach(el => {
+        // Remove existing listener to avoid duplicates
+        el.removeEventListener('scroll', onScroll);
+        el.addEventListener('scroll', onScroll);
+      });
+    }
+    
+    setupScrollListeners();
+
+    // Set up MutationObserver to detect dynamically added tables
+    const observer = new MutationObserver((mutations) => {
+      let shouldUpdate = false;
+      
+      mutations.forEach((mutation) => {
+        // Check if any nodes were added that might contain tables
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as Element;
+            // Check if the added node itself or its children contain overflow-x-auto elements
+            if (element.classList?.contains('overflow-x-auto') || 
+                element.querySelector?.('.overflow-x-auto')) {
+              shouldUpdate = true;
+            }
+          }
+        });
+      });
+      
+      if (shouldUpdate) {
+        // Use setTimeout to ensure DOM is fully updated
+        setTimeout(() => {
+          updateScrollArrows();
+          setupScrollListeners();
+        }, 100);
+      }
+    });
+
+    // Start observing the document for changes
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
 
     // Clean up listeners and remove arrows
     return () => {
-      window.removeEventListener('resize', updateScrollArrows);
+      window.removeEventListener('resize', debouncedUpdate);
+      const elements = document.querySelectorAll('.prose .overflow-x-auto, .overflow-x-auto');
       elements.forEach(el => {
         el.removeEventListener('scroll', onScroll);
         el.querySelectorAll('.scroll-arrow-btn').forEach(btn => btn.remove());
       });
+      observer.disconnect();
     };
   }, []);
   return null;

@@ -152,12 +152,7 @@ body {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
 }
-.prose .overflow-x-auto::before {
-  display: none;
-}
-.prose .overflow-x-auto::before {
-  display: none;
-}
+
 /* ===== SCROLL TO TOP BUTTON STYLES ===== */
 .scroll-to-top-button {
   position: fixed !important;
