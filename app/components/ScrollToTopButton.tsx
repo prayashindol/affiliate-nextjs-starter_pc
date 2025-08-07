@@ -15,9 +15,25 @@ export function ScrollToTopButton() {
       
       tables.forEach(el => {
         const element = el as HTMLElement;
-        // Check if element has horizontal scroll
-        if (element.scrollWidth > element.clientWidth + 2) {
-          hasOverflow = true;
+        // More robust check for horizontal scroll with larger tolerance
+        // Account for browser rendering differences and ensure we only detect truly overflowing content
+        const scrollDifference = element.scrollWidth - element.clientWidth;
+        
+        // Only consider it overflowing if there's a significant difference (>15px)
+        // This prevents false positives from minor browser rendering differences
+        if (scrollDifference > 15) {
+          // Additional verification: try to scroll slightly to confirm scrollability
+          const originalScrollLeft = element.scrollLeft;
+          element.scrollLeft = Math.min(1, scrollDifference);
+          const didScroll = element.scrollLeft !== originalScrollLeft;
+          element.scrollLeft = originalScrollLeft; // Reset to original position
+          
+          // Only set overflow if both conditions are met:
+          // 1. Significant size difference (>15px)
+          // 2. Element actually scrolled when we tried to scroll it
+          if (didScroll) {
+            hasOverflow = true;
+          }
         }
       });
       
@@ -25,8 +41,9 @@ export function ScrollToTopButton() {
     }
 
     function handleScroll() {
+      const scrollY = window.scrollY;
       // Show button when scrolled down AND there are overflowing tables
-      const shouldShow = window.scrollY > 300 && hasOverflowingTables;
+      const shouldShow = scrollY > 300 && hasOverflowingTables;
       setShowButton(shouldShow);
     }
 
