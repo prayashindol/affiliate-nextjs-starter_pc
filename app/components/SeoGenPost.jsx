@@ -3,7 +3,60 @@ import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 
 function cleanContentHtml(html, mainImage, permalink) {
-  const $ = load(html || "");
+  // --- NEW: Fix broken markdown-like table formatting ---
+  let processedHtml = html;
+  
+  // Look for table pattern that starts with "| Property Type" and continues through multiple rows
+  // This is more direct approach for the specific issue described
+  const tablePattern = /\|\s*Property Type.*?\|\s*Villa[^|]*\|[^<]*(?:\s*Please note[^<]*)?/s;
+  const match = processedHtml.match(tablePattern);
+  
+  if (match) {
+    // Split into lines and parse
+    const lines = match[0].split(/<br\s*\/?>/gi);
+    const tableLines = [];
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      // Check if this line looks like a table row
+      if (trimmedLine.match(/^\s*\|\s*[^|]+.*\|\s*$/)) {
+        // Skip separator lines (contains only -, |, and spaces)
+        if (trimmedLine.match(/^\s*\|\s*[-\s|]*\|\s*$/)) {
+          continue;
+        }
+        tableLines.push(trimmedLine);
+      }
+    }
+    
+    // Convert to HTML table if we found at least 2 lines (header + data)
+    if (tableLines.length >= 2) {
+      let tableHtml = '<table>';
+      let isFirstRow = true;
+      
+      for (const line of tableLines) {
+        const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+        if (cells.length > 0) {
+          tableHtml += '<tr>';
+          for (const cell of cells) {
+            if (isFirstRow) {
+              tableHtml += `<th>${cell}</th>`;
+            } else {
+              tableHtml += `<td>${cell}</td>`;
+            }
+          }
+          tableHtml += '</tr>';
+          isFirstRow = false;
+        }
+      }
+      tableHtml += '</table>';
+      
+      // Replace the broken table content with the HTML table
+      processedHtml = processedHtml.replace(match[0], tableHtml);
+    }
+  }
+  
+  // Now process with cheerio
+  const $ = load(processedHtml || "");
 
   // --- NEW: Clean up navigation, author box, lone links, and empty divs ---
 $('.nsg-adjacent-links').remove();
