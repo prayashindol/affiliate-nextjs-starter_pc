@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
+import ScrollArrowEffect from "./components/ScrollArrowEffect";
 import { ScrollToTopButton } from "./components/ScrollToTopButton";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
         <UserProvider>
           <CartProvider>
             <Header />
+            <ScrollArrowEffect />
             <ScrollToTopButton />
             <div className="container mx-auto px-4 max-w-6xl">
               {children}
