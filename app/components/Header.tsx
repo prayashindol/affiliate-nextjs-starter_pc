@@ -53,10 +53,13 @@ export default function Header() {
           </Link>
           <button
             type="button"
-            className="p-2 rounded-md text-gray-600"
+            className="relative z-50 p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 touch-manipulation"
             onClick={() => setMobileOpen(true)}
+            aria-label="Open main menu"
+            aria-expanded={mobileOpen}
           >
-            <Bars3Icon className="h-6 w-6" />
+            <span className="sr-only">Open main menu</span>
+            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
 
@@ -143,7 +146,7 @@ export default function Header() {
       </nav>
 
       <Transition.Root show={mobileOpen} as={Fragment}>
-        <Dialog as="div" className="lg:hidden" onClose={setMobileOpen}>
+        <Dialog as="div" className="lg:hidden relative z-50" onClose={setMobileOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity duration-200"
@@ -153,10 +156,22 @@ export default function Header() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25 z-50" />
+            <div
+              className="fixed inset-0 bg-black bg-opacity-25 touch-manipulation"
+              role="button"
+              aria-label="Close menu"
+              tabIndex={0}
+              onClick={() => setMobileOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setMobileOpen(false);
+                }
+              }}
+            />
           </Transition.Child>
 
-          <div className="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white shadow-lg overflow-y-auto">
+          <div className="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white shadow-lg overflow-y-auto touch-manipulation">
             <div className="flex items-center justify-between p-4 border-b">
               <Link href="/" className="flex items-center">
                 <img
@@ -166,8 +181,13 @@ export default function Header() {
                   style={{ objectFit: 'contain' }}
                 />
               </Link>
-              <button onClick={() => setMobileOpen(false)} className="p-2 rounded-md text-gray-600">
-                <XMarkIcon className="h-6 w-6" />
+              <button 
+                onClick={() => setMobileOpen(false)} 
+                className="relative z-50 p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 touch-manipulation"
+                aria-label="Close main menu"
+              >
+                <span className="sr-only">Close main menu</span>
+                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>
             <nav className="p-4 flex flex-col gap-2">
@@ -176,7 +196,7 @@ export default function Header() {
                   <Disclosure key={item.name}>
                     {({ open }) => (
                       <>
-                        <Disclosure.Button className="flex w-full justify-between items-center px-2 py-2 text-base font-semibold text-gray-900 hover:bg-gray-100 rounded">
+                        <Disclosure.Button className="flex w-full justify-between items-center px-2 py-2 text-base font-semibold text-gray-900 hover:bg-gray-100 rounded touch-manipulation">
                           {item.name}
                           {item.children && <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />}
                         </Disclosure.Button>
@@ -189,7 +209,7 @@ export default function Header() {
                                   <div className="ml-2 mt-1 flex flex-col gap-1">
                                     {Array.isArray(child.children) &&
                                       child.children.map((sub) => (
-                                        <Link key={sub.name} href={sub.href} className="block text-gray-600 py-1">
+                                        <Link key={sub.name} href={sub.href} className="block text-gray-600 py-1 touch-manipulation" onClick={() => setMobileOpen(false)}>
                                           {sub.name}
                                         </Link>
                                       ))}
@@ -197,7 +217,7 @@ export default function Header() {
                                 </div>
                               ) : (
                                 "href" in child && typeof child.href === 'string' ? (
-                                  <Link key={child.name} href={child.href} className="block text-gray-600 py-1">
+                                  <Link key={child.name} href={child.href} className="block text-gray-600 py-1 touch-manipulation" onClick={() => setMobileOpen(false)}>
                                     {child.name}
                                   </Link>
                                 ) : null
@@ -210,7 +230,7 @@ export default function Header() {
                   </Disclosure>
                 ) : (
                   "href" in item && typeof item.href === 'string' ? (
-                    <Link key={item.name} href={item.href} className="block px-2 py-2 text-base font-semibold text-gray-900 hover:bg-gray-100 rounded">
+                    <Link key={item.name} href={item.href} className="block px-2 py-2 text-base font-semibold text-gray-900 hover:bg-gray-100 rounded touch-manipulation" onClick={() => setMobileOpen(false)}>
                       {item.name}
                     </Link>
                   ) : null

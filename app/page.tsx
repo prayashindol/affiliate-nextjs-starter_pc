@@ -213,7 +213,7 @@ export default function Example() {
         </div>
 
         {/* Industry News Ticker */}
-        <NewsTicker />
+        {/* <NewsTicker /> */}
 
         {/* Logo cloud */}
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
