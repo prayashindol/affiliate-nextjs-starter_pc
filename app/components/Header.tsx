@@ -55,7 +55,6 @@ export default function Header() {
             type="button"
             className="relative z-50 p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 touch-manipulation"
             onClick={() => setMobileOpen(true)}
-            onTouchStart={() => setMobileOpen(true)}
             aria-label="Open main menu"
             aria-expanded={mobileOpen}
           >
