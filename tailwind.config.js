@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        sans: ['Inter', 'Arial', 'Helvetica', 'sans-serif'],
       },
       colors: {
         // Optional: fine-tune indigo
