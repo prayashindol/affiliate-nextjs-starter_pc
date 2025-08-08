@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
+import { SessionProvider } from "./components/SessionProvider";
 import ScrollArrowEffect from "./components/ScrollArrowEffect";
 import { ScrollToTopButton } from "./components/ScrollToTopButton";
 
@@ -27,17 +28,19 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased bg-white font-sans" style={{ fontFamily: 'Inter, Arial, Helvetica, sans-serif' }}>
-        <UserProvider>
-          <CartProvider>
-            <Header />
-            <ScrollArrowEffect />
-            <ScrollToTopButton />
-            <div className="container mx-auto px-4 max-w-6xl">
-              {children}
-            </div>
-            <Footer />
-          </CartProvider>
-        </UserProvider>
+        <SessionProvider>
+          <UserProvider>
+            <CartProvider>
+              <Header />
+              <ScrollArrowEffect />
+              <ScrollToTopButton />
+              <div className="container mx-auto px-4 max-w-6xl">
+                {children}
+              </div>
+              <Footer />
+            </CartProvider>
+          </UserProvider>
+        </SessionProvider>
       </body>
     </html>
   );
