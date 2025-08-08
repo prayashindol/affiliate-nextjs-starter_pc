@@ -33,23 +33,23 @@ body {
 }
 
 .seo-gen-content h2 {
-  @apply text-2xl md:text-3xl font-semibold text-gray-900 mt-10 mb-5 leading-tight;
+  @apply text-2xl md:text-3xl font-semibold text-gray-900 mt-12 mb-6 leading-tight;
 }
 
 .seo-gen-content h3 {
-  @apply text-xl md:text-2xl font-semibold text-gray-900 mt-8 mb-4 leading-tight;
+  @apply text-xl md:text-2xl font-semibold text-gray-900 mt-10 mb-4 leading-tight;
 }
 
 .seo-gen-content h4 {
-  @apply text-lg md:text-xl font-semibold text-gray-900 mt-6 mb-3 leading-tight;
+  @apply text-lg md:text-xl font-semibold text-gray-900 mt-8 mb-3 leading-tight;
 }
 
 .seo-gen-content h5 {
-  @apply text-base md:text-lg font-semibold text-gray-900 mt-5 mb-2 leading-tight;
+  @apply text-base md:text-lg font-semibold text-gray-900 mt-6 mb-3 leading-tight;
 }
 
 .seo-gen-content h6 {
-  @apply text-base font-semibold text-gray-900 mt-4 mb-2 leading-tight;
+  @apply text-base font-semibold text-gray-900 mt-6 mb-2 leading-tight;
 }
 
 /* Standardized paragraph spacing */
@@ -60,7 +60,7 @@ body {
 /* Standardized list spacing */
 .seo-gen-content ul,
 .seo-gen-content ol {
-  @apply mb-6 mt-2 space-y-2;
+  @apply mb-6 mt-4 space-y-2;
 }
 
 .seo-gen-content li {
@@ -85,7 +85,7 @@ body {
 
 /* Table styling for seo-gen-content */
 .seo-gen-content table {
-  @apply min-w-full mt-8 mb-8 bg-white border border-gray-200;
+  @apply min-w-full mt-8 mb-10 bg-white border border-gray-200;
   box-shadow: none;
   border-radius: 0;
   overflow: hidden;
@@ -179,32 +179,37 @@ body {
   }
   
   .seo-gen-content h1 {
-    @apply text-2xl mt-8 mb-4;
+    @apply text-2xl mt-8 mb-5;
   }
   
   .seo-gen-content h2 {
-    @apply text-xl mt-6 mb-3;
+    @apply text-xl mt-8 mb-4;
   }
   
   .seo-gen-content h3 {
-    @apply text-lg mt-5 mb-3;
+    @apply text-lg mt-6 mb-3;
   }
   
   .seo-gen-content h4 {
+    @apply text-base mt-5 mb-3;
+  }
+  
+  .seo-gen-content h5,
+  .seo-gen-content h6 {
     @apply text-base mt-4 mb-2;
   }
   
   .seo-gen-content p {
-    @apply mb-4;
+    @apply mb-5;
   }
   
   .seo-gen-content ul,
   .seo-gen-content ol {
-    @apply mb-4;
+    @apply mb-5 mt-3;
   }
   
   .seo-gen-content table {
-    @apply mt-6 mb-6;
+    @apply mt-6 mb-8;
   }
   
   .seo-gen-content th,
