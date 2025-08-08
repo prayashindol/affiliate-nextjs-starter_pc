@@ -34,16 +34,6 @@ export async function generateStaticParams() {
   }));
 }
 
-async function getPrevNextPosts(dateModified, slug) {
-  const query = `
-    {
-      "prev": *[_type == "seoGenPost" && dateModified < $dateModified] | order(dateModified desc)[0] {title, slug},
-      "next": *[_type == "seoGenPost" && dateModified > $dateModified] | order(dateModified asc)[0] {title, slug}
-    }
-  `;
-  return await sanityClient.fetch(query, { dateModified, slug });
-}
-
 // --- Dynamic meta tags for SEO ---
 export async function generateMetadata({ params }) {
   const post = await getSeoGenPost(params.slug);
@@ -95,29 +85,9 @@ export default async function SeoGenPostPage({ params }) {
     );
   }
 
-  const nav = await getPrevNextPosts(post.dateModified, post.slug.current);
-
   return (
     <>
       <SeoGenPost post={post} />
-      <div className="flex justify-between mt-16 max-w-3xl mx-auto font-sans">
-        {nav.prev ? (
-          <a
-            href={`/${nav.prev.slug.current}`}
-            className="text-indigo-600 hover:underline text-lg"
-          >
-            ← Previous: {nav.prev.title}
-          </a>
-        ) : <span />}
-        {nav.next ? (
-          <a
-            href={`/${nav.next.slug.current}`}
-            className="text-indigo-600 hover:underline text-lg ml-auto"
-          >
-            Next: {nav.next.title} →
-          </a>
-        ) : <span />}
-      </div>
     </>
   );
 }
