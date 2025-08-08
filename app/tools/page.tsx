@@ -23,14 +23,26 @@ interface Tool {
   [key: string]: unknown;
 }
 
+import { GET as getToolsAPI } from "../api/tools/route";
+
 async function getTools() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/tools`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch tools");
+  try {
+    const response = await getToolsAPI();
+    const data = await response.json();
+    
+    // Handle different response formats from the API
+    if (data.error) {
+      // API returned an error but with fallback data
+      console.warn(`Tools API warning: ${data.message}`);
+      return data.data || [];
+    }
+    
+    // Normal response - could be array or object with records
+    return Array.isArray(data) ? data : data.records || [];
+  } catch (error) {
+    console.error("Error getting tools:", error);
+    return [];
   }
-  return res.json();
 }
 
 export default async function ToolsPage() {
