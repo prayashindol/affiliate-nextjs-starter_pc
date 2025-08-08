@@ -20,6 +20,134 @@ body {
   font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
+/* ===== SEO GEN POST STANDARDIZED SPACING ===== */
+.seo-gen-content {
+  @apply text-gray-800;
+  font-size: 1.14rem;
+  line-height: 2.1;
+}
+
+/* Standardized heading styles with consistent spacing */
+.seo-gen-content h1 {
+  @apply text-3xl md:text-4xl font-bold text-gray-900 mt-12 mb-6 leading-tight;
+}
+
+.seo-gen-content h2 {
+  @apply text-2xl md:text-3xl font-semibold text-gray-900 mt-10 mb-5 leading-tight;
+}
+
+.seo-gen-content h3 {
+  @apply text-xl md:text-2xl font-semibold text-gray-900 mt-8 mb-4 leading-tight;
+}
+
+.seo-gen-content h4 {
+  @apply text-lg md:text-xl font-semibold text-gray-900 mt-6 mb-3 leading-tight;
+}
+
+.seo-gen-content h5 {
+  @apply text-base md:text-lg font-semibold text-gray-900 mt-5 mb-2 leading-tight;
+}
+
+.seo-gen-content h6 {
+  @apply text-base font-semibold text-gray-900 mt-4 mb-2 leading-tight;
+}
+
+/* Standardized paragraph spacing */
+.seo-gen-content p {
+  @apply mb-6 leading-relaxed;
+}
+
+/* Standardized list spacing */
+.seo-gen-content ul,
+.seo-gen-content ol {
+  @apply mb-6 mt-2 space-y-2;
+}
+
+.seo-gen-content li {
+  @apply leading-relaxed;
+}
+
+.seo-gen-content ul {
+  @apply list-disc pl-6;
+}
+
+.seo-gen-content ol {
+  @apply list-decimal pl-6;
+}
+
+/* Nested list adjustments */
+.seo-gen-content ul ul,
+.seo-gen-content ol ol,
+.seo-gen-content ul ol,
+.seo-gen-content ol ul {
+  @apply mt-2 mb-2;
+}
+
+/* Blockquote styling */
+.seo-gen-content blockquote {
+  @apply border-l-4 border-indigo-500 pl-6 py-2 mb-6 italic text-gray-700 bg-gray-50;
+}
+
+/* Strong and emphasis */
+.seo-gen-content strong {
+  @apply font-semibold text-gray-900;
+}
+
+.seo-gen-content em {
+  @apply italic;
+}
+
+/* Links */
+.seo-gen-content a {
+  @apply text-indigo-600 hover:text-indigo-800 underline;
+}
+
+/* Code elements */
+.seo-gen-content code {
+  @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono;
+}
+
+.seo-gen-content pre {
+  @apply bg-gray-100 p-4 rounded overflow-x-auto mb-6;
+}
+
+.seo-gen-content pre code {
+  @apply bg-transparent p-0;
+}
+
+/* Responsive spacing adjustments */
+@media (max-width: 640px) {
+  .seo-gen-content {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+  
+  .seo-gen-content h1 {
+    @apply text-2xl mt-8 mb-4;
+  }
+  
+  .seo-gen-content h2 {
+    @apply text-xl mt-6 mb-3;
+  }
+  
+  .seo-gen-content h3 {
+    @apply text-lg mt-5 mb-3;
+  }
+  
+  .seo-gen-content h4 {
+    @apply text-base mt-4 mb-2;
+  }
+  
+  .seo-gen-content p {
+    @apply mb-4;
+  }
+  
+  .seo-gen-content ul,
+  .seo-gen-content ol {
+    @apply mb-4;
+  }
+}
+
 /* --------- TABLE & PROSE OVERRIDES --------- */
 .prose table {
   @apply min-w-full mt-10 bg-white border border-gray-200;

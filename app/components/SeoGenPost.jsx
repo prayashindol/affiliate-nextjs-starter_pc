@@ -296,8 +296,7 @@ export default function SeoGenPost({ post }) {
       </div>
       {post.contentHtml && (
         <div
-          className="prose prose-lg prose-indigo max-w-none mb-12"
-          style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
+          className="seo-gen-content max-w-none mb-12"
           dangerouslySetInnerHTML={{
             __html: cleanedHtml,
           }}
