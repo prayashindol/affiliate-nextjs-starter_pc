@@ -23,11 +23,11 @@ body {
 /* ===== SEO GEN POST STANDARDIZED SPACING ===== */
 .seo-gen-content {
   @apply text-gray-800;
-  font-size: 1.14rem;
-  line-height: 2.1;
+  font-size: 1.125rem;
+  line-height: 1.75;
 }
 
-/* Standardized heading styles with consistent spacing */
+/* Standardized heading styles with consistent spacing matching reference post */
 .seo-gen-content h1 {
   @apply text-3xl md:text-4xl font-bold text-gray-900 mt-12 mb-6 leading-tight;
 }
@@ -83,6 +83,61 @@ body {
   @apply mt-2 mb-2;
 }
 
+/* Table styling for seo-gen-content */
+.seo-gen-content table {
+  @apply min-w-full mt-8 mb-8 bg-white border border-gray-200;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.seo-gen-content th {
+  @apply bg-indigo-50 text-indigo-900 px-6 py-5 font-bold text-lg text-left;
+}
+
+.seo-gen-content td {
+  @apply px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base;
+  vertical-align: top;
+}
+
+.seo-gen-content tr {
+  @apply odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150;
+}
+
+.seo-gen-content .overflow-x-auto {
+  margin-left: -1rem;
+  margin-right: -1rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow-x: auto;
+}
+
+@media (min-width: 640px) {
+  .seo-gen-content .overflow-x-auto {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* Remove gaps above tables after headings */
+.seo-gen-content h1 + div,
+.seo-gen-content h2 + div,
+.seo-gen-content h3 + div,
+.seo-gen-content h4 + div,
+.seo-gen-content h5 + div,
+.seo-gen-content h6 + div {
+  margin-top: 0;
+}
+
+.seo-gen-content h1 + div > .overflow-x-auto,
+.seo-gen-content h2 + div > .overflow-x-auto,
+.seo-gen-content h3 + div > .overflow-x-auto,
+.seo-gen-content h4 + div > .overflow-x-auto,
+.seo-gen-content h5 + div > .overflow-x-auto,
+.seo-gen-content h6 + div > .overflow-x-auto {
+  margin-top: 0;
+}
+
 /* Blockquote styling */
 .seo-gen-content blockquote {
   @apply border-l-4 border-indigo-500 pl-6 py-2 mb-6 italic text-gray-700 bg-gray-50;
@@ -108,7 +163,8 @@ body {
 }
 
 .seo-gen-content pre {
-  @apply bg-gray-100 p-4 rounded overflow-x-auto mb-6;
+  @apply bg-gray-100 p-4 rounded mb-6;
+  overflow-x: auto;
 }
 
 .seo-gen-content pre code {
@@ -119,7 +175,7 @@ body {
 @media (max-width: 640px) {
   .seo-gen-content {
     font-size: 1rem;
-    line-height: 1.8;
+    line-height: 1.625;
   }
   
   .seo-gen-content h1 {
@@ -145,6 +201,19 @@ body {
   .seo-gen-content ul,
   .seo-gen-content ol {
     @apply mb-4;
+  }
+  
+  .seo-gen-content table {
+    @apply mt-6 mb-6;
+  }
+  
+  .seo-gen-content th,
+  .seo-gen-content td {
+    @apply px-3 py-3 text-sm;
+  }
+  
+  .seo-gen-content .overflow-x-auto {
+    @apply mb-6;
   }
 }
 
