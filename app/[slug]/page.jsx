@@ -97,27 +97,35 @@ export default async function SeoGenPostPage({ params }) {
 
   const nav = await getPrevNextPosts(post.dateModified, post.slug.current);
 
+  // Check if this post should hide navigation (SEO-gen posts)
+  const shouldHideNavigation = post.category && (
+    post.category === "SEO Gen Post" || 
+    post.category === "SEO Gen Post (Viator)"
+  );
+
   return (
     <>
       <SeoGenPost post={post} />
-      <div className="flex justify-between mt-16 max-w-3xl mx-auto font-sans">
-        {nav.prev ? (
-          <a
-            href={`/${nav.prev.slug.current}`}
-            className="text-indigo-600 hover:underline text-lg"
-          >
-            ← Previous: {nav.prev.title}
-          </a>
-        ) : <span />}
-        {nav.next ? (
-          <a
-            href={`/${nav.next.slug.current}`}
-            className="text-indigo-600 hover:underline text-lg ml-auto"
-          >
-            Next: {nav.next.title} →
-          </a>
-        ) : <span />}
-      </div>
+      {!shouldHideNavigation && (
+        <div className="flex justify-between mt-16 max-w-3xl mx-auto font-sans">
+          {nav.prev ? (
+            <a
+              href={`/${nav.prev.slug.current}`}
+              className="text-indigo-600 hover:underline text-lg"
+            >
+              ← Previous: {nav.prev.title}
+            </a>
+          ) : <span />}
+          {nav.next ? (
+            <a
+              href={`/${nav.next.slug.current}`}
+              className="text-indigo-600 hover:underline text-lg ml-auto"
+            >
+              Next: {nav.next.title} →
+            </a>
+          ) : <span />}
+        </div>
+      )}
     </>
   );
 }
