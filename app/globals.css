@@ -83,9 +83,9 @@ body {
   @apply mt-2 mb-2;
 }
 
-/* Table styling for seo-gen-content with balanced spacing */
+/* Table styling for seo-gen-content with minimal spacing */
 .seo-gen-content table {
-  @apply min-w-full mt-8 mb-10 bg-white border border-gray-200;
+  @apply min-w-full mt-4 mb-6 bg-white border border-gray-200;
   box-shadow: none;
   border-radius: 0;
   overflow: hidden;
@@ -201,7 +201,7 @@ body {
   }
   
   .seo-gen-content table {
-    @apply mt-6 mb-8;
+    @apply mt-3 mb-5;
   }
   
   .seo-gen-content th,
@@ -323,27 +323,27 @@ body {
   padding-top: 0 !important;
 }
 
-/* Remove margin/padding from the inner overflow-x-auto directly after the div */
+/* Remove margin/padding from the inner overflow-x-auto directly after the div - minimal spacing */
 .prose h1 + div > .overflow-x-auto,
 .prose h2 + div > .overflow-x-auto,
 .prose h3 + div > .overflow-x-auto,
 .prose h4 + div > .overflow-x-auto,
 .prose h5 + div > .overflow-x-auto,
 .prose h6 + div > .overflow-x-auto {
-  margin-top: 0 !important;
+  margin-top: 0.25rem !important;
   padding-top: 0 !important;
 }
 
-/* Remove margin/padding from the table itself (above and below) */
+/* Remove margin/padding from the table itself - minimal spacing instead of zero */
 .prose h1 + div > .overflow-x-auto > table,
 .prose h2 + div > .overflow-x-auto > table,
 .prose h3 + div > .overflow-x-auto > table,
 .prose h4 + div > .overflow-x-auto > table,
 .prose h5 + div > .overflow-x-auto > table,
 .prose h6 + div > .overflow-x-auto > table {
-  margin-top: 0 !important;
+  margin-top: 0.5rem !important;
   padding-top: 0 !important;
-  margin-bottom: 0 !important;
+  margin-bottom: 0.75rem !important;
   padding-bottom: 0 !important;
 }
 
