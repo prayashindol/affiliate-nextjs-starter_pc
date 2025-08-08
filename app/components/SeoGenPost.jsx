@@ -3,7 +3,64 @@ import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 
 function cleanContentHtml(html, mainImage, permalink) {
-  const $ = load(html || "");
+  // --- NEW: Fix broken markdown-like table formatting ---
+  let processedHtml = html;
+  
+  // More general approach: Find ALL markdown-like table patterns in the content
+  // Look for complete table blocks and replace them entirely
+  const tableBlockPattern = /(\|\s*[^|<]+.*?\|[\s\S]*?)(?=<[^b]|$)/g;
+  let match;
+  
+  while ((match = tableBlockPattern.exec(processedHtml)) !== null) {
+    const tableBlock = match[1];
+    
+    // Split the table block by <br> tags to get individual lines
+    const lines = tableBlock.split(/<br\s*\/?>/gi);
+    const tableLines = [];
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      // Check if this line looks like a table row
+      if (trimmedLine.match(/^\s*\|\s*[^|]+.*\|\s*$/)) {
+        // Skip separator lines (contains only -, |, and spaces)
+        if (!trimmedLine.match(/^\s*\|\s*[-\s|]*\|\s*$/)) {
+          tableLines.push(trimmedLine);
+        }
+      }
+    }
+    
+    // Convert to HTML table if we found at least 2 valid table lines (header + data)
+    if (tableLines.length >= 2) {
+      let tableHtml = '<table>';
+      let isFirstRow = true;
+      
+      for (const tableLine of tableLines) {
+        const cells = tableLine.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+        if (cells.length > 0) {
+          tableHtml += '<tr>';
+          for (const cell of cells) {
+            if (isFirstRow) {
+              tableHtml += `<th>${cell}</th>`;
+            } else {
+              tableHtml += `<td>${cell}</td>`;
+            }
+          }
+          tableHtml += '</tr>';
+          isFirstRow = false;
+        }
+      }
+      tableHtml += '</table>';
+      
+      // Replace the entire table block with the HTML table
+      processedHtml = processedHtml.replace(tableBlock, tableHtml);
+      
+      // Reset the regex to start searching from the beginning since we modified the string
+      tableBlockPattern.lastIndex = 0;
+    }
+  }
+  
+  // Now process with cheerio
+  const $ = load(processedHtml || "");
 
   // --- NEW: Clean up navigation, author box, lone links, and empty divs ---
 $('.nsg-adjacent-links').remove();
