@@ -6,14 +6,16 @@ function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Fix broken markdown-like table formatting ---
   let processedHtml = html;
   
-  // Look for table pattern that starts with "| Property Type" and continues through multiple rows
-  // This is more direct approach for the specific issue described
-  const tablePattern = /\|\s*Property Type.*?\|\s*Villa[^|]*\|[^<]*(?:\s*Please note[^<]*)?/s;
-  const match = processedHtml.match(tablePattern);
+  // More general approach: Find ALL markdown-like table patterns in the content
+  // Look for complete table blocks and replace them entirely
+  const tableBlockPattern = /(\|\s*[^|<]+.*?\|[\s\S]*?)(?=<[^b]|$)/g;
+  let match;
   
-  if (match) {
-    // Split into lines and parse
-    const lines = match[0].split(/<br\s*\/?>/gi);
+  while ((match = tableBlockPattern.exec(processedHtml)) !== null) {
+    const tableBlock = match[1];
+    
+    // Split the table block by <br> tags to get individual lines
+    const lines = tableBlock.split(/<br\s*\/?>/gi);
     const tableLines = [];
     
     for (const line of lines) {
@@ -21,20 +23,19 @@ function cleanContentHtml(html, mainImage, permalink) {
       // Check if this line looks like a table row
       if (trimmedLine.match(/^\s*\|\s*[^|]+.*\|\s*$/)) {
         // Skip separator lines (contains only -, |, and spaces)
-        if (trimmedLine.match(/^\s*\|\s*[-\s|]*\|\s*$/)) {
-          continue;
+        if (!trimmedLine.match(/^\s*\|\s*[-\s|]*\|\s*$/)) {
+          tableLines.push(trimmedLine);
         }
-        tableLines.push(trimmedLine);
       }
     }
     
-    // Convert to HTML table if we found at least 2 lines (header + data)
+    // Convert to HTML table if we found at least 2 valid table lines (header + data)
     if (tableLines.length >= 2) {
       let tableHtml = '<table>';
       let isFirstRow = true;
       
-      for (const line of tableLines) {
-        const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+      for (const tableLine of tableLines) {
+        const cells = tableLine.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
         if (cells.length > 0) {
           tableHtml += '<tr>';
           for (const cell of cells) {
@@ -50,8 +51,11 @@ function cleanContentHtml(html, mainImage, permalink) {
       }
       tableHtml += '</table>';
       
-      // Replace the broken table content with the HTML table
-      processedHtml = processedHtml.replace(match[0], tableHtml);
+      // Replace the entire table block with the HTML table
+      processedHtml = processedHtml.replace(tableBlock, tableHtml);
+      
+      // Reset the regex to start searching from the beginning since we modified the string
+      tableBlockPattern.lastIndex = 0;
     }
   }
   
