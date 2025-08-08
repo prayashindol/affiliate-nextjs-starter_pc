@@ -62,48 +62,103 @@ function cleanContentHtml(html, mainImage, permalink) {
   // Now process with cheerio
   const $ = load(processedHtml || "");
 
-  // --- NEW: Clean up navigation, author box, lone links, and empty divs ---
-$('.nsg-adjacent-links').remove();
-  // Remove "Prev/Next" navigation footer block
+  // --- COMPREHENSIVE: Clean up all possible navigation patterns ---
+  
+  // Remove known navigation classes and elements
   $('.nsg-adjacent-links, .nsg-adjacent-links-wrapper').remove();
-
-  // Remove the entire navigation block and all its links in one shot!
-
-
-
-  // Remove Elementor/WordPress author box widget
+  $('.post-navigation, .nav-links, .navigation-links').remove();
+  $('.prev-post, .next-post, .post-nav').remove();
+  $('.pagination, .page-navigation').remove();
+  
+  // Remove WordPress/Elementor navigation widgets
+  $('.elementor-widget-post-navigation').remove();
+  $('[data-widget_type="post-navigation.default"]').remove();
+  $('[data-widget_type="theme-post-navigation.default"]').remove();
+  
+  // Remove author box widgets
   $('.elementor-widget-author-box').remove();
   $('[data-widget_type="author-box.default"]').each(function () {
     $(this).closest('[data-element_type="widget"]').remove();
   });
 
-  // Remove lone navigation links at the end (direct <a> children of body)
-  $('body > a').each(function () {
-    const linkText = $(this).text().toLowerCase();
-    if (
-      linkText.includes('previous') ||
-      linkText.includes('next') ||
-      linkText.includes('overview') ||
-      linkText.includes('prev post') ||
-      linkText.includes('next post')
-    ) {
+  // Remove navigation links by text content (comprehensive patterns)
+  $('a').each(function () {
+    const linkText = $(this).text().toLowerCase().trim();
+    const navigationPatterns = [
+      'previous post',
+      'next post', 
+      'prev post',
+      'previous',
+      'next',
+      'overview',
+      '← previous',
+      'next →',
+      '‹ previous',
+      'next ›',
+      'previous article',
+      'next article',
+      'previous page',
+      'next page',
+      'read previous',
+      'read next',
+      'view previous',
+      'view next',
+      'back to overview',
+      'continue reading',
+      'related posts',
+      'more posts'
+    ];
+    
+    const isNavigationLink = navigationPatterns.some(pattern => 
+      linkText.includes(pattern) || 
+      linkText === pattern ||
+      linkText.startsWith(pattern) ||
+      linkText.endsWith(pattern)
+    );
+    
+    if (isNavigationLink) {
+      // Remove the link and potentially its parent container
+      const parentDiv = $(this).closest('div');
+      if (parentDiv.length && parentDiv.children().length === 1) {
+        parentDiv.remove();
+      } else {
+        $(this).remove();
+      }
+    }
+  });
+
+  // Remove containers that only contain navigation elements
+  $('div, section, nav').each(function () {
+    const containerText = $(this).text().toLowerCase().trim();
+    const isNavigationContainer = containerText.match(/^(previous|next|prev|overview|navigation|more posts|related posts)/i) ||
+      containerText.match(/(previous|next)\s*(post|page|article)$/i);
+    
+    if (isNavigationContainer && containerText.length < 100) {
       $(this).remove();
     }
   });
 
-  // Remove divs at the end of body that only contain links or brs (safety net)
-  $('body > div').each(function () {
-    const onlyLinks =
-      $(this).children().length > 0 &&
-      $(this)
-        .children()
-        .toArray()
-        .every((el) => el.tagName === "a" || el.tagName === "br");
-    if (onlyLinks) $(this).remove();
+  // Remove divs that only contain links or navigation elements
+  $('div').each(function () {
+    const children = $(this).children();
+    if (children.length > 0) {
+      const onlyNavElements = children.toArray().every((el) => {
+        return el.tagName === "a" || el.tagName === "br" || el.tagName === "span" ||
+               (el.tagName === "div" && $(el).text().trim().length < 50);
+      });
+      
+      if (onlyNavElements) {
+        const containerText = $(this).text().toLowerCase().trim();
+        if (containerText.includes('previous') || containerText.includes('next') || 
+            containerText.includes('overview') || containerText.length < 50) {
+          $(this).remove();
+        }
+      }
+    }
   });
 
-  // Remove any empty divs left behind
-  $('body div').each(function () {
+  // Final cleanup: Remove any remaining empty containers
+  $('div, section, nav').each(function () {
     if ($(this).text().trim() === "" && $(this).children().length === 0) {
       $(this).remove();
     }
