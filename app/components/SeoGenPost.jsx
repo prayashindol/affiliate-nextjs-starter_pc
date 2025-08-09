@@ -1,6 +1,7 @@
 import React from "react";
 import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
+import ViatorTours from "./ViatorTours";
 
 function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Fix broken markdown-like table formatting ---
@@ -209,7 +210,39 @@ function cleanContentHtml(html, mainImage, permalink) {
   return $("body").html();
 }
 
-export default function SeoGenPost({ post }) {
+function ContentWithViatorTours({ htmlContent, viatorTours, city }) {
+  // Split content at the injection point
+  const parts = htmlContent.split('<div id="viator-tours-injection-point"></div>');
+  
+  return (
+    <>
+      {parts[0] && (
+        <div dangerouslySetInnerHTML={{ __html: parts[0] }} />
+      )}
+      <ViatorTours city={city} tours={viatorTours} />
+      {parts[1] && (
+        <div dangerouslySetInnerHTML={{ __html: parts[1] }} />
+      )}
+    </>
+  );
+}
+
+function injectViatorToursAfterParagraph(htmlContent, viatorToursComponent, paragraphIndex = 2) {
+  if (!viatorToursComponent || !htmlContent) return htmlContent;
+
+  const $ = load(htmlContent);
+  const paragraphs = $('p');
+  
+  if (paragraphs.length >= paragraphIndex) {
+    const targetParagraph = paragraphs.eq(paragraphIndex - 1);
+    // Create a marker for the Viator tours injection point
+    targetParagraph.after('<div id="viator-tours-injection-point"></div>');
+  }
+  
+  return $.html();
+}
+
+export default function SeoGenPost({ post, isViatorPost = false, viatorTours = [], city = null }) {
   console.log("********* SeoGenPost RENDERED *********");
   console.log("POST OBJECT:", post);
   console.log("POST TYPE:", post && post.postType);
@@ -231,6 +264,12 @@ export default function SeoGenPost({ post }) {
   let cleanedHtml = "";
   if (post.contentHtml) {
     cleanedHtml = cleanContentHtml(post.contentHtml, mainImageUrl, post.permalink);
+    
+    // If this is a Viator post, inject tours after 2nd paragraph
+    if (isViatorPost && viatorTours.length > 0) {
+      cleanedHtml = injectViatorToursAfterParagraph(cleanedHtml, true, 2);
+    }
+    
     if (typeof window === "undefined") {
       console.log("CLEANED HTML:", cleanedHtml);
     }
@@ -298,10 +337,21 @@ export default function SeoGenPost({ post }) {
         <div
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
-          dangerouslySetInnerHTML={{
-            __html: cleanedHtml,
-          }}
-        />
+        >
+          {isViatorPost && viatorTours.length > 0 ? (
+            <ContentWithViatorTours 
+              htmlContent={cleanedHtml} 
+              viatorTours={viatorTours} 
+              city={city} 
+            />
+          ) : (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: cleanedHtml,
+              }}
+            />
+          )}
+        </div>
       )}
       {selectedBanner && (
         <div className="flex justify-center my-12">
