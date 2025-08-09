@@ -30,26 +30,40 @@ VIATOR_API_KEY=your_viator_api_key_here
 
 # Sanity CMS (already configured)
 NEXT_PUBLIC_SANITY_TOKEN=your_sanity_token
+
+# Optional: Other API integrations
+AIRTABLE_PERSONAL_TOKEN=your_airtable_token
+AIRTABLE_BASE_ID=your_base_id
+AIRTABLE_TABLE_ID=your_table_id
 ```
 
 ### Viator Tours Integration
 
-This project supports special "SEO Gen Post (Viator)" posts that automatically inject Viator tours after the 2nd paragraph. To add support for new cities:
+This project supports special "SEO Gen Post (Viator)" posts that automatically inject Viator tours after the 2nd paragraph. 
 
-1. Add the city mapping to `data/viatorCityMap.json`:
+**Setup Requirements:**
+1. Set `VIATOR_API_KEY` in your environment variables (server-side only, never exposed to client)
+2. In Sanity, create posts with category "SEO Gen Post (Viator)" and a `city` field
+3. Add city mappings to `data/viatorCityMap.json` for new destinations
+
+**Adding new cities:**
+Edit `data/viatorCityMap.json`:
 ```json
 {
   "shannon": "d6207",
   "dublin": "d5036", 
   "galway": "d5156",
   "kerry": "d26008",
+  "motueka": "d6218",
   "yourcity": "destination_id_from_viator"
 }
 ```
 
-2. In Sanity, create posts with:
-   - Category: "SEO Gen Post (Viator)"
-   - City field: set to the city name (lowercase, matching the key in viatorCityMap.json)
+**How it works:**
+- Posts with category "SEO Gen Post (Viator)" automatically show 9 highest-rated tours
+- Tours are fetched server-side and cached (ISR with 12h revalidation)
+- If city is not mapped or API fails, page renders normally without tours
+- Tours appear as a grid after the 2nd paragraph of the post content
 
 ## Learn More
 
