@@ -29,8 +29,8 @@ async function getSeoGenPost(slug) {
 
 // --- Fixed: Static Params must return { params: { slug } } ---
 export async function generateStaticParams() {
-  // Fetch all slugs from Sanity for SEO posts only
-  const query = `*[_type == "seoGenPost" && postType == "seo" && defined(slug.current)]{ "slug": slug.current }`;
+  // Fetch all slugs from Sanity for ALL seoGenPost types (including Viator posts)
+  const query = `*[_type == "seoGenPost" && defined(slug.current)]{ "slug": slug.current }`;
   const posts = await sanityClient.fetch(query);
   return posts.map(post => ({
     params: { slug: post.slug },
