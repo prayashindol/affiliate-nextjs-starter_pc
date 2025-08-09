@@ -20,6 +20,37 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```env
+# Viator API Integration (for SEO Gen Post (Viator) category posts)
+VIATOR_API_KEY=your_viator_api_key_here
+
+# Sanity CMS (already configured)
+NEXT_PUBLIC_SANITY_TOKEN=your_sanity_token
+```
+
+### Viator Tours Integration
+
+This project supports special "SEO Gen Post (Viator)" posts that automatically inject Viator tours after the 2nd paragraph. To add support for new cities:
+
+1. Add the city mapping to `data/viatorCityMap.json`:
+```json
+{
+  "shannon": "d6207",
+  "dublin": "d5036", 
+  "galway": "d5156",
+  "kerry": "d26008",
+  "yourcity": "destination_id_from_viator"
+}
+```
+
+2. In Sanity, create posts with:
+   - Category: "SEO Gen Post (Viator)"
+   - City field: set to the city name (lowercase, matching the key in viatorCityMap.json)
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

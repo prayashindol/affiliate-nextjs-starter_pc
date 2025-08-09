@@ -1,4 +1,5 @@
 import { sanityClient } from "../../lib/sanity";
+import { fetchViatorTours } from "../../lib/viator";
 import SeoGenPost from "../components/SeoGenPost";
 
 // --- Fetch post by slug, including mainImageAsset ---
@@ -18,7 +19,9 @@ async function getSeoGenPost(slug) {
       contentHtml,
       location,
       category,
-    postType
+      categories[]->{title},
+      city,
+      postType
     }
   `;
   return await sanityClient.fetch(query, { slug });
@@ -85,9 +88,32 @@ export default async function SeoGenPostPage({ params }) {
     );
   }
 
+  // Check if this is a Viator post by looking at categories
+  const isViatorPost = post?.categories?.some(c => c?.title === 'SEO Gen Post (Viator)');
+  
+  // Fetch Viator tours if this is a Viator post and has a city
+  let viatorTours = [];
+  if (isViatorPost && post?.city) {
+    try {
+      const viatorResult = await fetchViatorTours({ 
+        city: post.city, 
+        count: 9 
+      });
+      viatorTours = viatorResult.products || [];
+    } catch (error) {
+      console.error('Failed to fetch Viator tours:', error);
+      // Continue rendering without tours if API fails
+    }
+  }
+
   return (
     <>
-      <SeoGenPost post={post} />
+      <SeoGenPost 
+        post={post} 
+        isViatorPost={isViatorPost}
+        viatorTours={viatorTours}
+        city={post?.city}
+      />
     </>
   );
 }
