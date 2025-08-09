@@ -5,7 +5,7 @@ import SeoGenPost from "../components/SeoGenPost";
 // --- Fetch post by slug, including mainImageAsset ---
 async function getSeoGenPost(slug) {
   const query = `
-    *[_type == "seoGenPost" && slug.current == $slug][0] {
+    *[_type in ["seoGenPost","seoGenPostViator"] && slug.current == $slug][0] {
       title,
       slug,
       description,
@@ -27,10 +27,9 @@ async function getSeoGenPost(slug) {
   return await sanityClient.fetch(query, { slug });
 }
 
-// --- Fixed: Static Params must return { params: { slug } } ---
+// --- Static Params: include slugs from BOTH types ---
 export async function generateStaticParams() {
-  // Fetch all slugs from Sanity for ALL seoGenPost types (including Viator posts)
-  const query = `*[_type == "seoGenPost" && defined(slug.current)]{ "slug": slug.current }`;
+  const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)]{ "slug": slug.current }`;
   const posts = await sanityClient.fetch(query);
   return posts.map(post => ({
     params: { slug: post.slug },
