@@ -11,6 +11,7 @@ const navigation = [
   { name: "Posts", href: "/posts" },
   { name: "Blog", href: "/blog" },
   { name: "Tools", href: "/tools" },
+  { name: "SEO Gen Post (Viator)", href: "/tools/viator-seo" },
   {
     name: "Guides",
     children: [
