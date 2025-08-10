@@ -1,6 +1,9 @@
 import { sanityClient } from "@/lib/sanity";
 import Link from "next/link";
 
+// Minimum content length to filter out posts with very short/incomplete content
+const MIN_CONTENT_LENGTH = 100;
+
 async function getAllSeoGenPosts() {
   // Include both seoGenPost and seoGenPostViator types
   // Filter out posts with empty/incomplete content
