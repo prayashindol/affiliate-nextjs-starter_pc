@@ -86,41 +86,37 @@ function cleanContentHtml(html, mainImage, permalink) {
   $('.viator-tours, .tour-item').remove();
   $('[class*="viator"], [id*="viator"]').remove();
   
-  // Remove any elements that contain "highest rated" tour text that looks like Viator content
-  $('h2, h3').each(function () {
-    const text = $(this).text().toLowerCase();
-    if (text.includes('highest rated') && (text.includes('tour') || text.includes('sight-seeing'))) {
-      // Remove this heading and try to find associated tour content
-      const nextElements = $(this).nextUntil('h1, h2, h3').addBack();
-      nextElements.each(function() {
+  // Combine selector filtering and reduce DOM traversal for headings related to "highest rated" tours
+  $('h2, h3')
+    .filter(function () {
+      const text = $(this).text().toLowerCase();
+      return text.includes('highest rated') && (text.includes('tour') || text.includes('sight-seeing'));
+    })
+    .each(function () {
+      // Collect all elements to remove: the heading and associated tour content
+      const toRemove = [this];
+      $(this).nextUntil('h1, h2, h3').each(function () {
         const elemText = $(this).text().toLowerCase();
-        if (elemText.includes('book now') || elemText.includes('from:') || elemText.includes('reviews') || elemText.includes('duration')) {
-          $(this).remove();
+        if (
+          elemText.includes('book now') ||
+          elemText.includes('from:') ||
+          elemText.includes('reviews') ||
+          elemText.includes('duration')
+        ) {
+          toRemove.push(this);
         }
       });
-      $(this).remove();
-  // Combine selector filtering and reduce DOM traversal for headings related to "highest rated" tours
-  $('h2, h3').filter(function () {
-    const text = $(this).text().toLowerCase();
-    return text.includes('highest rated') && (text.includes('tour') || text.includes('sight-seeing'));
-  }).each(function () {
-    // Collect all elements to remove: the heading and associated tour content
-    const toRemove = [this];
-    $(this).nextUntil('h1, h2, h3').each(function () {
-      const elemText = $(this).text().toLowerCase();
-      if (elemText.includes('book now') || elemText.includes('from:') || elemText.includes('reviews') || elemText.includes('duration')) {
-        toRemove.push(this);
-      }
+      $(toRemove).remove();
     });
-    $(toRemove).remove();
-  });
 
   // Remove divs that look like tour cards (contain book now, pricing, etc.)
   $('div').each(function () {
     const divText = $(this).text().toLowerCase();
-    if ((divText.includes('book now') && divText.includes('from:')) || 
-        (divText.includes('reviews') && divText.includes('hrs')) ||
-        divText.includes('viator')) {
+    if (
+      (divText.includes('book now') && divText.includes('from:')) ||
+      (divText.includes('reviews') && divText.includes('hrs')) ||
+      divText.includes('viator')
+    ) {
       $(this).remove();
     }
   });
@@ -138,7 +134,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     const linkText = $(this).text().toLowerCase().trim();
     const navigationPatterns = [
       'previous post',
-      'next post', 
+      'next post',
       'prev post',
       'previous',
       'next',
@@ -161,8 +157,8 @@ function cleanContentHtml(html, mainImage, permalink) {
       'more posts'
     ];
     
-    const isNavigationLink = navigationPatterns.some(pattern => 
-      linkText.includes(pattern) || 
+    const isNavigationLink = navigationPatterns.some(pattern =>
+      linkText.includes(pattern) ||
       linkText === pattern ||
       linkText.startsWith(pattern) ||
       linkText.endsWith(pattern)
@@ -182,7 +178,8 @@ function cleanContentHtml(html, mainImage, permalink) {
   // Remove containers that only contain navigation elements
   $('div, section, nav').each(function () {
     const containerText = $(this).text().toLowerCase().trim();
-    const isNavigationContainer = containerText.match(/^(previous|next|prev|overview|navigation|more posts|related posts)/i) ||
+    const isNavigationContainer =
+      containerText.match(/^(previous|next|prev|overview|navigation|more posts|related posts)/i) ||
       containerText.match(/(previous|next)\s*(post|page|article)$/i);
     
     if (isNavigationContainer && containerText.length < 100) {
@@ -195,14 +192,22 @@ function cleanContentHtml(html, mainImage, permalink) {
     const children = $(this).children();
     if (children.length > 0) {
       const onlyNavElements = children.toArray().every((el) => {
-        return el.tagName === "a" || el.tagName === "br" || el.tagName === "span" ||
-               (el.tagName === "div" && $(el).text().trim().length < 50);
+        return (
+          el.tagName === "a" ||
+          el.tagName === "br" ||
+          el.tagName === "span" ||
+          (el.tagName === "div" && $(el).text().trim().length < 50)
+        );
       });
       
       if (onlyNavElements) {
         const containerText = $(this).text().toLowerCase().trim();
-        if (containerText.includes('previous') || containerText.includes('next') || 
-            containerText.includes('overview') || containerText.length < 50) {
+        if (
+          containerText.includes('previous') ||
+          containerText.includes('next') ||
+          containerText.includes('overview') ||
+          containerText.length < 50
+        ) {
           $(this).remove();
         }
       }
@@ -217,7 +222,6 @@ function cleanContentHtml(html, mainImage, permalink) {
   });
 
   // --- Original cleaning and formatting rules ---
-
   $('[data-widget_type="image.default"]').each(function () {
     $(this).closest('[data-element_type="widget"]').remove();
   });
