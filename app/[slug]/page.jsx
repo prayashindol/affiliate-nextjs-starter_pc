@@ -1,8 +1,11 @@
 import { sanityClient } from "../../lib/sanity";
 import { fetchViatorTours } from "../../lib/viator";
-import SeoGenPost from "../components/SeoGenPost";
 
-// --- Fetch post by slug, including mainImageAsset ---
+import SEOGenPostLayout from "../components/layouts/SEOGenPostLayout";
+import ViatorPostLayout from "../components/layouts/ViatorPostLayout";
+import { isViatorByCategories } from "../../lib/postKinds";
+
+// --- Fetch post by slug, including category slugs ---
 async function getSeoGenPost(slug) {
   const query = `
     *[_type in ["seoGenPost","seoGenPostViator"] && slug.current == $slug][0] {
@@ -19,7 +22,8 @@ async function getSeoGenPost(slug) {
       contentHtml,
       location,
       category,
-      categories[]->{title},
+      // Fetch both title and slug for robust checks:
+      categories[]->{title, slug},
       city,
       postType
     }
@@ -87,32 +91,24 @@ export default async function SeoGenPostPage({ params }) {
     );
   }
 
-  // Check if this is a Viator post by looking at categories
-  const isViatorPost = post?.categories?.some(c => c?.title === 'SEO Gen Post (Viator)');
-  
-  // Fetch Viator tours if this is a Viator post and has a city
+  const viator = isViatorByCategories(post?.categories);
+
+  // Fetch Viator tours only for Viator-category posts
   let viatorTours = [];
-  if (isViatorPost && post?.city) {
+  if (viator && post?.city) {
     try {
-      const viatorResult = await fetchViatorTours({ 
-        city: post.city, 
-        count: 9 
+      const viatorResult = await fetchViatorTours({
+        city: post.city,
+        count: 9,
       });
       viatorTours = viatorResult.products || [];
     } catch (error) {
-      console.error('Failed to fetch Viator tours:', error);
-      // Continue rendering without tours if API fails
+      console.error("Failed to fetch Viator tours:", error);
     }
   }
 
-  return (
-    <>
-      <SeoGenPost 
-        post={post} 
-        isViatorPost={isViatorPost}
-        viatorTours={viatorTours}
-        city={post?.city}
-      />
-    </>
-  );
+  if (viator) {
+    return <ViatorPostLayout post={post} viatorTours={viatorTours} />;
+  }
+  return <SEOGenPostLayout post={post} />;
 }

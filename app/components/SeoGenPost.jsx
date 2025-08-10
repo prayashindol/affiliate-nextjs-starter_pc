@@ -242,7 +242,7 @@ function injectViatorToursAfterParagraph(htmlContent, viatorToursComponent, para
   return $.html();
 }
 
-export default function SeoGenPost({ post, isViatorPost = false, viatorTours = [], city = null }) {
+export default function SeoGenPost({ post, viatorTours = [] }) {
   console.log("********* SeoGenPost RENDERED *********");
   console.log("POST OBJECT:", post);
   console.log("POST TYPE:", post && post.postType);
@@ -265,8 +265,8 @@ export default function SeoGenPost({ post, isViatorPost = false, viatorTours = [
   if (post.contentHtml) {
     cleanedHtml = cleanContentHtml(post.contentHtml, mainImageUrl, post.permalink);
     
-    // If this is a Viator post, inject tours after 2nd paragraph
-    if (isViatorPost && viatorTours.length > 0) {
+    // If viatorTours are provided, inject tours after 2nd paragraph
+    if (viatorTours.length > 0) {
       cleanedHtml = injectViatorToursAfterParagraph(cleanedHtml, true, 2);
     }
     
@@ -338,11 +338,11 @@ export default function SeoGenPost({ post, isViatorPost = false, viatorTours = [
           className="prose prose-lg prose-indigo max-w-none mb-12"
           style={{ fontSize: "1.14rem", lineHeight: "2.1" }}
         >
-          {isViatorPost && viatorTours.length > 0 ? (
+          {viatorTours.length > 0 ? (
             <ContentWithViatorTours 
               htmlContent={cleanedHtml} 
               viatorTours={viatorTours} 
-              city={city} 
+              city={post?.city} 
             />
           ) : (
             <div
