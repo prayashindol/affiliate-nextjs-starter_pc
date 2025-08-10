@@ -2,14 +2,16 @@ import { sanityClient } from "@/lib/sanity";
 import Link from "next/link";
 
 async function getAllSeoGenPosts() {
-  // Only show published posts; sort by dateModified or datePublished
+  // Only show published posts with content; sort by dateModified or datePublished
+  // Include both regular and Viator posts, but filter out empty posts
   const query = `
-    *[_type == "seoGenPost"] | order(dateModified desc) {
+    *[_type in ["seoGenPost", "seoGenPostViator"] && defined(title) && defined(contentHtml) && length(contentHtml) > 0] | order(dateModified desc) {
       title,
       slug,
       excerpt,
       mainImage,
-      dateModified
+      dateModified,
+      _type
     }
   `;
   return await sanityClient.fetch(query);
