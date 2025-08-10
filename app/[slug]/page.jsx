@@ -9,6 +9,7 @@ import { isViatorByCategories } from "../../lib/postKinds";
 async function getSeoGenPost(slug) {
   const query = `
     *[_type in ["seoGenPost","seoGenPostViator"] && slug.current == $slug][0] {
+      _type,
       title,
       slug,
       description,
@@ -91,7 +92,7 @@ export default async function SeoGenPostPage({ params }) {
     );
   }
 
-  const viator = isViatorByCategories(post?.categories);
+  const viator = post?._type === "seoGenPostViator" || isViatorByCategories(post?.categories);
 
   // Fetch Viator tours only for Viator-category posts
   let viatorTours = [];
