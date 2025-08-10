@@ -43,7 +43,8 @@ export async function generateStaticParams() {
 
 // --- Dynamic meta tags for SEO ---
 export async function generateMetadata({ params }) {
-  const post = await getSeoGenPost(params.slug);
+  const { slug } = await params;
+  const post = await getSeoGenPost(slug);
   if (!post) return {};
 
   let ogImages = [];
@@ -75,13 +76,14 @@ export async function generateMetadata({ params }) {
       url: post.permalink || `https://strspecialist.com/${params.slug}`,
     },
     alternates: {
-      canonical: post.permalink || `https://strspecialist.com/${params.slug}`,
+      canonical: post.permalink || `https://strspecialist.com/${slug}`,
     },
   };
 }
 
 export default async function SeoGenPostPage({ params }) {
-  const post = await getSeoGenPost(params.slug);
+  const { slug } = await params;
+  const post = await getSeoGenPost(slug);
 
   if (!post) {
     return (
