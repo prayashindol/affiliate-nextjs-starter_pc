@@ -1,43 +1,47 @@
 'use client'
 
 import React, { useState } from 'react'
-
-// NOTE: Update classes below to match existing SEO‑Gen card styles.
-// If there is a shared Card component, import and use it here.
+import { ClockIcon, StarIcon } from '@heroicons/react/24/solid'
+import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
 
 function Stars({ rating = 0 }) {
   const rounded = Math.round(rating)
   return (
-    <span className="inline-flex gap-0.5 align-middle">
-      {[1,2,3,4,5].map(i =>
-        i <= rounded ? (
-          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="gold" width="16" height="16" viewBox="0 0 24 24">
-            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
-          </svg>
-        ) : (
-          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="none" stroke="gold" strokeWidth="2" width="16" height="16" viewBox="0 0 24 24">
-            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
-          </svg>
-        )
-      )}
-    </span>
+    <div className="flex items-center gap-1">
+      <div className="flex items-center">
+        {[1,2,3,4,5].map(i =>
+          i <= rounded ? (
+            <StarIcon key={i} className="h-4 w-4 text-yellow-400" />
+          ) : (
+            <StarOutlineIcon key={i} className="h-4 w-4 text-gray-300" />
+          )
+        )}
+      </div>
+      <span className="text-sm font-medium text-yellow-600">{rating.toFixed(1)}</span>
+    </div>
   )
 }
 
-function Expandable({ text, limit = 250 }) {
+function Expandable({ text, limit = 150 }) {
   const [expanded, setExpanded] = useState(false)
   if (!text) return null
   const truncated = text.length > limit ? text.slice(0, limit) + '...' : text
-  const isTruncated = truncated.length < text.length
+  const isTruncated = text.length > limit
 
   return (
-    <div className="mt-2 text-sm text-gray-900">
-      <span>{expanded ? text : truncated}</span>
-      {isTruncated && (
-        <button type="button" onClick={() => setExpanded(s => !s)} className="ml-1 font-bold underline">
-          {expanded ? 'Less' : 'More'}
-        </button>
-      )}
+    <div className="mt-3">
+      <p className="text-sm text-gray-600 leading-relaxed">
+        {expanded ? text : truncated}
+        {isTruncated && (
+          <button 
+            type="button" 
+            onClick={() => setExpanded(s => !s)} 
+            className="ml-1 text-indigo-600 hover:text-indigo-800 font-medium underline transition-colors duration-150"
+          >
+            {expanded ? 'Show less' : 'Read more'}
+          </button>
+        )}
+      </p>
     </div>
   )
 }
@@ -47,51 +51,81 @@ export default function ViatorTours({ city, tours }) {
   const heading = `${tours.length} Highest Rated Sight-Seeing Tours to Take in ${city}`
 
   return (
-    <section className="my-10">
-      <h2 className="text-3xl font-extrabold text-orange-600 mb-4">{heading}</h2>
+    <section className="my-12">
+      <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{heading}</h2>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {tours.map((tour, idx) => (
-          <article key={tour.productCode || idx} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <article 
+            key={tour.productCode || idx} 
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group"
+          >
+            {/* Tour Image */}
             {tour?.images?.[0]?.variants?.[3]?.url && (
-              <img
-                src={tour.images[0].variants[3].url}
-                alt={tour.title || 'Tour'}
-                className="w-full h-44 object-cover"
-                loading="lazy"
-              />
+              <div className="relative overflow-hidden">
+                <img
+                  src={tour.images[0].variants[3].url}
+                  alt={tour.title || 'Tour'}
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
             )}
 
-            <div className="p-3">
-              {tour?.title && <h3 className="font-extrabold text-lg leading-snug">{tour.title}</h3>}
+            <div className="p-6">
+              {/* Tour Title */}
+              {tour?.title && (
+                <h3 className="font-bold text-lg leading-tight text-gray-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors duration-200">
+                  {tour.title}
+                </h3>
+              )}
 
+              {/* Rating and Reviews */}
               {tour?.reviews?.totalReviews && tour?.reviews?.combinedAverageRating ? (
-                <div className="mt-2 text-sm">
-                  <a href={tour.productUrl} target="_blank" rel="noopener noreferrer" className="no-underline text-blue-600 inline-flex items-center gap-1">
-                    <Stars rating={tour.reviews.combinedAverageRating} />
-                    <span>({tour.reviews.totalReviews} reviews)</span>
-                  </a>
+                <div className="flex items-center justify-between mb-3">
+                  <Stars rating={tour.reviews.combinedAverageRating} />
+                  <span className="text-sm text-gray-500">
+                    ({tour.reviews.totalReviews.toLocaleString()} reviews)
+                  </span>
                 </div>
               ) : null}
 
+              {/* Duration */}
               {tour?.duration?.fixedDurationInMinutes ? (
-                <div className="mt-1 text-sm text-gray-600">
-                  <span className="mr-1">🕘</span>
-                  {Math.floor(tour.duration.fixedDurationInMinutes / 60)} hrs
+                <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
+                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                  <span>{Math.floor(tour.duration.fixedDurationInMinutes / 60)} hours</span>
                 </div>
               ) : null}
 
+              {/* Description */}
               <Expandable text={tour?.description} />
 
-              {tour?.pricing?.summary?.fromPrice ? (
-                <p className="mt-2 font-bold">From: ${tour.pricing.summary.fromPrice}</p>
-              ) : null}
+              {/* Price and Booking */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  {tour?.pricing?.summary?.fromPrice ? (
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide">From</span>
+                      <span className="text-xl font-bold text-gray-900">
+                        ${tour.pricing.summary.fromPrice}
+                      </span>
+                    </div>
+                  ) : <div></div>}
 
-              {tour?.productUrl ? (
-                <a href={tour.productUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 bg-orange-500 text-white font-bold px-4 py-2 rounded">
-                  Book Now
-                </a>
-              ) : null}
+                  {tour?.productUrl ? (
+                    <a 
+                      href={tour.productUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                    >
+                      Book Now
+                    </a>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </article>
         ))}
