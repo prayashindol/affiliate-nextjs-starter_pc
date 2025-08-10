@@ -93,18 +93,29 @@ export default async function SeoGenPostPage({ params }) {
   }
 
   const viator = post?._type === "seoGenPostViator" || isViatorByCategories(post?.categories);
+  
+  console.log("VIATOR DETECTION:");
+  console.log("- Post _type:", post?._type);
+  console.log("- Post categories:", post?.categories);
+  console.log("- isViatorByCategories result:", isViatorByCategories(post?.categories));
+  console.log("- Final viator flag:", viator);
+  console.log("- Post city:", post?.city);
 
   // Fetch Viator tours only for Viator-category posts
   let viatorTours = [];
   if (viator && post?.city) {
     try {
+      console.log(`Attempting to fetch Viator tours for city: ${post.city}`);
       const viatorResult = await fetchViatorTours({
         city: post.city,
         count: 9,
       });
       viatorTours = viatorResult.products || [];
+      console.log(`Found ${viatorTours.length} Viator tours`);
     } catch (error) {
       console.error("Failed to fetch Viator tours:", error);
+      // Don't throw the error - just log it and continue with empty tours
+      viatorTours = [];
     }
   }
 
