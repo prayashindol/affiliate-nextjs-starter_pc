@@ -208,7 +208,7 @@ function cleanContentHtml(html, mainImage, permalink) {
         // MUCH MORE SPECIFIC: Only remove if it contains navigation keywords AND is short
         if (
           (containerText.includes('previous') || containerText.includes('next') || containerText.includes('overview')) && 
-          containerText.length < 50
+          containerText.length < MAX_NAVIGATION_TEXT_LENGTH
         ) {
           $(this).remove();
         }
