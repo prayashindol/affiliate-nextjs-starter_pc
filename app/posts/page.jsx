@@ -9,7 +9,7 @@ async function getAllSeoGenPosts() {
       defined(title) && 
       defined(slug.current) && 
       defined(contentHtml) && 
-      length(contentHtml) > 100 &&
+      length(contentHtml) > ${MIN_CONTENT_LENGTH} &&
       !(!defined(excerpt) && !defined(description))
     ] | order(dateModified desc, datePublished desc) {
       title,
