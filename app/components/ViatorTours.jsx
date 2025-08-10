@@ -119,7 +119,7 @@ export default function ViatorTours({ city, tours }) {
                         ${tour.pricing.summary.fromPrice}
                       </span>
                     </div>
-                  ) : <div></div>}
+                  ) : null}
 
                   {tour?.productUrl ? (
                     <a 
