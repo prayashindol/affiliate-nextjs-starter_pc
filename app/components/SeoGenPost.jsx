@@ -198,18 +198,17 @@ function cleanContentHtml(html, mainImage, permalink) {
         return (
           el.tagName === "a" ||
           el.tagName === "br" ||
-          el.tagName === "span" ||
-          (el.tagName === "div" && $(el).text().trim().length < 50)
+          el.tagName === "span"
+          // REMOVED: || (el.tagName === "div" && $(el).text().trim().length < 50)
         );
       });
       
       if (onlyNavElements) {
         const containerText = $(this).text().toLowerCase().trim();
+        // MUCH MORE SPECIFIC: Only remove if it contains navigation keywords AND is short
         if (
-          containerText.includes('previous') ||
-          containerText.includes('next') ||
-          containerText.includes('overview') ||
-          containerText.length < 50
+          (containerText.includes('previous') || containerText.includes('next') || containerText.includes('overview')) && 
+          containerText.length < MAX_NAVIGATION_TEXT_LENGTH
         ) {
           $(this).remove();
         }
