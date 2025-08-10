@@ -2,10 +2,13 @@ import React from "react";
 import { load } from "cheerio";
 import { urlFor } from "../../lib/sanity";
 import ViatorTours from "./ViatorTours";
+import { fixViatorHtml } from "../../lib/viatorHtml";
 
 function cleanContentHtml(html, mainImage, permalink) {
-  // --- NEW: Fix broken markdown-like table formatting ---
-  let processedHtml = html;
+  // --- NEW: Apply Viator HTML normalization first ---
+  let processedHtml = fixViatorHtml(html);
+  
+  // --- EXISTING: Fix broken markdown-like table formatting ---
   
   // More general approach: Find ALL markdown-like table patterns in the content
   // Look for complete table blocks and replace them entirely
