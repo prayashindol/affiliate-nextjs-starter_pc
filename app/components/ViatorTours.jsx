@@ -2,93 +2,112 @@
 
 import React, { useState } from 'react'
 
-// NOTE: Update classes below to match existing SEO‑Gen card styles.
-// If there is a shared Card component, import and use it here.
-
-function Stars({ rating = 0 }) {
-  const rounded = Math.round(rating)
-  return (
-    <span className="inline-flex gap-0.5 align-middle">
-      {[1,2,3,4,5].map(i =>
-        i <= rounded ? (
-          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="gold" width="16" height="16" viewBox="0 0 24 24">
-            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
-          </svg>
-        ) : (
-          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="none" stroke="gold" strokeWidth="2" width="16" height="16" viewBox="0 0 24 24">
-            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
-          </svg>
-        )
-      )}
-    </span>
-  )
-}
-
-function Expandable({ text, limit = 250 }) {
-  const [expanded, setExpanded] = useState(false)
-  if (!text) return null
-  const truncated = text.length > limit ? text.slice(0, limit) + '...' : text
-  const isTruncated = truncated.length < text.length
-
-  return (
-    <div className="mt-2 text-sm text-gray-900">
-      <span>{expanded ? text : truncated}</span>
-      {isTruncated && (
-        <button type="button" onClick={() => setExpanded(s => !s)} className="ml-1 font-bold underline">
-          {expanded ? 'Less' : 'More'}
-        </button>
-      )}
-    </div>
-  )
-}
-
 export default function ViatorTours({ city, tours }) {
   if (!tours?.length) return null
-  const heading = `${tours.length} Highest Rated Sight-Seeing Tours to Take in ${city}`
+  
+  // Match the heading logic from PHP code
+  const tour_count = tours.length
+  const heading = tour_count > 1
+    ? `${tour_count} Highest Rated Sight-Seeing Tours to Take in ${city}`
+    : `Highest Rated Sight-Seeing Tour to Take in ${city}`
 
   return (
-    <section className="my-10">
-      <h2 className="text-3xl font-extrabold text-orange-600 mb-4">{heading}</h2>
+    <section className="my-12">
+      <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{heading}</h2>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="viator-tours grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {tours.map((tour, idx) => (
-          <article key={tour.productCode || idx} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <article 
+            key={tour.productCode || idx} 
+            className="tour-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+          >
+            {/* Tour Image - matches PHP: tour.images[0].variants[3].url */}
             {tour?.images?.[0]?.variants?.[3]?.url && (
-              <img
-                src={tour.images[0].variants[3].url}
-                alt={tour.title || 'Tour'}
-                className="w-full h-44 object-cover"
-                loading="lazy"
-              />
+              <div className="relative">
+                <img
+                  src={tour.images[0].variants[3].url}
+                  alt={tour.title || 'Tour'}
+                  className="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+              </div>
             )}
 
-            <div className="p-3">
-              {tour?.title && <h3 className="font-extrabold text-lg leading-snug">{tour.title}</h3>}
+            <div className="p-6">
+              {/* Tour Title - matches PHP: tour.title */}
+              {tour?.title && (
+                <h3
+                  className="font-bold text-lg leading-tight text-gray-900 mb-3"
+                  style={{
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
+                  {tour.title}
+                </h3>
+              )}
 
-              {tour?.reviews?.totalReviews && tour?.reviews?.combinedAverageRating ? (
-                <div className="mt-2 text-sm">
-                  <a href={tour.productUrl} target="_blank" rel="noopener noreferrer" className="no-underline text-blue-600 inline-flex items-center gap-1">
-                    <Stars rating={tour.reviews.combinedAverageRating} />
-                    <span>({tour.reviews.totalReviews} reviews)</span>
+              {/* Rating and Reviews - matches PHP logic exactly */}
+              {tour?.reviews?.totalReviews && tour?.reviews?.combinedAverageRating && tour?.productUrl ? (
+                <div className="reviews mb-3">
+                  <a 
+                    href={tour.productUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 no-underline flex items-center text-sm"
+                  >
+                    {/* SVG stars - exactly matching PHP logic */}
+                    <div className="flex items-center mr-2">
+                      {[1,2,3,4,5].map(i => {
+                        const stars = Math.round(tour.reviews.combinedAverageRating)
+                        return i <= stars ? (
+                          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="gold" width="16" height="16" viewBox="0 0 24 24" className="mr-0.5">
+                            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
+                          </svg>
+                        ) : (
+                          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="lightgray" width="16" height="16" viewBox="0 0 24 24" className="mr-0.5">
+                            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
+                          </svg>
+                        )
+                      })}
+                    </div>
+                    <span>{tour.reviews.totalReviews.toLocaleString()} reviews</span>
                   </a>
                 </div>
               ) : null}
 
+              {/* Duration - matches PHP: tour.duration.fixedDurationInMinutes */}
               {tour?.duration?.fixedDurationInMinutes ? (
-                <div className="mt-1 text-sm text-gray-600">
-                  <span className="mr-1">🕘</span>
-                  {Math.floor(tour.duration.fixedDurationInMinutes / 60)} hrs
+                <div className="duration flex items-center gap-2 mb-3 text-sm text-gray-600">
+                  <span className="clock-icon mr-1">🕒</span>
+                  <span>{Math.floor(tour.duration.fixedDurationInMinutes / 60)} hrs</span>
                 </div>
               ) : null}
 
-              <Expandable text={tour?.description} />
+              {/* Description - matches PHP: tour.description with truncation */}
+              {tour?.description && (
+                <div className="description mb-4">
+                  <ExpandableDescription text={tour.description} />
+                </div>
+              )}
 
+              {/* Price - matches PHP: tour.pricing.summary.fromPrice */}
               {tour?.pricing?.summary?.fromPrice ? (
-                <p className="mt-2 font-bold">From: ${tour.pricing.summary.fromPrice}</p>
+                <p className="price mb-4">
+                  <strong>From: ${tour.pricing.summary.fromPrice}</strong>
+                </p>
               ) : null}
 
+              {/* Book Now Button - matches PHP: tour.productUrl */}
               {tour?.productUrl ? (
-                <a href={tour.productUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 bg-orange-500 text-white font-bold px-4 py-2 rounded">
+                <a 
+                  className="book-now inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200 w-full text-center"
+                  href={tour.productUrl} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Book Now
                 </a>
               ) : null}
@@ -97,5 +116,33 @@ export default function ViatorTours({ city, tours }) {
         ))}
       </div>
     </section>
+  )
+}
+
+// Component for expandable description matching PHP JavaScript logic
+function ExpandableDescription({ text, truncateAt = 250 }) {
+  const [expanded, setExpanded] = useState(false)
+  
+  if (!text) return null
+  
+  const shouldTruncate = text.length > truncateAt
+  const displayText = shouldTruncate && !expanded 
+    ? text.substring(0, truncateAt) + '...' 
+    : text
+
+  return (
+    <div>
+      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+        {displayText}
+        {shouldTruncate && (
+          <span 
+            className="more-link ml-1 font-bold text-blue-600 hover:text-blue-800 cursor-pointer"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? 'Less' : 'More'}
+          </span>
+        )}
+      </p>
+    </div>
   )
 }
