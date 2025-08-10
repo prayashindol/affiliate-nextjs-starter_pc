@@ -114,6 +114,8 @@ export default async function SeoGenPostPage({ params }) {
       console.log(`Found ${viatorTours.length} Viator tours`);
     } catch (error) {
       console.error("Failed to fetch Viator tours:", error);
+      // Don't throw the error - just log it and continue with empty tours
+      viatorTours = [];
     }
   }
 
