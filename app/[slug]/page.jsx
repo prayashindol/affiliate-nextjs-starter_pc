@@ -93,6 +93,13 @@ export default async function SeoGenPostPage({ params }) {
   }
 
   const viator = post?._type === "seoGenPostViator" || isViatorByCategories(post?.categories);
+  
+  console.log("VIATOR DETECTION:");
+  console.log("- Post _type:", post?._type);
+  console.log("- Post categories:", post?.categories);
+  console.log("- isViatorByCategories result:", isViatorByCategories(post?.categories));
+  console.log("- Final viator flag:", viator);
+  console.log("- Post city:", post?.city);
 
   // Fetch Viator tours only for Viator-category posts
   let viatorTours = [];

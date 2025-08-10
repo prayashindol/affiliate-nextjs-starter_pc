@@ -82,6 +82,44 @@ function cleanContentHtml(html, mainImage, permalink) {
     $(this).closest('[data-element_type="widget"]').remove();
   });
 
+  // Remove existing Viator tours content (static HTML from WordPress)
+  $('.viator-tours, .tour-item').remove();
+  $('[class*="viator"], [id*="viator"]').remove();
+  
+  // Remove any elements that contain "highest rated" tour text that looks like Viator content
+  $('h2, h3').each(function () {
+    const text = $(this).text().toLowerCase();
+    if (text.includes('highest rated') && (text.includes('tour') || text.includes('sight-seeing'))) {
+      // Remove this heading and try to find associated tour content
+      const nextElements = $(this).nextUntil('h1, h2, h3').addBack();
+      nextElements.each(function() {
+        const elemText = $(this).text().toLowerCase();
+        if (elemText.includes('book now') || elemText.includes('from:') || elemText.includes('reviews') || elemText.includes('duration')) {
+          $(this).remove();
+        }
+      });
+      $(this).remove();
+    }
+  });
+
+  // Remove divs that look like tour cards (contain book now, pricing, etc.)
+  $('div').each(function () {
+    const divText = $(this).text().toLowerCase();
+    if ((divText.includes('book now') && divText.includes('from:')) || 
+        (divText.includes('reviews') && divText.includes('hrs')) ||
+        divText.includes('viator')) {
+      $(this).remove();
+    }
+  });
+
+  // Remove script tags that contain viator tour functionality
+  $('script').each(function () {
+    const scriptContent = $(this).html();
+    if (scriptContent && scriptContent.toLowerCase().includes('viator')) {
+      $(this).remove();
+    }
+  });
+
   // Remove navigation links by text content (comprehensive patterns)
   $('a').each(function () {
     const linkText = $(this).text().toLowerCase().trim();
@@ -246,6 +284,9 @@ export default function SeoGenPost({ post, viatorTours = [] }) {
   console.log("********* SeoGenPost RENDERED *********");
   console.log("POST OBJECT:", post);
   console.log("POST TYPE:", post && post.postType);
+  console.log("POST CITY:", post && post.city);
+  console.log("VIATOR TOURS LENGTH:", viatorTours.length);
+  console.log("VIATOR TOURS:", viatorTours);
 
   if (!post) {
     return <div>NO POST DATA</div>;
