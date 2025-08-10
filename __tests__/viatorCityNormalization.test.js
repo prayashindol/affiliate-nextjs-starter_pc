@@ -33,6 +33,22 @@ function testViatorCityNormalization() {
       expected: '914',
       description: 'Napa & Sonoma with normal ampersand'
     },
+    // NEW: Test cities without ampersands (as they appear in Sanity database)
+    {
+      input: 'monterey carmel',
+      expected: '5250',
+      description: 'Monterey Carmel without ampersand (database format)'
+    },
+    {
+      input: 'napa sonoma',
+      expected: '914',
+      description: 'Napa Sonoma without ampersand (database format)'
+    },
+    {
+      input: 'cairns the tropical north',
+      expected: '754',
+      description: 'Cairns the tropical north without ampersand (database format)'
+    },
     // Test other special character entities
     {
       input: 'test &lt;city&gt;',
