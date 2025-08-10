@@ -8,7 +8,58 @@ function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Apply Viator HTML normalization first ---
   let processedHtml = fixViatorHtml(html);
   
-  // --- EXISTING: Fix broken markdown-like table formatting ---
+  // --- NEW: Check if content is minimal after initial processing ---
+  const tempDom = load(processedHtml || "");
+  const textContent = tempDom('body').text().trim();
+  const hasSubstantialContent = textContent.length > 1000 && 
+    !textContent.includes('No data found') && 
+    (textContent.includes('visit') || textContent.includes('guide') || textContent.includes('travel') || textContent.includes('tip'));
+  
+  // If content is minimal/placeholder, be much more conservative with cleaning
+  if (!hasSubstantialContent) {
+    console.log('[Content Cleaning] Detected minimal content, using conservative cleaning');
+    
+    const $ = load(processedHtml || "");
+    
+    // Only remove clearly unwanted elements for minimal content
+    $('.nsg-adjacent-links, .nsg-adjacent-links-wrapper').remove();
+    $('.post-navigation, .nav-links, .navigation-links').remove();
+    $('.prev-post, .next-post, .post-nav').remove();
+    $('.pagination, .page-navigation').remove();
+    
+    // Remove navigation widgets
+    $('.elementor-widget-post-navigation').remove();
+    $('[data-widget_type="post-navigation.default"]').remove();
+    $('[data-widget_type="theme-post-navigation.default"]').remove();
+    
+    // Remove author boxes
+    $('.elementor-widget-author-box').remove();
+    $('[data-widget_type="author-box.default"]').each(function () {
+      $(this).closest('[data-element_type="widget"]').remove();
+    });
+
+    // Remove existing Viator tours content (static HTML from WordPress)
+    $('.viator-tours, .tour-item').remove();
+    $('[class*="viator"], [id*="viator"]').remove();
+    
+    // Remove style and class attributes for cleaner output
+    $("[style]").removeAttr("style");
+    $("[class]").removeAttr("class");
+    
+    // Add basic table styling if any tables exist
+    $("table").each((tableIdx, table) => {
+      $(table).wrap('<div class="overflow-x-auto"></div>');
+      $(table).find("th").addClass("bg-indigo-50 text-indigo-900 px-6 py-5 text-left font-bold text-lg");
+      $(table).find("td").addClass("px-6 py-5 border-t border-gray-200 text-gray-800 align-top text-base");
+      $(table).find("tr").addClass("odd:bg-gray-50 hover:bg-indigo-50/40 transition-colors duration-150");
+      $(table).find("tr:last-child td:first-child").addClass("rounded-bl-xl");
+      $(table).find("tr:last-child td:last-child").addClass("rounded-br-xl");
+    });
+    
+    return $("body").html();
+  }
+  
+  // --- EXISTING: Fix broken markdown-like table formatting for substantial content ---
   
   // More general approach: Find ALL markdown-like table patterns in the content
   // Look for complete table blocks and replace them entirely
@@ -63,7 +114,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     }
   }
   
-  // Now process with cheerio
+  // Now process with cheerio for substantial content
   const $ = load(processedHtml || "");
 
   // --- COMPREHENSIVE: Clean up all possible navigation patterns ---
