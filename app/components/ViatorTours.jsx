@@ -56,7 +56,7 @@ export default function ViatorTours({ city, tours }) {
                     href={tour.productUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 text-decoration-none flex items-center text-sm"
+                    className="text-blue-600 hover:text-blue-800 no-underline flex items-center text-sm"
                   >
                     {/* SVG stars - exactly matching PHP logic */}
                     <div className="flex items-center mr-2">
