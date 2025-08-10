@@ -98,11 +98,13 @@ export default async function SeoGenPostPage({ params }) {
   let viatorTours = [];
   if (viator && post?.city) {
     try {
+      console.log(`Attempting to fetch Viator tours for city: ${post.city}`);
       const viatorResult = await fetchViatorTours({
         city: post.city,
         count: 9,
       });
       viatorTours = viatorResult.products || [];
+      console.log(`Found ${viatorTours.length} Viator tours`);
     } catch (error) {
       console.error("Failed to fetch Viator tours:", error);
     }
