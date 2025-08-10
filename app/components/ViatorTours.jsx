@@ -75,7 +75,15 @@ export default function ViatorTours({ city, tours }) {
             <div className="p-6">
               {/* Tour Title */}
               {tour?.title && (
-                <h3 className="font-bold text-lg leading-tight text-gray-900 mb-3 line-clamp-2">
+                <h3
+                  className="font-bold text-lg leading-tight text-gray-900 mb-3"
+                  style={{
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
                   {tour.title}
                 </h3>
               )}
