@@ -99,7 +99,20 @@ function cleanContentHtml(html, mainImage, permalink) {
         }
       });
       $(this).remove();
-    }
+  // Combine selector filtering and reduce DOM traversal for headings related to "highest rated" tours
+  $('h2, h3').filter(function () {
+    const text = $(this).text().toLowerCase();
+    return text.includes('highest rated') && (text.includes('tour') || text.includes('sight-seeing'));
+  }).each(function () {
+    // Collect all elements to remove: the heading and associated tour content
+    const toRemove = [this];
+    $(this).nextUntil('h1, h2, h3').each(function () {
+      const elemText = $(this).text().toLowerCase();
+      if (elemText.includes('book now') || elemText.includes('from:') || elemText.includes('reviews') || elemText.includes('duration')) {
+        toRemove.push(this);
+      }
+    });
+    $(toRemove).remove();
   });
 
   // Remove divs that look like tour cards (contain book now, pricing, etc.)
