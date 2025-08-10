@@ -13,18 +13,8 @@ async function getAllSeoGenPosts() {
       defined(slug.current) && 
       defined(contentHtml) && 
       length(contentHtml) > ${MIN_CONTENT_LENGTH} &&
-      !(!defined(excerpt) && !defined(description))
-    let basePosts = *[_type in ["seoGenPost", "seoGenPostViator"]];
-    let withContent = basePosts[
-      defined(title) &&
-      defined(slug.current) &&
-      defined(contentHtml) &&
-      length(contentHtml) > ${MIN_CONTENT_LENGTH}
-    ];
-    let withMeta = withContent[
-      defined(excerpt) || defined(description)
-    ];
-    withMeta | order(dateModified desc, datePublished desc) {
+      (defined(excerpt) || defined(description))
+    ] | order(dateModified desc, datePublished desc) {
       title,
       slug,
       excerpt,
