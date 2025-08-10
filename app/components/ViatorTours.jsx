@@ -19,7 +19,7 @@ export default function ViatorTours({ city, tours }) {
         {tours.map((tour, idx) => (
           <article 
             key={tour.productCode || idx} 
-            className="tour-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+            className="tour-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full"
           >
             {/* Tour Image - matches PHP: tour.images[0].variants[3].url */}
             {tour?.images?.[0]?.variants?.[3]?.url && (
@@ -33,7 +33,7 @@ export default function ViatorTours({ city, tours }) {
               </div>
             )}
 
-            <div className="p-6">
+            <div className="p-4 flex flex-col flex-grow">
               {/* Tour Title - matches PHP: tour.title */}
               {tour?.title && (
                 <h3
@@ -51,7 +51,7 @@ export default function ViatorTours({ city, tours }) {
 
               {/* Rating and Reviews - matches PHP logic exactly */}
               {tour?.reviews?.totalReviews && tour?.reviews?.combinedAverageRating && tour?.productUrl ? (
-                <div className="reviews mb-3">
+                <div className="reviews mb-2">
                   <a 
                     href={tour.productUrl} 
                     target="_blank" 
@@ -88,29 +88,32 @@ export default function ViatorTours({ city, tours }) {
 
               {/* Description - matches PHP: tour.description with truncation */}
               {tour?.description && (
-                <div className="description mb-4">
+                <div className="description mb-3 flex-grow">
                   <ExpandableDescription text={tour.description} />
                 </div>
               )}
 
-              {/* Price - matches PHP: tour.pricing.summary.fromPrice */}
-              {tour?.pricing?.summary?.fromPrice ? (
-                <p className="price mb-4">
-                  <strong>From: ${tour.pricing.summary.fromPrice}</strong>
-                </p>
-              ) : null}
+              {/* Price and Button Container - pushes button to bottom */}
+              <div className="mt-auto">
+                {/* Price - matches PHP: tour.pricing.summary.fromPrice */}
+                {tour?.pricing?.summary?.fromPrice ? (
+                  <p className="price mb-3">
+                    <strong>From: ${tour.pricing.summary.fromPrice}</strong>
+                  </p>
+                ) : null}
 
-              {/* Book Now Button - matches PHP: tour.productUrl */}
-              {tour?.productUrl ? (
-                <a 
-                  className="book-now inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200 w-full text-center"
-                  href={tour.productUrl} 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Book Now
-                </a>
-              ) : null}
+                {/* Book Now Button - matches PHP: tour.productUrl */}
+                {tour?.productUrl ? (
+                  <a 
+                    className="book-now inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200 w-full text-center"
+                    href={tour.productUrl} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Book Now
+                  </a>
+                ) : null}
+              </div>
             </div>
           </article>
         ))}
