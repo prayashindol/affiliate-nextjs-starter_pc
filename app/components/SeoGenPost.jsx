@@ -8,16 +8,42 @@ function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Apply Viator HTML normalization first ---
   let processedHtml = fixViatorHtml(html);
   
-  // --- NEW: Check if content is minimal after initial processing ---
+  // --- NEW: Check if content is minimal or primarily Elementor structure ---
   const tempDom = load(processedHtml || "");
   const textContent = tempDom('body').text().trim();
-  const hasSubstantialContent = textContent.length > 1000 && 
-    !textContent.includes('No data found') && 
-    (textContent.includes('visit') || textContent.includes('guide') || textContent.includes('travel') || textContent.includes('tip'));
   
-  // If content is minimal/placeholder, be much more conservative with cleaning
-  if (!hasSubstantialContent) {
-    console.log('[Content Cleaning] Detected minimal content, using conservative cleaning');
+  // Check for signs of substantial article content vs placeholder/Elementor structure
+  const elementorDensity = (processedHtml.match(/elementor-|data-element_type|data-widget_type/g) || []).length;
+  const contentLength = textContent.length;
+  const hasPlaceholderSigns = textContent.includes('No data found') || 
+                              textContent.includes('placeholder') ||
+                              contentLength < 500;
+  
+  // Check for actual travel content indicators
+  const travelContentKeywords = ['visit', 'guide', 'travel', 'tip', 'tour', 'attraction', 'destination', 'experience'];
+  const hasRealTravelContent = travelContentKeywords.some(keyword => 
+    textContent.toLowerCase().includes(keyword)
+  );
+  
+  // Use conservative cleaning if:
+  // 1. Content is very short OR
+  // 2. High Elementor density relative to content OR  
+  // 3. Has placeholder signs OR
+  // 4. Lacks travel content indicators
+  const useConservativeCleaning = hasPlaceholderSigns || 
+                                  contentLength < 800 || 
+                                  (elementorDensity > 20 && contentLength < 2000) ||
+                                  !hasRealTravelContent;
+  
+  // If content needs conservative cleaning, be much more careful
+  if (useConservativeCleaning) {
+    console.log('[Content Cleaning] Using conservative cleaning:', {
+      contentLength,
+      elementorDensity,
+      hasPlaceholderSigns,
+      hasRealTravelContent,
+      useConservativeCleaning
+    });
     
     const $ = load(processedHtml || "");
     
@@ -59,7 +85,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     return $("body").html();
   }
   
-  // --- EXISTING: Fix broken markdown-like table formatting for substantial content ---
+  // --- EXISTING: Fix broken markdown-like table formatting for full content ---
   
   // More general approach: Find ALL markdown-like table patterns in the content
   // Look for complete table blocks and replace them entirely
@@ -114,7 +140,7 @@ function cleanContentHtml(html, mainImage, permalink) {
     }
   }
   
-  // Now process with cheerio for substantial content
+  // Now process with cheerio for full content cleaning
   const $ = load(processedHtml || "");
 
   // --- COMPREHENSIVE: Clean up all possible navigation patterns ---
