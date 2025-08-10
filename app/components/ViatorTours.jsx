@@ -54,36 +54,35 @@ export default function ViatorTours({ city, tours }) {
     <section className="my-12">
       <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{heading}</h2>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {tours.map((tour, idx) => (
           <article 
             key={tour.productCode || idx} 
-            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
           >
             {/* Tour Image */}
             {tour?.images?.[0]?.variants?.[3]?.url && (
-              <div className="relative overflow-hidden">
+              <div className="relative">
                 <img
                   src={tour.images[0].variants[3].url}
                   alt={tour.title || 'Tour'}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-48 object-cover"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
             )}
 
             <div className="p-6">
               {/* Tour Title */}
               {tour?.title && (
-                <h3 className="font-bold text-lg leading-tight text-gray-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors duration-200">
+                <h3 className="font-bold text-lg leading-tight text-gray-900 mb-3 line-clamp-2">
                   {tour.title}
                 </h3>
               )}
 
               {/* Rating and Reviews */}
               {tour?.reviews?.totalReviews && tour?.reviews?.combinedAverageRating ? (
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 mb-3">
                   <Stars rating={tour.reviews.combinedAverageRating} />
                   <span className="text-sm text-gray-500">
                     ({tour.reviews.totalReviews.toLocaleString()} reviews)
@@ -119,7 +118,7 @@ export default function ViatorTours({ city, tours }) {
                       href={tour.productUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200"
                     >
                       Book Now
                     </a>
