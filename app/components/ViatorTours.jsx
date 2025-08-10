@@ -33,7 +33,7 @@ export default function ViatorTours({ city, tours }) {
               </div>
             )}
 
-            <div className="p-4 flex flex-col flex-grow">
+            <div className="px-4 pb-4 pt-2 flex flex-col flex-grow">
               {/* Tour Title - matches PHP: tour.title */}
               {tour?.title && (
                 <h3
