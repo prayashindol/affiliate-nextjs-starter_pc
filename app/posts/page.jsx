@@ -1,29 +1,15 @@
 import { sanityClient } from "@/lib/sanity";
 import Link from "next/link";
 
-// Minimum content length to filter out posts with very short/incomplete content
-const MIN_CONTENT_LENGTH = 100;
-
 async function getAllSeoGenPosts() {
-  // Include both seoGenPost and seoGenPostViator types
-  // Filter out posts with empty/incomplete content
+  // Only show published posts; sort by dateModified or datePublished
   const query = `
-    *[_type in ["seoGenPost", "seoGenPostViator"] && 
-      defined(title) && 
-      defined(slug.current) && 
-      defined(contentHtml) && 
-      length(contentHtml) > ${MIN_CONTENT_LENGTH} &&
-      (defined(excerpt) || defined(description))
-    ] | order(dateModified desc, datePublished desc) {
+    *[_type == "seoGenPost"] | order(dateModified desc) {
       title,
       slug,
       excerpt,
-      description,
       mainImage,
-      dateModified,
-      datePublished,
-      _type,
-      city
+      dateModified
     }
   `;
   return await sanityClient.fetch(query);
@@ -51,16 +37,11 @@ export default async function PostsListingPage() {
             )}
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-              <p className="text-gray-600 mb-2">{post.excerpt || post.description}</p>
-              {post.city && (
-                <p className="text-sm text-indigo-600 mb-2">📍 {post.city}</p>
-              )}
+              <p className="text-gray-600 mb-2">{post.excerpt}</p>
               <p className="text-xs text-gray-400">
                 Last updated:{" "}
                 {post.dateModified
                   ? new Date(post.dateModified).toLocaleDateString()
-                  : post.datePublished
-                  ? new Date(post.datePublished).toLocaleDateString() 
                   : ""}
               </p>
             </div>
