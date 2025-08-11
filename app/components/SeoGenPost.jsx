@@ -285,16 +285,24 @@ function ContentWithViatorTours({ htmlContent, viatorTours, city }) {
   );
 }
 
-function injectViatorToursAfterParagraph(htmlContent, viatorToursComponent, paragraphIndex = 2) {
+function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent) {
   if (!viatorToursComponent || !htmlContent) return htmlContent;
 
   const $ = load(htmlContent);
-  const paragraphs = $('p');
+  const h2Elements = $('h2');
   
-  if (paragraphs.length >= paragraphIndex) {
-    const targetParagraph = paragraphs.eq(paragraphIndex - 1);
+  // Inject before the first H2 (which is the "second" heading after H1)
+  if (h2Elements.length > 0) {
+    const firstH2 = h2Elements.eq(0);
     // Create a marker for the Viator tours injection point
-    targetParagraph.after('<div id="viator-tours-injection-point"></div>');
+    firstH2.before('<div id="viator-tours-injection-point"></div>');
+  } else {
+    // Fallback: if no H2 found, inject after the first paragraph as a sensible default
+    const paragraphs = $('p');
+    if (paragraphs.length > 0) {
+      const firstParagraph = paragraphs.eq(0);
+      firstParagraph.after('<div id="viator-tours-injection-point"></div>');
+    }
   }
   
   // Return just the body content to avoid nested HTML structures
@@ -357,9 +365,9 @@ export default function SeoGenPost({ post, viatorTours = [], isViatorPost }) {
   if (post.contentHtml) {
     cleanedHtml = cleanContentHtml(post.contentHtml, mainImageUrl, post.permalink);
     
-    // If viatorTours are provided, inject tours after 2nd paragraph
+    // If viatorTours are provided, inject tours before the first H2 (second heading)
     if (viatorTours.length > 0) {
-      cleanedHtml = injectViatorToursAfterParagraph(cleanedHtml, true, 2);
+      cleanedHtml = injectViatorToursBeforeSecondHeading(cleanedHtml, true);
     }
     
     if (typeof window === "undefined") {
