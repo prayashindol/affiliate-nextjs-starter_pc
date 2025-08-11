@@ -21,7 +21,7 @@ function cleanContentHtml(html, mainImage, permalink) {
   
   // Check for actual travel content indicators
   const travelContentKeywords = ['visit', 'guide', 'travel', 'tip', 'tour', 'attraction', 'destination', 'experience'];
-  const hasRealTravelContent = travelContentKeywords.some(keyword => 
+  const hasRealTravelContent = TRAVEL_CONTENT_KEYWORDS.some(keyword => 
     textContent.toLowerCase().includes(keyword)
   );
   
