@@ -11,7 +11,6 @@ __tests__
 *.spec.tsx
 
 # Documentation
-README.md
 *.md
 docs/
 documentation/
