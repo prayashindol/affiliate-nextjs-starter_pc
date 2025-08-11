@@ -1,0 +1,35 @@
+---
+name: Vercel Production Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  info-when-missing-secret:
+    if: ${{ secrets.VERCEL_DEPLOY_HOOK == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Missing Vercel Deploy Hook secret
+        run: |
+          echo "No VERCEL_DEPLOY_HOOK secret configured."
+          echo "Create a Deploy Hook in your Vercel project (Production) and add the URL as the repository secret VERCEL_DEPLOY_HOOK."
+          exit 0
+
+  deploy:
+    if: ${{ secrets.VERCEL_DEPLOY_HOOK != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deploy Hook
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          set -euo pipefail
+          echo "Triggering Vercel deploy hook for production..."
+          curl -fsSL -X POST "$DEPLOY_HOOK"
+          echo "Deploy hook triggered."
