@@ -4,6 +4,12 @@ import { urlFor } from "../../lib/sanity";
 import ViatorTours from "./ViatorTours";
 import { fixViatorHtml } from "../../lib/viatorHtml";
 
+// Content cleaning thresholds
+const MIN_CONTENT_LENGTH_FOR_DEEP_CLEANING = 800;
+const CONTENT_LENGTH_CONSERVATIVE = 500;
+const CONTENT_LENGTH_MINIMAL = 300;
+const ELEMENTOR_DENSITY_THRESHOLD = 20;
+
 function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Apply Viator HTML normalization first ---
   let processedHtml = fixViatorHtml(html);
@@ -21,7 +27,7 @@ function cleanContentHtml(html, mainImage, permalink) {
   
   // Check for actual travel content indicators
   const travelContentKeywords = ['visit', 'guide', 'travel', 'tip', 'tour', 'attraction', 'destination', 'experience'];
-  const hasRealTravelContent = TRAVEL_CONTENT_KEYWORDS.some(keyword => 
+  const hasRealTravelContent = travelContentKeywords.some(keyword => 
     textContent.toLowerCase().includes(keyword)
   );
   
