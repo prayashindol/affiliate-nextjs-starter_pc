@@ -32,7 +32,8 @@ function cleanContentHtml(html, mainImage, permalink) {
   // 4. Lacks travel content indicators
   const useConservativeCleaning = hasPlaceholderSigns || 
                                   contentLength < 800 || 
-                                  (elementorDensity > ELEMENTOR_DENSITY_THRESHOLD && contentLength < CONTENT_LENGTH_THRESHOLD) ||
+                                  contentLength < CONTENT_LENGTH_CONSERVATIVE || 
+                                  (elementorDensity > ELEMENTOR_DENSITY_THRESHOLD && contentLength < CONTENT_LENGTH_MINIMAL) ||
                                   !hasRealTravelContent;
   
   // If content needs conservative cleaning, be much more careful
