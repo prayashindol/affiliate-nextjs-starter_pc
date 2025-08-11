@@ -18,8 +18,14 @@ async function getSeoGenPost(slug) {
       datePublished,
       dateModified,
       author,
-      mainImage,
-      mainImageAsset,
+      mainImage{
+        asset->,
+        alt
+      },
+      mainImageAsset{
+        asset->,
+        alt
+      },
       contentHtml,
       location,
       category,
