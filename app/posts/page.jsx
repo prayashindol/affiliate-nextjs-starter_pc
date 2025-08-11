@@ -1,20 +1,69 @@
 import { sanityClient } from "@/lib/sanity";
 import Link from "next/link";
+import { CATEGORY_SLUGS } from "@/lib/postKinds";
 
 async function getAllSeoGenPosts() {
-  // Only show published posts with content; sort by dateModified or datePublished
-  // Include both regular and Viator posts, but filter out empty posts
-  const query = `
-    *[_type in ["seoGenPost", "seoGenPostViator"] && defined(title) && defined(contentHtml) && length(contentHtml) > 0] | order(dateModified desc) {
+  // Debug: Check what content exists for seoGenPost type
+  const debugSeoGenQuery = `
+    *[_type == "seoGenPost"] {
       title,
       slug,
       excerpt,
       mainImage,
       dateModified,
-      _type
+      _type,
+      "hasContentHtml": defined(contentHtml),
+      "contentLength": length(contentHtml),
+      categories[]->{title, slug}
     }
   `;
-  return await sanityClient.fetch(query);
+  
+  const debugPosts = await sanityClient.fetch(debugSeoGenQuery);
+  console.log('Debug - All seoGenPost posts (regardless of content):', JSON.stringify(debugPosts, null, 2));
+  
+  // Less restrictive query for seoGenPost - just require title
+  const relaxedQuery = `
+    *[_type == "seoGenPost" && defined(title)] | order(dateModified desc) {
+      title,
+      slug,
+      excerpt,
+      mainImage,
+      dateModified,
+      _type,
+      categories[]->{title, slug}
+    }
+  `;
+  
+  let posts = await sanityClient.fetch(relaxedQuery);
+  console.log('Debug - Relaxed query (seoGenPost with just title):', posts.length, 'posts found');
+  
+  if (posts.length > 0) {
+    return posts;
+  }
+  
+  // If still no results, try to find the one seoGenPost I saw in the debug data
+  const allPostsQuery = `
+    *[_type in ["seoGenPost", "seoGenPostViator"]] {
+      title,
+      slug,
+      excerpt,
+      mainImage,
+      dateModified,
+      _type,
+      "hasContentHtml": defined(contentHtml),
+      "contentLength": length(contentHtml),
+      categories[]->{title, slug}
+    } | order(_type asc, dateModified desc)
+  `;
+  
+  const allPosts = await sanityClient.fetch(allPostsQuery);
+  console.log('Debug - All posts by type:', JSON.stringify(allPosts.slice(0, 10), null, 2));
+  
+  // Return only seoGenPost type posts, regardless of content
+  const seoGenPosts = allPosts.filter(post => post._type === 'seoGenPost');
+  console.log('Debug - Filtered seoGenPost posts:', seoGenPosts.length);
+  
+  return seoGenPosts;
 }
 
 export default async function PostsListingPage() {
