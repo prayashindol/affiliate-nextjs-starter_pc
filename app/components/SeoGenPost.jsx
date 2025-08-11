@@ -333,7 +333,7 @@ function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent)
       injectionTarget.before('<div id="viator-tours-injection-point"></div>');
     }
     
-    if (typeof window === "undefined") {
+    if (IS_SERVER) {
       console.log('🎯 Viator injection: Placed', insertMethod, injectionTarget.prop('tagName'), 'with text:', injectionTarget.text().trim().substring(0, 50));
     }
   } else {
