@@ -301,7 +301,7 @@ function injectViatorToursAfterParagraph(htmlContent, viatorToursComponent, para
   return $("body").html() || htmlContent;
 }
 
-export default function SeoGenPost({ post, viatorTours = [] }) {
+export default function SeoGenPost({ post, viatorTours = [], isViatorPost }) {
   console.log("********* SeoGenPost RENDERED *********");
   console.log("POST OBJECT:", post);
   console.log("POST TYPE:", post && post.postType);
@@ -322,6 +322,36 @@ export default function SeoGenPost({ post, viatorTours = [] }) {
     post.mainImageAsset && post.mainImageAsset.alt
       ? post.mainImageAsset.alt
       : post.title;
+
+  // Viator detection logic
+  const isViator =
+    isViatorPost === true ||
+    post?._type === 'seoGenPostViator' ||
+    (Array.isArray(post?.category) && post.category.includes('airbnb-gen-viator'));
+
+  // Featured image computation with fallbacks
+  let featuredSrc = null;
+  let featuredAlt = post?.mainImage?.alt || post?.title || '';
+
+  if (post?.mainImage?.asset) {
+    featuredSrc = urlFor(post.mainImage)
+      .width(1600)
+      .height(900)
+      .fit('max')
+      .auto('format')
+      .url();
+  } else if (typeof post?.mainImage === 'string') {
+    featuredSrc = post.mainImage;
+  } else if (post?.mainImageAsset?.asset) {
+    // Back-compat
+    featuredSrc = urlFor(post.mainImageAsset)
+      .width(1600)
+      .height(900)
+      .fit('max')
+      .auto('format')
+      .url();
+    featuredAlt = post?.mainImageAsset?.alt || featuredAlt;
+  }
 
   let cleanedHtml = "";
   if (post.contentHtml) {
@@ -369,13 +399,31 @@ export default function SeoGenPost({ post, viatorTours = [] }) {
       <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight text-center">
         {post.title}
       </h1>
-      {mainImageUrl && (
-        <img
-          src={mainImageUrl}
-          alt={mainImageAlt}
-          className="rounded-2xl shadow-lg my-8 w-full h-auto object-cover"
-          loading="eager"
-        />
+      {/* Featured image logic:
+          - For Viator posts: show mainImage if present; else show placeholder.
+          - For non-Viator posts: show image only if available (keep existing behavior). */}
+      {isViator ? (
+        featuredSrc ? (
+          <img
+            src={featuredSrc}
+            alt={featuredAlt}
+            className="rounded-2xl shadow-lg my-8 w-full h-auto object-cover"
+            loading="eager"
+          />
+        ) : (
+          <div className="rounded-2xl border-2 border-dashed border-gray-300 my-8 p-12 text-center text-gray-500 bg-gray-50">
+            Featured Image Coming Soon
+          </div>
+        )
+      ) : (
+        (featuredSrc || mainImageUrl) && (
+          <img
+            src={featuredSrc || mainImageUrl}
+            alt={featuredAlt || mainImageAlt}
+            className="rounded-2xl shadow-lg my-8 w-full h-auto object-cover"
+            loading="eager"
+          />
+        )
       )}
       <div className="flex flex-wrap items-center text-gray-500 text-sm mb-8 gap-4">
         {post.location && (
