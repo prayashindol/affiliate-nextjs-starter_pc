@@ -7,8 +7,11 @@ import { fixViatorHtml } from "../../lib/viatorHtml";
 // Content cleaning thresholds
 const MIN_CONTENT_LENGTH_FOR_DEEP_CLEANING = 800;
 const CONTENT_LENGTH_CONSERVATIVE = 500;
-const CONTENT_LENGTH_MINIMAL = 300;
+const CONTENT_LENGTH_MINIMAL = 2000;
 const ELEMENTOR_DENSITY_THRESHOLD = 20;
+
+// Travel content keywords for detection
+const TRAVEL_CONTENT_KEYWORDS = ['visit', 'guide', 'travel', 'tip', 'tour', 'attraction', 'destination', 'experience'];
 
 function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Apply Viator HTML normalization first ---
@@ -23,11 +26,10 @@ function cleanContentHtml(html, mainImage, permalink) {
   const contentLength = textContent.length;
   const hasPlaceholderSigns = textContent.includes('No data found') || 
                               textContent.includes('placeholder') ||
-                              contentLength < 500;
+                              contentLength < CONTENT_LENGTH_CONSERVATIVE;
   
   // Check for actual travel content indicators
-  const travelContentKeywords = ['visit', 'guide', 'travel', 'tip', 'tour', 'attraction', 'destination', 'experience'];
-  const hasRealTravelContent = travelContentKeywords.some(keyword => 
+  const hasRealTravelContent = TRAVEL_CONTENT_KEYWORDS.some(keyword => 
     textContent.toLowerCase().includes(keyword)
   );
   
@@ -38,7 +40,6 @@ function cleanContentHtml(html, mainImage, permalink) {
   // 4. Lacks travel content indicators
   const useConservativeCleaning = hasPlaceholderSigns || 
                                   contentLength < MIN_CONTENT_LENGTH_FOR_DEEP_CLEANING || 
-                                  contentLength < CONTENT_LENGTH_CONSERVATIVE || 
                                   (elementorDensity > ELEMENTOR_DENSITY_THRESHOLD && contentLength < CONTENT_LENGTH_MINIMAL) ||
                                   !hasRealTravelContent;
   
