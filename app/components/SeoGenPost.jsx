@@ -318,7 +318,7 @@ function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent)
       for (let i = contentBeforeH2.length - 1; i >= 0; i--) {
         const el = $(contentBeforeH2[i]);
         // Look for paragraph, list, or div with substantial content
-        if (el.is('p, ul, ol, div') && el.text().trim().length > 10) {
+        if (el.is('p, ul, ol, div') && el.text().trim().length > MIN_MEANINGFUL_CONTENT_LENGTH) {
           injectionTarget = el;
           insertMethod = 'after';
           break;
