@@ -344,7 +344,7 @@ function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent)
     // Find the first paragraph with substantial content
     paragraphs.each(function() {
       const $p = $(this);
-      if ($p.text().trim().length > 20 && !injected) {
+      if ($p.text().trim().length > MIN_SUBSTANTIAL_PARAGRAPH_LENGTH && !injected) {
         $p.after('<div id="viator-tours-injection-point"></div>');
         injected = true;
         if (typeof window === "undefined") {
