@@ -289,19 +289,78 @@ function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent)
   if (!viatorToursComponent || !htmlContent) return htmlContent;
 
   const $ = load(htmlContent);
+  
+  // First, remove any existing injection points to prevent duplicates
+  $('#viator-tours-injection-point').remove();
+  
   const h2Elements = $('h2');
   
   // Inject before the first H2 (which is the "second" heading after H1)
   if (h2Elements.length > 0) {
     const firstH2 = h2Elements.eq(0);
-    // Create a marker for the Viator tours injection point
-    firstH2.before('<div id="viator-tours-injection-point"></div>');
+    
+    // Find the best injection point - after introductory content but before the H2
+    // Look for meaningful content before the H2 to inject after it
+    let injectionTarget = firstH2;
+    let insertMethod = 'before';
+    
+    // Check if there's meaningful content before the first H2
+    const contentBeforeH2 = [];
+    let prevElement = firstH2.prev();
+    
+    while (prevElement.length) {
+      contentBeforeH2.unshift(prevElement[0]);
+      prevElement = prevElement.prev();
+    }
+    
+    // Find the last meaningful content element before the H2
+    if (contentBeforeH2.length > 0) {
+      for (let i = contentBeforeH2.length - 1; i >= 0; i--) {
+        const el = $(contentBeforeH2[i]);
+        // Look for paragraph, list, or div with substantial content
+        if (el.is('p, ul, ol, div') && el.text().trim().length > MIN_MEANINGFUL_CONTENT_LENGTH) {
+          injectionTarget = el;
+          insertMethod = 'after';
+          break;
+        }
+      }
+    }
+    
+    // Create injection point
+    if (insertMethod === 'after') {
+      injectionTarget.after('<div id="viator-tours-injection-point"></div>');
+    } else {
+      injectionTarget.before('<div id="viator-tours-injection-point"></div>');
+    }
+    
+    if (IS_SERVER) {
+      console.log('🎯 Viator injection: Placed', insertMethod, injectionTarget.prop('tagName'), 'with text:', injectionTarget.text().trim().substring(0, 50));
+    }
   } else {
-    // Fallback: if no H2 found, inject after the first paragraph as a sensible default
+    // Fallback: if no H2 found, inject after the first meaningful paragraph
     const paragraphs = $('p');
-    if (paragraphs.length > 0) {
+    let injected = false;
+    
+    // Find the first paragraph with substantial content
+    paragraphs.each(function() {
+      const $p = $(this);
+      if ($p.text().trim().length > MIN_SUBSTANTIAL_PARAGRAPH_LENGTH && !injected) {
+        $p.after('<div id="viator-tours-injection-point"></div>');
+        injected = true;
+        if (typeof window === "undefined") {
+          console.log('🎯 Viator injection fallback: After paragraph with text:', $p.text().trim().substring(0, 50));
+        }
+        return false; // break the loop
+      }
+    });
+    
+    if (!injected && paragraphs.length > 0) {
+      // Last resort: after first paragraph
       const firstParagraph = paragraphs.eq(0);
       firstParagraph.after('<div id="viator-tours-injection-point"></div>');
+      if (typeof window === "undefined") {
+        console.log('🎯 Viator injection last resort: After first paragraph');
+      }
     }
   }
   
