@@ -412,7 +412,7 @@ export default function SeoGenPost({ post, viatorTours = [], isViatorPost }) {
           />
         ) : (
           <div className="rounded-2xl border-2 border-dashed border-gray-300 my-8 p-12 text-center text-gray-500 bg-gray-50">
-            Featured Image Awaited
+            Featured Image Coming Soon
           </div>
         )
       ) : (
