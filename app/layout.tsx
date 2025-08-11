@@ -8,7 +8,17 @@ import { SessionProvider } from "./components/SessionProvider";
 import ScrollArrowEffect from "./components/ScrollArrowEffect";
 import { ScrollToTopButton } from "./components/ScrollToTopButton";
 
+// Prefer explicit NEXT_PUBLIC_SITE_URL; else use Vercel preview hostname; else localhost
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
+const ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || "development";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  // Avoid indexing previews
+  robots: ENV === "production" ? undefined : { index: false, follow: false },
   title: "STR Specialist - Airbnb Host Resources",
   description:
     "Your central reliable resource for essential tools, templates, and training to maximize your hosting success",

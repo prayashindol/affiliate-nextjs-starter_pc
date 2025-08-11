@@ -73,10 +73,10 @@ export async function generateMetadata({ params }) {
       description: post.description || post.excerpt || "",
       images: ogImages,
       type: "article",
-      url: post.permalink || `https://strspecialist.com/${params.slug}`,
+      url: post.permalink || `/${params.slug}`,
     },
     alternates: {
-      canonical: post.permalink || `https://strspecialist.com/${slug}`,
+      canonical: post.permalink || `/${slug}`,
     },
   };
 }
