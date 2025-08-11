@@ -4,6 +4,10 @@ import { urlFor } from "../../lib/sanity";
 import ViatorTours from "./ViatorTours";
 import { fixViatorHtml } from "../../lib/viatorHtml";
 
+// Constants for Viator tours injection logic
+const MIN_MEANINGFUL_CONTENT_LENGTH = 50; // Minimum characters for meaningful content before H2
+const MIN_SUBSTANTIAL_PARAGRAPH_LENGTH = 100; // Minimum characters for substantial paragraph content
+
 function cleanContentHtml(html, mainImage, permalink) {
   // --- NEW: Apply Viator HTML normalization first ---
   let processedHtml = fixViatorHtml(html);
@@ -333,7 +337,7 @@ function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent)
       injectionTarget.before('<div id="viator-tours-injection-point"></div>');
     }
     
-    if (IS_SERVER) {
+    if (typeof window === "undefined") {
       console.log('🎯 Viator injection: Placed', insertMethod, injectionTarget.prop('tagName'), 'with text:', injectionTarget.text().trim().substring(0, 50));
     }
   } else {
