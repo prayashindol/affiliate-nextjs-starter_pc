@@ -1,19 +1,27 @@
 import { sanityClient } from "@/lib/sanity";
 import Link from "next/link";
+import { CATEGORY_SLUGS } from "@/lib/postKinds";
 
 async function getAllSeoGenPosts() {
-  // Only show published posts with content; sort by dateModified or datePublished
-  // Include both regular and Viator posts, but filter out empty posts
+  // Query for non-Viator SEO gen posts only (airbnb-gen category)
+  // Exclude Viator posts which have the airbnb-gen-viator category
   const query = `
-    *[_type in ["seoGenPost", "seoGenPostViator"] && defined(title) && defined(contentHtml) && length(contentHtml) > 0] | order(dateModified desc) {
+    *[_type == "seoGenPost" && 
+      defined(title) && 
+      defined(contentHtml) && 
+      length(contentHtml) > 0 &&
+      references(*[_type == "category" && slug.current == "${CATEGORY_SLUGS.SEO_GEN}"]._id)
+    ] | order(dateModified desc) {
       title,
       slug,
       excerpt,
       mainImage,
       dateModified,
-      _type
+      _type,
+      categories[]->{title, slug}
     }
   `;
+  
   return await sanityClient.fetch(query);
 }
 
