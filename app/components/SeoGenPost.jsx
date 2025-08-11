@@ -297,7 +297,8 @@ function injectViatorToursAfterParagraph(htmlContent, viatorToursComponent, para
     targetParagraph.after('<div id="viator-tours-injection-point"></div>');
   }
   
-  return $.html();
+  // Return just the body content to avoid nested HTML structures
+  return $("body").html() || htmlContent;
 }
 
 export default function SeoGenPost({ post, viatorTours = [] }) {
