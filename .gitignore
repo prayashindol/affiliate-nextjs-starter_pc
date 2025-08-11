@@ -45,3 +45,14 @@ next-env.d.ts
 .env.*.local
 posts.csv
 csv_to_ndjson.py
+
+# Additional deployment optimization files
+*.log
+*.csv.backup
+*.bak
+test-*.js
+*.tmp
+*.temp
+.turbo/
+coverage/
+dist/

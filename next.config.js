@@ -41,6 +41,12 @@ const nextConfig = {
       'react-icons'
     ],
   },
+  // Production optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Output configuration for better caching
+  output: 'standalone',
   // Add retry configuration for chunk loading
   webpack: (config, { isServer }) => {
     if (!isServer) {
