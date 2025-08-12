@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   info-when-missing-secrets:
-    if: ${{ secrets.VERCEL_DEPLOY_HOOK == '' && secrets.VERCEL_PREVIEW_DEPLOY_HOOK == '' }}
+    if: ${{ !secrets.VERCEL_DEPLOY_HOOK && !secrets.VERCEL_PREVIEW_DEPLOY_HOOK }}
     runs-on: ubuntu-latest
     steps:
       - name: Missing Vercel Deploy Hook secrets
