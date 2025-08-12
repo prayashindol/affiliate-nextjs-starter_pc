@@ -27,7 +27,7 @@ jobs:
           exit 0
 
   deploy-preview:
-    if: ${{ secrets.VERCEL_PREVIEW_DEPLOY_HOOK != '' || secrets.VERCEL_DEPLOY_HOOK != '' }}
+    if: ${{ secrets.VERCEL_PREVIEW_DEPLOY_HOOK || secrets.VERCEL_DEPLOY_HOOK }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Preview Deploy Hook
