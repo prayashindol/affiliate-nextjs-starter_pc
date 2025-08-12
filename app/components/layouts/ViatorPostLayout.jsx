@@ -1,7 +1,7 @@
 import React from 'react'
-import SeoGenPost from '../SeoGenPost'
+import ViatorGenPost from '../posts/ViatorGenPost'
 
 export default function ViatorPostLayout({ post, viatorTours = [] }) {
-  // The underlying SeoGenPost already supports viatorTours; keep behavior intact
-  return <SeoGenPost post={post} isViatorPost={true} viatorTours={viatorTours} city={post?.city} />
+  // Use the new dedicated component for Viator posts
+  return <ViatorGenPost post={post} viatorTours={viatorTours} city={post?.city} />
 }
