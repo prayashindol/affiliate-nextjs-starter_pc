@@ -1,5 +1,5 @@
 // Enhanced error handling and debugging for Viator integration
-import { fetchViatorTours, getViatorDestinationId } from '../../../lib/viator';
+import { fetchViatorTours, getViatorDestinationId } from '@/lib/viator';
 
 export default async function ViatorDiagnosticsPage() {
   const diagnostics = await runViatorDiagnostics();
