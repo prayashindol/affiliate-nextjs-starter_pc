@@ -53,7 +53,7 @@ jobs:
           echo "Preview deploy hook triggered successfully."
 
   deploy-production:
-    if: ${{ secrets.VERCEL_DEPLOY_HOOK != '' }}
+    if: ${{ secrets.VERCEL_DEPLOY_HOOK }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Production Deploy Hook
