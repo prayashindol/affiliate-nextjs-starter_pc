@@ -32,6 +32,11 @@ const nextConfig = {
         destination: '/:slug*',
         permanent: true,
       },
+      {
+        source: '/post',
+        destination: '/posts',
+        permanent: true,
+      },
     ];
   },
   // Optimize chunks to prevent loading failures
