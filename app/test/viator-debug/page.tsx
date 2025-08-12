@@ -1,7 +1,7 @@
 // Test page component to debug Viator integration without Sanity dependency
 import React from 'react';
 import SeoGenPost from '../../components/SeoGenPost';
-import { fetchViatorTours } from '../../../lib/viator';
+import { fetchViatorTours } from '@/lib/viator';
 
 // Mock post data that simulates a real Viator post
 const mockViatorPost = {
