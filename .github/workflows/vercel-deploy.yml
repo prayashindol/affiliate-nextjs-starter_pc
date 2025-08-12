@@ -1,5 +1,5 @@
 ---
-name: Vercel Production Deploy
+name: Vercel Production Deploy (Main Branch)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: vercel-deploy-${{ github.ref }}
+  group: vercel-deploy-main-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

@@ -60,7 +60,15 @@ export default async function ViatorTestPage() {
   
   let viatorTours = [];
   let errorMessage = null;
-  const debugInfo = {};
+  interface DebugInfo {
+    isViatorPost?: boolean;
+    city?: string;
+    shouldFetchTours?: boolean;
+    viatorTours?: Array<{ title: string; imageUrl: string; price: string; currency: string; bookingLink: string }>;
+    error?: string;
+  }
+  
+  const debugInfo: DebugInfo = {};
   
   try {
     // Simulate the same logic as the real page
@@ -70,7 +78,7 @@ export default async function ViatorTestPage() {
     
     debugInfo.isViatorPost = isViatorPost;
     debugInfo.city = mockViatorPost.city;
-    debugInfo.shouldFetchTours = isViatorPost && mockViatorPost.city;
+    debugInfo.shouldFetchTours = isViatorPost && !!mockViatorPost.city;
     
     console.log('🎯 Viator detection results:', debugInfo);
     

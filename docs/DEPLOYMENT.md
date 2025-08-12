@@ -1,17 +1,47 @@
 # Production Deployments (Vercel)
 
-This project deploys to Vercel. To guarantee that merges to `main` trigger a production deploy, this repo includes a GitHub Actions workflow that calls a Vercel Deploy Hook.
+This project deploys to Vercel with both automatic PR previews and production deployments. 
+
+## Deployment Configuration
+
+### PR Deployments (Preview + Production)
+- **Automatic**: All pull requests to `main` trigger deployments to both preview and production environments
+- **Purpose**: Allows testing changes in both environments before merging
+- **Workflow**: `.github/workflows/vercel-pr-deploy.yml`
+
+### Main Branch Deployments (Production Only)
+- **Automatic**: Pushes to `main` branch trigger production deployments
+- **Purpose**: Final production deployment after PR merge
+- **Workflow**: `.github/workflows/vercel-deploy.yml`
 
 ## One-time Setup
 
+### Required Secrets
 1. In Vercel, open your Project → Settings → Deploy Hooks.
-2. Create a Deploy Hook for Production and copy its URL.
-3. In this GitHub repository, go to Settings → Secrets and variables → Actions → New repository secret:
-   - Name: `VERCEL_DEPLOY_HOOK`
-   - Value: the hook URL from step 2
+2. Create a Deploy Hook for **Production** and copy its URL.
+3. (Optional) Create a Deploy Hook for **Preview** and copy its URL.
+4. In this GitHub repository, go to Settings → Secrets and variables → Actions:
+
+**Required:**
+- Name: `VERCEL_DEPLOY_HOOK`
+- Value: Production hook URL from step 2
+
+**Optional (for separate preview deployments):**
+- Name: `VERCEL_PREVIEW_DEPLOY_HOOK` 
+- Value: Preview hook URL from step 3
+- Note: If not set, PRs will use the production hook for preview deployments
 
 ## How It Works
 
+### Pull Request Deployments
+- The workflow `.github/workflows/vercel-pr-deploy.yml` runs on:
+  - Pull request events: `opened`, `synchronize`, `reopened`
+  - Manual trigger via the "Run workflow" button (Actions tab)
+- **Dual Deployment**: Each PR triggers both preview and production deployments
+- **Preview Environment**: Uses `VERCEL_PREVIEW_DEPLOY_HOOK` if configured, otherwise falls back to production hook
+- **Production Environment**: Uses `VERCEL_DEPLOY_HOOK` for immediate production testing
+
+### Main Branch Deployments  
 - The workflow `.github/workflows/vercel-deploy.yml` runs on:
   - `push` to `main` (e.g., when PRs are merged)
   - Manual trigger via the "Run workflow" button (Actions tab)
@@ -19,17 +49,62 @@ This project deploys to Vercel. To guarantee that merges to `main` trigger a pro
 
 ## Manual Deployment
 
-- Go to Actions → Vercel Production Deploy → Run workflow and click Run.
+### From GitHub Actions
+- **PR Deployment**: Go to Actions → "Vercel PR Deploy (Preview + Production)" → Run workflow
+- **Main Branch Deployment**: Go to Actions → "Vercel Production Deploy (Main Branch)" → Run workflow
+
+### From Command Line
+```bash
+# Deploy to production
+npm run deploy:production
+
+# Deploy preview 
+npm run deploy:preview
+```
+
+## Vercel Configuration Changes
+
+### What Changed
+- **Enabled PR Deployments**: `vercel.json` now allows deployments from feature branches and PRs
+- **Removed Build Restrictions**: Removed the restrictive `ignoreCommand` that was preventing PR builds
+- **GitHub Integration**: Changed `silent: false` to show deployment status in GitHub
+
+### vercel.json Key Changes
+```json
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "copilot/*": true  // Now enabled for PR branches
+    }
+  },
+  "github": {
+    "silent": false  // Show deployment status in PRs
+  }
+  // Removed restrictive ignoreCommand
+}
+```
+
+## Development Workflow
+
+### For Pull Requests
+1. **Create PR**: Open a pull request against `main` branch
+2. **Automatic Deployment**: GitHub Actions automatically triggers deployments to:
+   - Preview environment (for testing)
+   - Production environment (for immediate validation)
+3. **Preview Changes**: Use the preview URL to review changes before merging
+4. **Merge**: Once satisfied, merge the PR to main
+
+### For Emergency Deployments
+- Use `[deploy]` in commit message on any branch to force deployment
+- Example: `git commit -m "hotfix: critical bug [deploy]"`
 
 ## Notes About vercel.json and Forcing Deploys
 
-- If you use an `ignoreCommand` in `vercel.json` to reduce unnecessary builds, ensure that:
-  - Builds on `main` (and optionally commit messages including `[deploy]`) are NOT ignored.
-  - Example allow-main / allow-[deploy] pattern:
-    ```
-    "ignoreCommand": "bash -c 'if [[ \"$VERCEL_GIT_COMMIT_REF\" == \"main\" ]] || [[ \"$VERCEL_GIT_COMMIT_MESSAGE\" =~ \\[deploy\\] ]]; then exit 1; else exit 0; fi'"
-    ```
-- You can also force a deploy by pushing a commit with `[deploy]` in the message.
+### Current Configuration
+- **All Branches**: PRs and feature branches now deploy automatically
+- **No Build Restrictions**: Removed the `ignoreCommand` that was preventing builds
+- **GitHub Integration**: Deployment status visible in GitHub PRs
 
 ## Additional Deployment Optimizations
 
@@ -53,7 +128,7 @@ git commit -m "feat: new feature [deploy]"
 ```
 
 ### Best Practices
-1. **Batch changes**: Group related changes into single commits
-2. **Use feature branches**: Develop on branches, merge to main when ready
-3. **Tag deployments**: Use `[deploy]` only when necessary
-4. **Test locally**: Use `npm run build` to test before deploying
+1. **Development Cycle**: Create PR → Review preview deployment → Merge when ready
+2. **Testing**: Use both preview and production deployments to catch environment-specific issues
+3. **Coordination**: PRs now deploy to production automatically - coordinate team deployments carefully
+4. **Monitoring**: Watch deployment status in GitHub PR checks
