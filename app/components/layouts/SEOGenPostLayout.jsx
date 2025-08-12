@@ -1,7 +1,7 @@
 import React from 'react'
-import SeoGenPost from '../SeoGenPost'
+import AirbnbGenPost from '../posts/AirbnbGenPost'
 
 export default function SEOGenPostLayout({ post }) {
-  // Keep using your shared renderer for the base SEO Gen layout
-  return <SeoGenPost post={post} />
+  // Use the new dedicated component for regular airbnb-gen posts
+  return <AirbnbGenPost post={post} />
 }

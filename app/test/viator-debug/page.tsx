@@ -1,6 +1,6 @@
 // Test page component to debug Viator integration without Sanity dependency
 import React from 'react';
-import SeoGenPost from '../../components/SeoGenPost';
+import ViatorGenPost from '../../components/posts/ViatorGenPost';
 import { fetchViatorTours } from '@/lib/viator';
 
 // Mock post data that simulates a real Viator post
@@ -55,12 +55,21 @@ const mockViatorPost = {
   }
 };
 
+interface DebugInfo {
+  isViatorPost?: boolean;
+  city?: string;
+  shouldFetchTours?: boolean;
+  toursFound?: number;
+  destinationId?: string;
+  error?: string;
+}
+
 export default async function ViatorTestPage() {
   console.log('🧪 VIATOR TEST PAGE - Starting fetch...');
   
-  let viatorTours = [];
-  let errorMessage = null;
-  let debugInfo = {};
+  let viatorTours: unknown[] = [];
+  let errorMessage: string | null = null;
+  const debugInfo: DebugInfo = {};
   
   try {
     // Simulate the same logic as the real page
@@ -93,10 +102,11 @@ export default async function ViatorTestPage() {
       console.log('❌ Not fetching tours - either not a Viator post or no city specified');
     }
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('💥 Error fetching Viator tours:', error);
-    errorMessage = error.message;
-    debugInfo.error = error.message;
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    errorMessage = errorMsg;
+    debugInfo.error = errorMsg;
   }
   
   return (
@@ -159,10 +169,10 @@ export default async function ViatorTestPage() {
       </div>
       
       {/* Render the actual post with Viator integration */}
-      <SeoGenPost 
+      <ViatorGenPost 
         post={mockViatorPost} 
         viatorTours={viatorTours} 
-        isViatorPost={true} 
+        city={mockViatorPost.city} 
       />
       
       {/* Debug footer */}
