@@ -1,5 +1,7 @@
 ---
 name: Vercel PR Deploy (Preview + Production)
+permissions:
+  contents: read
 
 on:
   pull_request:
