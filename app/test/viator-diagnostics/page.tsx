@@ -150,7 +150,7 @@ async function runViatorDiagnostics() {
         status: 'failed',
         toursCount: 0,
         destinationId: null,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }

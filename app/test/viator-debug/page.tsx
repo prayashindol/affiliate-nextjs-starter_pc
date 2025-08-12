@@ -79,7 +79,7 @@ export default async function ViatorTestPage() {
     
     debugInfo.isViatorPost = isViatorPost;
     debugInfo.city = mockViatorPost.city;
-    debugInfo.shouldFetchTours = isViatorPost && mockViatorPost.city;
+    debugInfo.shouldFetchTours = isViatorPost && !!mockViatorPost.city;
     
     console.log('🎯 Viator detection results:', debugInfo);
     
