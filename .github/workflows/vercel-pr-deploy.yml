@@ -10,12 +10,12 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: vercel-pr-deploy-${{ github.event.pull_request.number }}
+  group: vercel-pr-deploy-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
   info-when-missing-secrets:
-    if: ${{ !secrets.VERCEL_DEPLOY_HOOK && !secrets.VERCEL_PREVIEW_DEPLOY_HOOK }}
+    if: ${{ secrets.VERCEL_DEPLOY_HOOK == '' && secrets.VERCEL_PREVIEW_DEPLOY_HOOK == '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Missing Vercel Deploy Hook secrets
@@ -27,7 +27,7 @@ jobs:
           exit 0
 
   deploy-preview:
-    if: ${{ secrets.VERCEL_PREVIEW_DEPLOY_HOOK || secrets.VERCEL_DEPLOY_HOOK }}
+    if: ${{ secrets.VERCEL_PREVIEW_DEPLOY_HOOK != '' || secrets.VERCEL_DEPLOY_HOOK != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Preview Deploy Hook
@@ -38,22 +38,25 @@ jobs:
           set -euo pipefail
           
           # Use preview hook if available, otherwise fallback to production hook
-          if [ -n "$PREVIEW_DEPLOY_HOOK" ]; then
+          if [ -n "${PREVIEW_DEPLOY_HOOK:-}" ]; then
             DEPLOY_URL="$PREVIEW_DEPLOY_HOOK"
             DEPLOY_TYPE="preview"
-          else
+          elif [ -n "${FALLBACK_DEPLOY_HOOK:-}" ]; then
             DEPLOY_URL="$FALLBACK_DEPLOY_HOOK"
             DEPLOY_TYPE="production (fallback)"
+          else
+            echo "No deploy hooks available"
+            exit 1
           fi
           
           echo "Triggering Vercel deploy hook for $DEPLOY_TYPE environment..."
-          echo "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+          echo "PR #${{ github.event.pull_request.number || 'N/A' }}: ${{ github.event.pull_request.title || github.event.head_commit.message }}"
           
           curl -fsSL -X POST "$DEPLOY_URL"
           echo "Preview deploy hook triggered successfully."
 
   deploy-production:
-    if: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+    if: ${{ secrets.VERCEL_DEPLOY_HOOK != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Production Deploy Hook
@@ -62,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Triggering Vercel deploy hook for production environment..."
-          echo "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+          echo "PR #${{ github.event.pull_request.number || 'N/A' }}: ${{ github.event.pull_request.title || github.event.head_commit.message }}"
           
           curl -fsSL -X POST "$DEPLOY_HOOK"
           echo "Production deploy hook triggered successfully."

@@ -1,5 +1,7 @@
 ---
 name: Vercel Production Deploy (Main Branch)
+permissions:
+  contents: read
 
 on:
   push:
@@ -31,5 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Triggering Vercel deploy hook for production..."
+          echo "Commit: ${{ github.sha }}"
+          echo "Message: ${{ github.event.head_commit.message }}"
           curl -fsSL -X POST "$DEPLOY_HOOK"
-          echo "Deploy hook triggered."
+          echo "Deploy hook triggered successfully."

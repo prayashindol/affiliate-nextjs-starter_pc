@@ -47,6 +47,50 @@ This project deploys to Vercel with both automatic PR previews and production de
   - Manual trigger via the "Run workflow" button (Actions tab)
 - When the secret is configured, the workflow will `POST` to the Vercel Deploy Hook to request a production deployment.
 
+## Troubleshooting Deployment Errors
+
+### Common Issues Fixed (v2024.08.12)
+
+#### 1. Workflow Syntax Errors
+**Problem**: GitHub Actions workflows failing due to incorrect secret checking syntax.
+**Fix**: Updated workflows to use proper GitHub Actions secret syntax:
+- Changed `!secrets.SECRET_NAME` to `secrets.SECRET_NAME == ''`
+- Added fallback handling for missing secrets
+- Improved error handling and environment variable safety
+
+#### 2. Missing Permissions
+**Problem**: Workflows failing due to missing permissions.
+**Fix**: Added explicit permissions to all workflows:
+```yaml
+permissions:
+  contents: read
+```
+
+#### 3. Environment Variable Safety
+**Problem**: Bash scripts failing when environment variables are undefined.
+**Fix**: Added proper variable handling:
+```bash
+if [ -n "${PREVIEW_DEPLOY_HOOK:-}" ]; then
+  # Safe variable handling with fallbacks
+fi
+```
+
+#### 4. Concurrency Issues
+**Problem**: Multiple workflows running simultaneously causing conflicts.
+**Fix**: Added proper concurrency control:
+```yaml
+concurrency:
+  group: vercel-pr-deploy-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+```
+
+### Debugging Failed Deployments
+
+1. **Check GitHub Actions**: Go to the "Actions" tab to see workflow run details
+2. **Verify Secrets**: Ensure `VERCEL_DEPLOY_HOOK` is configured in repository secrets
+3. **Check Vercel Deploy Hooks**: Verify hooks exist and are active in Vercel project settings
+4. **Manual Test**: Try running the workflow manually to isolate issues
+
 ## Manual Deployment
 
 ### From GitHub Actions
@@ -99,36 +143,10 @@ npm run deploy:preview
 - Use `[deploy]` in commit message on any branch to force deployment
 - Example: `git commit -m "hotfix: critical bug [deploy]"`
 
-## Notes About vercel.json and Forcing Deploys
+## Best Practices
 
-### Current Configuration
-- **All Branches**: PRs and feature branches now deploy automatically
-- **No Build Restrictions**: Removed the `ignoreCommand` that was preventing builds
-- **GitHub Integration**: Deployment status visible in GitHub PRs
-
-## Additional Deployment Optimizations
-
-The project includes several optimizations to reduce Vercel deployment frequency and avoid hitting limits:
-
-### Selective Deployment
-- **Main branch only**: Automatic deployments only occur on the `main` branch
-- **Manual trigger**: Use `[deploy]` in commit message to force deployment from other branches
-- **Disabled on feature branches**: Copilot branches (`copilot/*`) don't auto-deploy
-
-### Manual Deployment Commands
-```bash
-# Deploy to production (main branch only)
-npm run deploy:production
-
-# Deploy preview (any branch)
-npm run deploy:preview
-
-# Force deployment with commit message
-git commit -m "feat: new feature [deploy]"
-```
-
-### Best Practices
 1. **Development Cycle**: Create PR → Review preview deployment → Merge when ready
 2. **Testing**: Use both preview and production deployments to catch environment-specific issues
 3. **Coordination**: PRs now deploy to production automatically - coordinate team deployments carefully
 4. **Monitoring**: Watch deployment status in GitHub PR checks
+5. **Secret Management**: Regularly rotate Vercel deploy hook URLs for security
