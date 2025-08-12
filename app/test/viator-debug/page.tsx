@@ -60,7 +60,7 @@ export default async function ViatorTestPage() {
   
   let viatorTours = [];
   let errorMessage = null;
-  let debugInfo = {};
+  const debugInfo: any = {};
   
   try {
     // Simulate the same logic as the real page
