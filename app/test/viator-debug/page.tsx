@@ -67,7 +67,7 @@ interface DebugInfo {
 export default async function ViatorTestPage() {
   console.log('🧪 VIATOR TEST PAGE - Starting fetch...');
   
-  let viatorTours = [];
+  let viatorTours: unknown[] = [];
   let errorMessage: string | null = null;
   const debugInfo: DebugInfo = {};
   
