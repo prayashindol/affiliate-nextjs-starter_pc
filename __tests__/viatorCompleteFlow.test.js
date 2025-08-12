@@ -109,7 +109,8 @@ function simulateViatorAPI(city, tours = mockTours) {
     'london': '77', // London's destination ID
     'paris': '76',  // Paris destination ID
     'rome': '187'   // Rome destination ID
-  };
+  // Use the real destination mapping from production
+  const cityMap = viatorCityMap;
   
   const destinationId = cityMap[city.toLowerCase()];
   if (!destinationId) {
