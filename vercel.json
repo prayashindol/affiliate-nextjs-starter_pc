@@ -1,16 +1,13 @@
 {
   "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "copilot/*": false
-    }
+    "deploymentEnabled": true
   },
   "github": {
     "autoAlias": false,
     "autoJobCancelation": true,
     "silent": true
   },
-  "ignoreCommand": "bash -c 'if [[ \"$VERCEL_GIT_COMMIT_REF\" == \"main\" ]] || [[ \"$VERCEL_GIT_COMMIT_MESSAGE\" =~ \\[deploy\\] ]]; then exit 1; else exit 0; fi'",
+
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
   "framework": "nextjs",
