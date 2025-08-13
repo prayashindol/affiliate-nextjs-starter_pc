@@ -53,7 +53,7 @@ interface DebugInfo {
   city?: string;
   shouldFetchTours?: boolean;
   toursFound?: number;
-  destinationId?: string;
+  destinationId?: string | null;
   error?: string;
 }
 
