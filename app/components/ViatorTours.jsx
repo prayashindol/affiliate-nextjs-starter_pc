@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import ViatorToursClientDebug from './ViatorToursClientDebug'
 
 export default function ViatorTours({ city, tours, destinationId, apiStatus, apiError, rawMeta }) {
@@ -15,14 +15,16 @@ export default function ViatorTours({ city, tours, destinationId, apiStatus, api
   return (
     <section className="my-12">
       {/* Debug component - only shows when ?debugViator=1 */}
-      <ViatorToursClientDebug 
-        city={city}
-        tours={tours}
-        destinationId={destinationId}
-        apiStatus={apiStatus}
-        apiError={apiError}
-        rawMeta={rawMeta}
-      />
+      <Suspense fallback={null}>
+        <ViatorToursClientDebug 
+          city={city}
+          tours={tours}
+          destinationId={destinationId}
+          apiStatus={apiStatus}
+          apiError={apiError}
+          rawMeta={rawMeta}
+        />
+      </Suspense>
       
       <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{heading}</h2>
 
