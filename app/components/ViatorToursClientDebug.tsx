@@ -37,7 +37,15 @@ export default function ViatorToursClientDebug({ city, tours, destinationId, api
         reviews: tour.reviews?.totalReviews,
         price: tour.pricing?.summary?.fromPrice,
         duration: Math.floor((tour.duration?.fixedDurationInMinutes || 0) / 60) + 'hrs'
-      })))
+      const processedTours = tours.map(tour => ({
+        code: tour.productCode,
+        title: tour.title?.substring(0, 50) + '...',
+        rating: tour.reviews?.combinedAverageRating,
+        reviews: tour.reviews?.totalReviews,
+        price: tour.pricing?.summary?.fromPrice,
+        duration: Math.floor((tour.duration?.fixedDurationInMinutes || 0) / 60) + 'hrs'
+      }))
+      console.table(processedTours)
     } else {
       console.warn('No tours data available')
     }
