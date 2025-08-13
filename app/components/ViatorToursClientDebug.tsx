@@ -58,7 +58,7 @@ export default function ViatorToursClientDebug({ city, tours, destinationId, api
       console.log('Tours Data:', tours)
       console.table(tours.map(tour => ({
         code: tour.productCode,
-        title: tour.title?.length && tour.title.length > 50 ? tour.title.substring(0, 50) + '...' : tour.title,
+        title: (tour.title ?? 'No title').substring(0, 50) + '...',
         rating: tour.reviews?.combinedAverageRating,
         reviews: tour.reviews?.totalReviews,
         price: tour.pricing?.summary?.fromPrice,
