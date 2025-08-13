@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
+import ViatorToursClientDebug from './ViatorToursClientDebug'
 
-export default function ViatorTours({ city, tours }) {
+export default function ViatorTours({ city, tours, destinationId, apiStatus, apiError, rawMeta }) {
   if (!tours?.length) return null
   
   // Match the heading logic from PHP code
@@ -13,6 +14,18 @@ export default function ViatorTours({ city, tours }) {
 
   return (
     <section className="my-12">
+      {/* Debug component - only shows when ?debugViator=1 */}
+      <Suspense fallback={null}>
+        <ViatorToursClientDebug 
+          city={city}
+          tours={tours}
+          destinationId={destinationId}
+          apiStatus={apiStatus}
+          apiError={apiError}
+          rawMeta={rawMeta}
+        />
+      </Suspense>
+      
       <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{heading}</h2>
 
       <div className="viator-tours grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

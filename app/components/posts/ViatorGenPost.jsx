@@ -272,7 +272,7 @@ function cleanContentHtml(html, mainImage, permalink) {
   return $("body").html();
 }
 
-function ContentWithViatorTours({ htmlContent, viatorTours, city }) {
+function ContentWithViatorTours({ htmlContent, viatorTours, city, viatorMetadata = {} }) {
   // Split content at the injection point
   const parts = htmlContent.split('<div id="viator-tours-injection-point"></div>');
   
@@ -281,7 +281,14 @@ function ContentWithViatorTours({ htmlContent, viatorTours, city }) {
       {parts[0] && (
         <div dangerouslySetInnerHTML={{ __html: parts[0] }} />
       )}
-      <ViatorTours city={city} tours={viatorTours} />
+      <ViatorTours 
+        city={city} 
+        tours={viatorTours}
+        destinationId={viatorMetadata.destinationId}
+        apiStatus={viatorMetadata.apiStatus}
+        apiError={viatorMetadata.apiError}
+        rawMeta={viatorMetadata.rawMeta}
+      />
       {parts[1] && (
         <div dangerouslySetInnerHTML={{ __html: parts[1] }} />
       )}
@@ -372,7 +379,7 @@ function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent)
   return $("body").html() || htmlContent;
 }
 
-export default function ViatorGenPost({ post, viatorTours = [], city }) {
+export default function ViatorGenPost({ post, viatorTours = [], city, viatorMetadata = {} }) {
   console.log("********* ViatorGenPost RENDERED *********");
   console.log("POST OBJECT:", post);
   console.log("POST TYPE:", post && post.postType);
@@ -505,6 +512,7 @@ export default function ViatorGenPost({ post, viatorTours = [], city }) {
               htmlContent={cleanedHtml} 
               viatorTours={viatorTours} 
               city={city || post?.city} 
+              viatorMetadata={viatorMetadata}
             />
           ) : (
             <div

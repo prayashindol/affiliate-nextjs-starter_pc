@@ -120,6 +120,7 @@ export default async function SeoGenPostPage({ params }) {
 
   // Fetch Viator tours only for Viator-category posts
   let viatorTours = [];
+  let viatorMetadata = {};
   if (viator && post?.city) {
     try {
       console.log(`Attempting to fetch Viator tours for city: ${post.city}`);
@@ -128,16 +129,29 @@ export default async function SeoGenPostPage({ params }) {
         count: 9,
       });
       viatorTours = viatorResult.products || [];
+      // Extract metadata for debug functionality
+      viatorMetadata = {
+        destinationId: viatorResult.destinationId,
+        apiStatus: viatorResult.apiStatus,
+        apiError: viatorResult.apiError,
+        rawMeta: viatorResult.rawMeta
+      };
       console.log(`Found ${viatorTours.length} Viator tours`);
     } catch (error) {
       console.error("Failed to fetch Viator tours:", error);
       // Don't throw the error - just log it and continue with empty tours
       viatorTours = [];
+      viatorMetadata = {
+        destinationId: null,
+        apiStatus: 'error',
+        apiError: error.message,
+        rawMeta: null
+      };
     }
   }
 
   if (viator) {
-    return <ViatorPostLayout post={post} viatorTours={viatorTours} />;
+    return <ViatorPostLayout post={post} viatorTours={viatorTours} viatorMetadata={viatorMetadata} />;
   }
   return <SEOGenPostLayout post={post} />;
 }
