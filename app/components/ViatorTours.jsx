@@ -5,7 +5,19 @@ import ViatorToursClientDebug from './ViatorToursClientDebug'
 
 export default function ViatorTours({ city, tours, destinationId, apiStatus, apiError, rawMeta }) {
   // Show error message only if there was an API issue (not just no tours found)
-  if (!tours?.length && apiStatus && apiStatus !== 'success' && apiStatus !== 'no_products') {
+// Helper function to determine if the error message should be shown
+function shouldShowErrorMessage(tours, apiStatus) {
+  return (
+    !tours?.length &&
+    apiStatus &&
+    apiStatus !== 'success' &&
+    apiStatus !== 'no_products'
+  );
+}
+
+export default function ViatorTours({ city, tours, destinationId, apiStatus, apiError, rawMeta }) {
+  // Show error message only if there was an API issue (not just no tours found)
+  if (shouldShowErrorMessage(tours, apiStatus)) {
     return (
       <section className="my-12">
         <Suspense fallback={null}>
