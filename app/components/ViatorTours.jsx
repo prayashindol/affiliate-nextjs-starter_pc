@@ -4,6 +4,37 @@ import React, { useState, Suspense } from 'react'
 import ViatorToursClientDebug from './ViatorToursClientDebug'
 
 export default function ViatorTours({ city, tours, destinationId, apiStatus, apiError, rawMeta }) {
+  // Show error message only if there was an API issue (not just no tours found)
+  if (!tours?.length && apiStatus && apiStatus !== 'success' && apiStatus !== 'no_products') {
+    return (
+      <section className="my-12">
+        <Suspense fallback={null}>
+          <ViatorToursClientDebug 
+            city={city}
+            tours={tours || []}
+            destinationId={destinationId}
+            apiStatus={apiStatus}
+            apiError={apiError}
+            rawMeta={rawMeta}
+          />
+        </Suspense>
+        
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-gray-700 mb-2">Tours Temporarily Unavailable</h2>
+          <p className="text-gray-600">
+            We&apos;re currently unable to load tours for {city}. Please check back later.
+          </p>
+          {process.env.NODE_ENV === 'development' && apiError && (
+            <p className="mt-2 text-sm text-red-600 font-mono">
+              Debug: {apiError}
+            </p>
+          )}
+        </div>
+      </section>
+    )
+  }
+  
+  // If no tours but no error, just return null (might be intentionally no tours for this city)
   if (!tours?.length) return null
   
   // Match the heading logic from PHP code
