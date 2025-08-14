@@ -17,7 +17,14 @@ export default function ViatorTours({ city, tours, destinationId, apiStatus, api
             apiError={apiError}
             rawMeta={rawMeta}
           />
-        </Suspense>
+        <ViatorToursClientDebug 
+          city={city}
+          tours={tours || []}
+          destinationId={destinationId}
+          apiStatus={apiStatus}
+          apiError={apiError}
+          rawMeta={rawMeta}
+        />
         
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
           <h2 className="text-2xl font-bold text-gray-700 mb-2">Tours Temporarily Unavailable</h2>
