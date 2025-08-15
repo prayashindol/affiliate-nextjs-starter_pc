@@ -149,7 +149,7 @@ export default function EnvDiagnosticsPage() {
                 <li>Go to Vercel Dashboard → Your Project → Settings → Environment Variables</li>
                 <li>Add <code className="bg-gray-200 px-1 rounded">NEXT_PUBLIC_SANITY_TOKEN</code> (with NEXT_PUBLIC prefix)</li>
                 <li>Set it for Production, Preview, and Development environments</li>
-                <li>The token should start with &apos;sk&apos; and be obtained from Sanity dashboard</li>
+                <li>The token should start with 'sk' and be obtained from Sanity dashboard</li>
                 <li>Redeploy your application</li>
               </ol>
             </div>
