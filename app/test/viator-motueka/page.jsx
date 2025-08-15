@@ -1,5 +1,5 @@
 import { fetchViatorTours } from '../../../lib/viator.js';
-import ViatorTours from '../components/ViatorTours.jsx';
+import ViatorTours from '../../components/ViatorTours.jsx';
 
 export default async function ViatorTestPage() {
   const city = 'motueka';
