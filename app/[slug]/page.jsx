@@ -3,6 +3,7 @@
  */
 import { sanityClient } from '../../lib/sanity'
 import { fetchViatorTours } from '../../lib/viator'
+import ViatorGenPost from '../components/posts/ViatorGenPost'
 
 async function getSeoGenPost(slug) {
   try {
@@ -14,14 +15,20 @@ async function getSeoGenPost(slug) {
       body,
       excerpt,
       description,
+      contentHtml,
       city,
       postType,
       category,
       categories[]->{title, slug},
+      mainImage,
       mainImageAsset{
         asset->{ _id, url },
         alt
-      }
+      },
+      dateModified,
+      author,
+      location,
+      permalink
     }`
     return await sanityClient.fetch(query, { slug })
   } catch (error) {
@@ -105,6 +112,19 @@ export default async function SeoGenPostPage({ params }) {
     viatorMeta = result
   }
 
+  // If this is a Viator post and has contentHtml, use the ViatorGenPost component
+  if (viator && post.contentHtml) {
+    return (
+      <ViatorGenPost 
+        post={post} 
+        viatorTours={viatorProducts} 
+        city={post.city} 
+        viatorMetadata={viatorMeta}
+      />
+    )
+  }
+
+  // Fallback to simple layout for non-Viator posts or posts without contentHtml
   return (
     <article className="prose max-w-3xl mx-auto py-10">
       <header>
