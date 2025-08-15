@@ -109,7 +109,7 @@ function simulateViatorAPI(city, tours = mockTours) {
     'london': '77', // London's destination ID
     'paris': '76',  // Paris destination ID
     'rome': '187',   // Rome destination ID
-    'motueka': '51839' // Sample mapping for testing
+    'motueka': '24533' // Sample mapping for testing
   };
   
   const destinationId = cityMap[city.toLowerCase()];
