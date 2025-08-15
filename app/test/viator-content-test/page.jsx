@@ -1,7 +1,7 @@
 /**
  * Test page to demonstrate ViatorGenPost component with contentHtml processing
  */
-import ViatorGenPost from '../../components/posts/ViatorGenPost'
+import ViatorGenPost from '../components/posts/ViatorGenPost'
 
 export default function ViatorContentTestPage() {
   // Mock post data to test the ViatorGenPost component functionality
