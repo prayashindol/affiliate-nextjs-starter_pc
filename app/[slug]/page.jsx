@@ -46,16 +46,11 @@ function isViatorByCategories(categories) {
 }
 
 export async function generateStaticParams() {
-  try {
-    const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)]{ "slug": slug.current }`
-    const posts = await sanityClient.fetch(query)
-    return posts.map(p => ({ slug: p.slug }))
-  } catch (error) {
-    console.error('Error fetching posts for static generation:', error.message)
-    // Return empty array to prevent build failure when Sanity is not accessible
-    return []
-  }
+  const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)][0..10]{ "slug": slug.current }`
+  const posts = await sanityClient.fetch(query);
+  return posts.map((post) => ({ slug: post.slug }));
 }
+
 
 export async function generateMetadata({ params }) {
   const { slug } = await params
