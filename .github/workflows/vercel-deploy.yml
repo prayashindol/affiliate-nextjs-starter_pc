@@ -1,16 +1,10 @@
 ---
-name: Vercel Deployment
+name: Vercel Production Deploy
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
-
-concurrency:
-  group: vercel-deploy-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   info-when-missing-secret:
@@ -27,29 +21,11 @@ jobs:
     if: ${{ secrets.VERCEL_DEPLOY_HOOK != '' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Determine deployment type
-        id: deployment-type
-        run: |
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "type=main-production" >> $GITHUB_OUTPUT
-            echo "description=Main branch to production" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "type=pr-production" >> $GITHUB_OUTPUT
-            echo "description=Pull request to production" >> $GITHUB_OUTPUT
-          else
-            echo "type=manual-production" >> $GITHUB_OUTPUT
-            echo "description=Manual trigger to production" >> $GITHUB_OUTPUT
-          fi
-
       - name: Trigger Vercel Production Deploy Hook
         env:
           DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
           set -euo pipefail
-          echo "Triggering Vercel production deploy hook..."
-          echo "Deployment type: ${{ steps.deployment-type.outputs.description }}"
+          echo "Triggering Vercel production deploy hook for main branch..."
           curl -fsSL -X POST "$DEPLOY_HOOK"
           echo "Production deploy hook triggered."
-
-  # Note: Preview deployments are automatically handled by Vercel when vercel.json has deploymentEnabled: true
-  # PRs will automatically get preview deployments, and this workflow will also deploy them to production

@@ -1,17 +1,7 @@
 {
-  "git": {
-    "deploymentEnabled": true
-  },
-  "github": {
-    "autoAlias": false,
-    "autoJobCancelation": true,
-    "silent": true
-  },
-
+  "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
-  "framework": "nextjs",
-  "regions": ["iad1"],
   "functions": {
     "app/api/**": {
       "maxDuration": 10
