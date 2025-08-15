@@ -104,13 +104,13 @@ function simulateViatorAPI(city, tours = mockTours) {
   
   console.log(`Attempting to fetch tours for city: ${city}`);
   
-  // Simulate the destination mapping
+  // Simulate the destination mapping (using some sample mappings for testing)
   const cityMap = {
     'london': '77', // London's destination ID
     'paris': '76',  // Paris destination ID
-    'rome': '187'   // Rome destination ID
-  // Use the real destination mapping from production
-  const cityMap = viatorCityMap;
+    'rome': '187',   // Rome destination ID
+    'motueka': '51839' // Sample mapping for testing
+  };
   
   const destinationId = cityMap[city.toLowerCase()];
   if (!destinationId) {
