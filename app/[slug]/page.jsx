@@ -3,7 +3,7 @@
  */
 import { sanityClient } from '../../lib/sanity'
 import { fetchViatorTours } from '../../lib/viator'
-import ViatorGenPost from '../../components/posts/ViatorGenPost'
+import ViatorGenPost from '../components/posts/ViatorGenPost'
 
 async function getSeoGenPost(slug) {
   try {
