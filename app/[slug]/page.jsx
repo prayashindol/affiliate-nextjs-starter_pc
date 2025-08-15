@@ -5,24 +5,29 @@ import { sanityClient } from '../../lib/sanity'
 import { fetchViatorTours } from '../../lib/viator'
 
 async function getSeoGenPost(slug) {
-  const query = `*[_type in ["seoGenPost","seoGenPostViator"] && slug.current == $slug][0]{
-    _id,
-    _type,
-    title,
-    slug,
-    body,
-    excerpt,
-    description,
-    city,
-    postType,
-    category,
-    categories[]->{title, slug},
-    mainImageAsset{
-      asset->{ _id, url },
-      alt
-    }
-  }`
-  return sanityClient.fetch(query, { slug })
+  try {
+    const query = `*[_type in ["seoGenPost","seoGenPostViator"] && slug.current == $slug][0]{
+      _id,
+      _type,
+      title,
+      slug,
+      body,
+      excerpt,
+      description,
+      city,
+      postType,
+      category,
+      categories[]->{title, slug},
+      mainImageAsset{
+        asset->{ _id, url },
+        alt
+      }
+    }`
+    return await sanityClient.fetch(query, { slug })
+  } catch (error) {
+    console.error('Error fetching post:', error.message)
+    return null
+  }
 }
 
 function isViatorByCategories(categories) {
@@ -34,9 +39,15 @@ function isViatorByCategories(categories) {
 }
 
 export async function generateStaticParams() {
-  const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)]{ "slug": slug.current }`
-  const posts = await sanityClient.fetch(query)
-  return posts.map(p => ({ slug: p.slug }))
+  try {
+    const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)]{ "slug": slug.current }`
+    const posts = await sanityClient.fetch(query)
+    return posts.map(p => ({ slug: p.slug }))
+  } catch (error) {
+    console.error('Error fetching posts for static generation:', error.message)
+    // Return empty array to prevent build failure when Sanity is not accessible
+    return []
+  }
 }
 
 export async function generateMetadata({ params }) {
