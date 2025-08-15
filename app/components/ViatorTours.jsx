@@ -3,6 +3,17 @@
 import React, { useState, Suspense } from 'react'
 import ViatorToursClientDebug from './ViatorToursClientDebug'
 
+// Simple HTML escaping function
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Helper function to determine if the error message should be shown
 function shouldShowErrorMessage(tours, apiStatus) {
   return (
