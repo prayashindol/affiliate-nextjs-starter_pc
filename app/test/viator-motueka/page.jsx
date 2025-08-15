@@ -42,7 +42,7 @@ export default async function ViatorTestPage() {
         <h3 className="text-lg font-semibold mb-2">Test Instructions:</h3>
         <p className="text-sm">
           This page demonstrates the Viator tours integration for Motueka. 
-          If you see "Tours Temporarily Unavailable", it means the API key is not configured. 
+          If you see &quot;Tours Temporarily Unavailable&quot;, it means the API key is not configured. 
           If you see tour cards, the integration is working correctly.
         </p>
       </div>
