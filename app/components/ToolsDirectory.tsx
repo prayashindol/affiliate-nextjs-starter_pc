@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import Image from 'next/image';
 import FavoriteButton from './FavoriteButton';
 import { toolSlug } from './util/toolSlug';
 
@@ -120,7 +119,7 @@ function ToolsDirectoryComponent({ featuredOnly = false }: ToolsDirectoryProps) 
         else if (Array.isArray(data.records)) recs = data.records
         else if (Array.isArray(data.data)) recs = data.data
         const shaped = recs.map(r => ({ ...r.fields, _id: r.id }))
-        if (shaped.some(t => t?.id?.startsWith?.('test') || t?.Name === 'PriceLabs')) {
+        if (shaped.some(t => t?._id?.startsWith?.('test') || t?.Name === 'PriceLabs')) {
           setIsTestData(true)
         }
         setTools(shaped)
@@ -223,7 +222,14 @@ function ToolsDirectoryComponent({ featuredOnly = false }: ToolsDirectoryProps) 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-3xl" aria-hidden="true">{emoji}</span>
-                      <FavoriteButton toolId={String(tool._id)} />
+                      <FavoriteButton 
+                        item={{
+                          id: String(tool._id),
+                          title: tool.Name || 'Unknown Tool',
+                          type: 'tool' as const,
+                          url: externalUrl || `/tools/${internal}` || '#'
+                        }}
+                      />
                     </div>
                     <h3 className="text-lg font-semibold leading-snug mb-2">
                       {tool.Name}
