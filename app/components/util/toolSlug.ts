@@ -20,7 +20,28 @@ export function toolSlug(tool: any): string {
     tool?.CleanedName ||
     tool?.Name ||
     tool?.id ||
-    '';
+
+// Defines the possible shapes for a tool object accepted by toolSlug
+export type ToolLike =
+  | string
+  | {
+      slug?: { current?: string } | string;
+      CleanedName?: string;
+      Name?: string;
+      id?: string;
+    };
+
+export function toolSlug(tool: ToolLike): string {
+  if (!tool) return '';
+  if (typeof tool === 'string') return normalize(tool);
+  const candidate =
+    typeof tool.slug === 'object'
+      ? tool.slug?.current
+      : tool?.slug ||
+        tool?.CleanedName ||
+        tool?.Name ||
+        tool?.id ||
+        '';
   return normalize(String(candidate));
 }
 
