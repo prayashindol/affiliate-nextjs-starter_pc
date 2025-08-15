@@ -27,6 +27,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'news.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'logo.clearbit.com',
       }
     ],
   },
