@@ -1,17 +1,8 @@
 /**
- * Dynamic post page with Viator integration.
- * - Determines if post should display tours
- * - Fetches tours server-side (SSR) to avoid client flash
- *
- * Assumptions:
- * - Sanity content rendering (PortableText or similar) can be plugged in where indicated.
- * - City field present for Viator posts.
+ * Dynamic post page with enriched Viator tour rendering.
  */
-
 import { sanityClient } from '../../lib/sanity'
 import { fetchViatorTours } from '../../lib/viator'
-
-// ---------- Data Helpers ----------
 
 async function getSeoGenPost(slug) {
   const query = `*[_type in ["seoGenPost","seoGenPostViator"] && slug.current == $slug][0]{
@@ -42,8 +33,6 @@ function isViatorByCategories(categories) {
   })
 }
 
-// ---------- Static Generation ----------
-
 export async function generateStaticParams() {
   const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)]{ "slug": slug.current }`
   const posts = await sanityClient.fetch(query)
@@ -54,7 +43,6 @@ export async function generateMetadata({ params }) {
   const { slug } = await params
   const post = await getSeoGenPost(slug)
   if (!post) return {}
-
   const ogImages = []
   if (post.mainImageAsset?.asset?.url) {
     ogImages.push({
@@ -64,7 +52,6 @@ export async function generateMetadata({ params }) {
       alt: post.mainImageAsset.alt || post.title
     })
   }
-
   return {
     title: post.title,
     description: post.description || post.excerpt || '',
@@ -77,8 +64,6 @@ export async function generateMetadata({ params }) {
     }
   }
 }
-
-// ---------- Page Component ----------
 
 export default async function SeoGenPostPage({ params }) {
   const { slug } = await params
@@ -93,7 +78,6 @@ export default async function SeoGenPostPage({ params }) {
     )
   }
 
-  // Viator detection logic (keep aligned with renderer)
   const viatorByStringCategory =
     Array.isArray(post?.category) && post.category.includes('airbnb-gen-viator')
 
@@ -102,34 +86,16 @@ export default async function SeoGenPostPage({ params }) {
     isViatorByCategories(post?.categories) ||
     viatorByStringCategory
 
-  console.log('VIATOR DETECTION:', {
-    type: post?._type,
-    categories: post?.categories,
-    categoryArray: post?.category,
-    viatorFlag: viator,
-    city: post?.city
-  })
-
-  // Fetch tours if applicable
   let viatorProducts = []
   let viatorMeta = null
   if (viator && post?.city) {
     const result = await fetchViatorTours({ city: post.city, count: 9 })
+    viatorProducts = result.products
     viatorMeta = result
-    viatorProducts = Array.isArray(result.products) ? result.products : []
-    console.log('Viator fetch summary:', {
-      city: post.city,
-      dest: result.destinationId,
-      status: result.apiStatus,
-      count: viatorProducts.length,
-      error: result.apiError
-    })
   }
 
-  // ---------- Render ----------
-
   return (
-    <article className="prose prose-headings:scroll-mt-20 max-w-3xl mx-auto py-10">
+    <article className="prose max-w-3xl mx-auto py-10">
       <header>
         <h1>{post.title}</h1>
         {post.city && (
@@ -139,74 +105,61 @@ export default async function SeoGenPostPage({ params }) {
         )}
       </header>
 
-      {/* MAIN CONTENT:
-          Replace this block with your existing rich text renderer if you have one (e.g. PortableText)
-          Example:
-          <PortableText value={post.body} components={portableTextComponents} />
-      */}
       <section className="mt-6">
         {Array.isArray(post.body) ? (
-          <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded border border-gray-200">
+          <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded border border-gray-200 overflow-x-auto">
             {JSON.stringify(post.body, null, 2)}
           </pre>
         ) : (
-          <p>{post.excerpt || 'Content coming soon.'}</p>
+          <p>{post.excerpt || post.description || 'Content coming soon.'}</p>
         )}
       </section>
 
-      {/* Viator Tours Section */}
       {viator && (
         <div className="mt-12">
           {viatorProducts.length > 0 ? (
             <div>
               <h2 className="text-xl font-semibold mb-4">Popular Tours</h2>
               <div className="grid gap-6 md:grid-cols-3">
-                {viatorProducts.map(t => (
-                  <div
-                    key={t.productCode || t.title}
-                    className="border rounded p-3 bg-white shadow-sm"
+                {viatorProducts.map(p => (
+                  <a
+                    key={p.productCode}
+                    href={p.link || '#'}
+                    target={p.link ? '_blank' : undefined}
+                    rel={p.link ? 'nofollow noopener noreferrer' : undefined}
+                    className="group border rounded-lg p-4 bg-white shadow-sm hover:shadow transition flex flex-col"
                   >
-                    <h3 className="font-medium text-sm mb-2 line-clamp-2">
-                      {t.title}
-                    </h3>
-                    {t.price?.formattedValue && (
-                      <p className="text-xs text-gray-600">
-                        {t.price.formattedValue}
-                      </p>
+                    {p.thumbnail && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.thumbnail}
+                        alt={p.title}
+                        className="w-full h-32 object-cover rounded mb-3 border border-gray-100"
+                        loading="lazy"
+                      />
                     )}
-                    <p className="mt-1 text-xs line-clamp-3 text-gray-500">
-                      {t.shortDescription || 'Tour description'}
+                    <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-indigo-600">
+                      {p.title}
+                    </h3>
+                    {p.price && (
+                      <p className="text-xs text-gray-600 mb-1">{p.price}</p>
+                    )}
+                    <p className="mt-auto text-xs line-clamp-3 text-gray-500">
+                      {p.shortDescription}
                     </p>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
           ) : (
             <div className="text-sm text-gray-500">
-              {viatorMeta?.apiStatus === 'error' && (
-                <span>
-                  Tours temporarily unavailable (API error). Check logs for details.
-                </span>
-              )}
-              {viatorMeta?.apiStatus === 'no-destination' && (
-                <span>No destination mapping for this city.</span>
-              )}
-              {viatorMeta?.apiStatus === 'mock' && (
-                <span>Showing mock tours (missing or test API key).</span>
-              )}
-              {viatorMeta?.apiStatus === 'exception' && (
-                <span>Unexpected error loading tours.</span>
-              )}
-              {viatorMeta?.apiStatus === 'success' && viatorProducts.length === 0 && (
-                <span>No tours found for this destination.</span>
-              )}
+              {viatorMeta?.apiStatus === 'error' && 'Tours temporarily unavailable (API error).'}
+              {viatorMeta?.apiStatus === 'no-destination' && 'No destination mapping for this city.'}
+              {viatorMeta?.apiStatus === 'mock' && 'Showing mock tours (test or missing API key).'}
+              {viatorMeta?.apiStatus === 'exception' && 'Unexpected error loading tours.'}
+              {viatorMeta?.apiStatus === 'success' && viatorProducts.length === 0 && 'No tours returned for this destination.'}
             </div>
           )}
-
-          {/* Optional Debug Metadata (comment out in production) */}
-          {/* <pre className="mt-4 p-3 text-xs bg-gray-50 border rounded">
-            {JSON.stringify(viatorMeta, null, 2)}
-          </pre> */}
         </div>
       )}
     </article>
