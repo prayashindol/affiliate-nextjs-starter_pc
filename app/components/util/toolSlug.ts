@@ -1,3 +1,13 @@
+// Defines the possible shapes for a tool object accepted by toolSlug
+export type ToolLike =
+  | string
+  | {
+      slug?: { current?: string } | string;
+      CleanedName?: string;
+      Name?: string;
+      id?: string;
+    };
+
 /**
  * Safely derive a URL-friendly slug string from various tool object shapes.
  * Prevents accidental object coercion (e.g. /tools/[object Object]) when constructing hrefs.
@@ -11,24 +21,6 @@
  * 6. tool.id
  * Returns '' if nothing usable is found.
  */
-export function toolSlug(tool: any): string {
-  if (!tool) return '';
-  if (typeof tool === 'string') return normalize(tool);
-  const candidate =
-    tool?.slug?.current ||
-    tool?.slug ||
-    tool?.CleanedName ||
-    tool?.Name ||
-// Defines the possible shapes for a tool object accepted by toolSlug
-export type ToolLike =
-  | string
-  | {
-      slug?: { current?: string } | string;
-      CleanedName?: string;
-      Name?: string;
-      id?: string;
-    };
-
 export function toolSlug(tool: ToolLike): string {
   if (!tool) return '';
   if (typeof tool === 'string') return normalize(tool);
