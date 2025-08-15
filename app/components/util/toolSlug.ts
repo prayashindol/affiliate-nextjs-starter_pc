@@ -19,7 +19,6 @@ export function toolSlug(tool: any): string {
     tool?.slug ||
     tool?.CleanedName ||
     tool?.Name ||
-    tool?.id ||
 
 // Defines the possible shapes for a tool object accepted by toolSlug
 export type ToolLike =
