@@ -1,238 +1,229 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from 'react';
 
 /**
  * Props:
- * - city: string
- * - destinationId: string | null
+ * - city?: string
  * - tours: Array<{
- *     productCode, title, shortDescription, thumbnail,
- *     duration, price, reviewCount, rating, link
+ *     productCode: string
+ *     title: string
+ *     thumbnail?: string | null
+ *     description?: string           // optional full text if you add it
+ *     shortDescription?: string      // plain text (fallback)
+ *     rating?: number | null         // 0–5 (combinedAverageRating)
+ *     totalReviews?: number          // totalReviews
+ *     duration?: string | null       // e.g. "3 hrs", "2 hrs 30 min"
+ *     price?: string | null          // e.g. "$129.00"
+ *     link?: string | null           // productUrl (preferred)
  *   }>
- * - apiStatus, apiError, rawMeta
+ * - destinationId?: string | null    // used for deep-link fallback
+ * - apiStatus?: 'success'|'mock'|'error'|'no-destination'|'exception'|string
+ * - apiError?: string | null
+ * - rawMeta?: any
  */
 export default function ViatorTours({
   city,
-  destinationId,
   tours = [],
+  destinationId,
   apiStatus,
   apiError,
-  rawMeta,
 }) {
-  if (apiStatus === "no-destination") {
-    return (
-      <section className="my-10">
-        <h2 className="text-2xl font-bold mb-4">
-          Popular Tours in {city}
-        </h2>
-        <p className="text-sm text-gray-500">
-          No destination mapping for this city.
-        </p>
-      </section>
-    );
-  }
+  const [expanded, setExpanded] = useState({}); // productCode -> boolean
 
-  if (apiStatus === "error" || apiStatus === "exception") {
-    return (
-      <section className="my-10">
-        <h2 className="text-2xl font-bold mb-4">
-          Popular Tours in {city}
-        </h2>
-        <p className="text-sm text-red-600">
-          Tours temporarily unavailable. {apiError || "Please try again later."}
-        </p>
-      </section>
-    );
-  }
+  const heading = useMemo(() => {
+    const n = Array.isArray(tours) ? tours.length : 0;
+    if (!city || n === 0) return null;
+    return n === 1
+      ? `Highest Rated Sight-Seeing Tour to Take in ${city}`
+      : `${n} Highest Rated Sight-Seeing Tours to Take in ${city}`;
+  }, [city, tours]);
 
-  if (!tours.length) {
-    return null;
+  if (!tours || tours.length === 0) {
+    return (
+      <div className="max-w-5xl mx-auto my-10">
+        <h2 className="text-2xl font-semibold mb-3">Experiences</h2>
+        <div className="text-sm text-gray-600">
+          {apiStatus === 'no-destination' && 'No destination mapping for this city.'}
+          {apiStatus === 'mock' && 'Showing mock tours (testing or missing API key).'}
+          {apiStatus === 'error' && `Tours temporarily unavailable. ${apiError || ''}`}
+          {apiStatus === 'exception' && 'Unexpected error loading tours.'}
+          {apiStatus === 'success' && 'No tours returned for this destination.'}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <section className="my-12">
-      <h2 className="text-3xl font-extrabold tracking-tight mb-6">
-        9 Highest Rated Sight-Seeing Tours to Take in {city}
-      </h2>
+    <section className="max-w-6xl mx-auto my-12">
+      {heading && (
+        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-6">
+          {heading}
+        </h2>
+      )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {tours.map((t) => (
-          <TourCard key={t.productCode} tour={t} />
-        ))}
+        {tours.map((p) => {
+          const code = p.productCode || Math.random().toString(36).slice(2);
+          const isOpen = !!expanded[code];
+
+          // Prefer full description if present, else shortDescription
+          const full = (p.description || p.shortDescription || '').trim();
+          const limit = 220;
+          const needsClamp = full.length > limit;
+          const preview = needsClamp ? full.slice(0, limit).trimEnd() + '…' : full;
+
+          // Prefer productUrl from API; fallback to classic deep link
+          const href =
+            p.link ||
+            (destinationId && p.productCode
+              ? `https://www.viator.com/tours/${destinationId}/${encodeURIComponent(
+                  p.productCode
+                )}`
+              : null);
+
+          return (
+            <article
+              key={code}
+              className="flex flex-col rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 overflow-hidden"
+            >
+              {/* Image */}
+              {p.thumbnail ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={p.thumbnail}
+                  alt={p.title}
+                  className="h-48 w-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="h-48 w-full bg-gray-100" />
+              )}
+
+              <div className="p-4 flex flex-col gap-3">
+                {/* Title */}
+                <h3 className="text-lg font-semibold leading-snug line-clamp-3">
+                  {p.title}
+                </h3>
+
+                {/* Meta row: rating + reviews, duration, price */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                  <Rating rating={p.rating} total={p.totalReviews} />
+                  {p.duration && (
+                    <span className="inline-flex items-center">
+                      <ClockIcon className="mr-1 h-4 w-4" />
+                      {p.duration}
+                    </span>
+                  )}
+                  {p.price && (
+                    <span className="ml-auto font-medium text-gray-900">
+                      From {p.price}
+                    </span>
+                  )}
+                </div>
+
+                {/* Description with inline Read more */}
+                {full && (
+                  <p className="text-sm text-gray-700">
+                    {isOpen ? full : preview}{' '}
+                    {needsClamp && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpanded((s) => ({ ...s, [code]: !isOpen }))
+                        }
+                        className="font-semibold text-indigo-600 hover:text-indigo-700 focus:outline-none"
+                        aria-label={isOpen ? 'Show less' : 'Read more'}
+                      >
+                        {isOpen ? 'Show less' : 'Read more'}
+                      </button>
+                    )}
+                  </p>
+                )}
+
+                {/* CTA */}
+                <div className="mt-2">
+                  <a
+                    href={href || '#'}
+                    target="_blank"
+                    rel="nofollow noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                    onClick={(e) => {
+                      if (!href) e.preventDefault();
+                    }}
+                  >
+                    Book Now
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-function TourCard({ tour }) {
-  const [expanded, setExpanded] = useState(false);
+/* ---------- Small presentational helpers ---------- */
 
-  const {
-    title,
-    thumbnail,
-    shortDescription,
-    duration,
-    price,
-    reviewCount,
-    rating,
-    link,
-  } = tour;
-
-  const desc = expanded
-    ? shortDescription.replace(/<span class="read-more">.*?<\/span>/, "")
-    : shortDescription;
-
+function Rating({ rating, total }) {
+  // rating: 0–5 (can be decimal) ; total: integer
+  const r = typeof rating === 'number' ? Math.max(0, Math.min(5, rating)) : 0;
+  const filled = Math.round(r); // simple: round to nearest whole star
   return (
-    <article className="group flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition overflow-hidden">
-      {/* Image */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-100">
-        {thumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={thumbnail}
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            loading="lazy"
-          />
-        ) : (
-          <div className="h-full w-full grid place-items-center text-sm text-gray-400">
-            No image
-          </div>
+    <span className="inline-flex items-center">
+      <span className="mr-1 inline-flex">
+        {Array.from({ length: 5 }).map((_, i) =>
+          i < filled ? <StarSolid key={i} /> : <StarOutline key={i} />
         )}
-      </div>
-
-      {/* Body */}
-      <div className="p-4 sm:p-5 flex flex-col gap-3">
-        <h3 className="font-semibold text-lg leading-snug line-clamp-2">
-          {title}
-        </h3>
-
-        {/* Meta row: rating + duration */}
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          <Stars rating={rating} />
-          <span className="text-gray-500">
-            {typeof reviewCount === "number" ? `(${reviewCount} reviews)` : null}
-          </span>
-
-          {duration ? (
-            <span className="ml-auto inline-flex items-center gap-1 whitespace-nowrap">
-              <ClockIcon className="h-4 w-4" />
-              {duration}
-            </span>
-          ) : null}
-        </div>
-
-        {/* Description */}
-        <p
-          className={`text-sm text-gray-700 ${expanded ? "" : "line-clamp-4"}`}
-          dangerouslySetInnerHTML={{ __html: desc }}
-        />
-
-        {/* Read more toggle (only if we truncated) */}
-        {shortDescription.includes('read-more') && (
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            className="self-start text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-          >
-            {expanded ? "Show less" : "Read more"}
-          </button>
-        )}
-
-        {/* Footer row: price + CTA */}
-        <div className="mt-2 flex items-center justify-between">
-          <div className="text-sm text-gray-900">
-            {price ? <span className="font-semibold">From: {price}</span> : <span>&nbsp;</span>}
-          </div>
-
-          {link ? (
-            <a
-              href={link}
-              target="_blank"
-              rel="nofollow noopener noreferrer sponsored"
-              className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Book Now
-            </a>
-          ) : (
-            <span className="text-xs text-gray-400">Link unavailable</span>
-          )}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function Stars({ rating }) {
-  if (!rating || rating <= 0) {
-    return (
-      <span className="inline-flex items-center gap-1 text-gray-400">
-        <StarIcon className="h-4 w-4" />
-        No reviews
       </span>
-    );
-  }
-  // Render 5 stars with partial fill (simple nearest-half approach)
-  const normalized = Math.max(0, Math.min(5, rating));
-  const full = Math.floor(normalized);
-  const half = normalized - full >= 0.5 ? 1 : 0;
-
-  return (
-    <span className="inline-flex items-center gap-1">
-      {Array.from({ length: full }).map((_, i) => (
-        <StarIcon key={`f${i}`} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-      ))}
-      {half ? <StarHalfIcon className="h-4 w-4 fill-yellow-400 text-yellow-400" /> : null}
-      {Array.from({ length: 5 - full - half }).map((_, i) => (
-        <StarIcon key={`e${i}`} className="h-4 w-4 text-gray-300" />
-      ))}
+      <span className="text-gray-700">
+        {total && total > 0 ? `(${total} reviews)` : 'No reviews'}
+      </span>
     </span>
   );
 }
 
-/** Simple SVG icons (no external deps) */
-function StarIcon({ className = "" }) {
+function StarSolid() {
   return (
-    <svg viewBox="0 0 20 20" className={className} aria-hidden="true">
-      <path d="M10 15.27l-5.18 3.05 1.4-5.99L1 7.97l6.09-.52L10 1.5l2.91 5.95 6.09.52-5.22 4.36 1.4 5.99L10 15.27z" />
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="h-4 w-4 text-yellow-400"
+      fill="currentColor"
+    >
+      <path d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.8 4.6 18.3l1-6.1L1.2 7.9l6.1-.9L10 1.5z" />
     </svg>
   );
 }
-function StarHalfIcon({ className = "" }) {
+
+function StarOutline() {
   return (
-    <svg viewBox="0 0 20 20" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id="half">
-          <stop offset="50%" stopColor="currentColor" />
-          <stop offset="50%" stopColor="transparent" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M10 15.27l-5.18 3.05 1.4-5.99L1 7.97l6.09-.52L10 1.5l2.91 5.95 6.09.52-5.22 4.36 1.4 5.99L10 15.27z"
-        fill="url(#half)"
-      />
-      <path
-        d="M10 15.27l-5.18 3.05 1.4-5.99L1 7.97l6.09-.52L10 1.5l2.91 5.95 6.09.52-5.22 4.36 1.4 5.99L10 15.27z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1"
-        className="text-yellow-400"
-      />
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="h-4 w-4 text-yellow-400"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.8 4.6 18.3l1-6.1L1.2 7.9l6.1-.9L10 1.5z" />
     </svg>
   );
 }
-function ClockIcon({ className = "" }) {
+
+function ClockIcon({ className = '' }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <path
-        d="M12 7v5l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 3" />
     </svg>
   );
 }
