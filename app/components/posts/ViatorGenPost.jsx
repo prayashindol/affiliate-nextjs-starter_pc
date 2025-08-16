@@ -296,88 +296,98 @@ function ContentWithViatorTours({ htmlContent, viatorTours, city, viatorMetadata
   );
 }
 
-function injectViatorToursBeforeSecondHeading(htmlContent, viatorToursComponent) {
-  if (!viatorToursComponent || !htmlContent) return htmlContent;
+function injectViatorToursBeforeSecondHeading(htmlContent, _viatorToursComponent) {
+  if (!htmlContent) return htmlContent;
 
   const $ = load(htmlContent);
-  
-  // First, remove any existing injection points to prevent duplicates
+
+  // Prevent duplicates
   $('#viator-tours-injection-point').remove();
-  
-  const h2Elements = $('h2');
-  
-  // Inject before the first H2 (which is the "second" heading after H1)
-  if (h2Elements.length > 0) {
-    const firstH2 = h2Elements.eq(0);
-    
-    // Find the best injection point - after introductory content but before the H2
-    // Look for meaningful content before the H2 to inject after it
-    let injectionTarget = firstH2;
-    let insertMethod = 'before';
-    
-    // Check if there's meaningful content before the first H2
-    const contentBeforeH2 = [];
-    let prevElement = firstH2.prev();
-    
-    while (prevElement.length) {
-      contentBeforeH2.unshift(prevElement[0]);
-      prevElement = prevElement.prev();
+
+  const h2s = $('h2');
+
+  if (h2s.length >= 2) {
+    // 🎯 target the 2nd <h2>
+    const targetH2 = h2s.eq(1);
+
+    // Default: insert right before the 2nd <h2>
+    let injectionTarget = targetH2;
+    let insertMethod: 'before' | 'after' = 'before';
+
+    // Try to place AFTER the last meaningful element immediately preceding the 2nd <h2>,
+    // but don't cross another heading boundary.
+    const meaningfulBefore = [];
+    let cursor = targetH2.prev();
+
+    while (cursor.length) {
+      // stop if we hit another section heading
+      if (/^h[1-6]$/i.test(cursor.prop('tagName') || '')) break;
+      meaningfulBefore.unshift(cursor[0]);
+      cursor = cursor.prev();
     }
-    
-    // Find the last meaningful content element before the H2
-    if (contentBeforeH2.length > 0) {
-      for (let i = contentBeforeH2.length - 1; i >= 0; i--) {
-        const el = $(contentBeforeH2[i]);
-        // Look for paragraph, list, or div with substantial content
-        if (el.is('p, ul, ol, div') && el.text().trim().length > MIN_MEANINGFUL_CONTENT_LENGTH) {
+
+    if (meaningfulBefore.length > 0) {
+      for (let i = meaningfulBefore.length - 1; i >= 0; i--) {
+        const el = $(meaningfulBefore[i]);
+        const isMeaningful =
+          el.is('p, ul, ol, div, blockquote, figure') &&
+          el.text().trim().length > MIN_MEANINGFUL_CONTENT_LENGTH;
+
+        if (isMeaningful) {
           injectionTarget = el;
           insertMethod = 'after';
           break;
         }
       }
     }
-    
-    // Create injection point
+
     if (insertMethod === 'after') {
       injectionTarget.after('<div id="viator-tours-injection-point"></div>');
     } else {
       injectionTarget.before('<div id="viator-tours-injection-point"></div>');
     }
-    
-    if (typeof window === "undefined") {
-      console.log('🎯 Viator injection: Placed', insertMethod, injectionTarget.prop('tagName'), 'with text:', injectionTarget.text().trim().substring(0, 50));
+
+    if (typeof window === 'undefined') {
+      console.log(
+        '🎯 Viator injection @ 2nd <h2> — placed',
+        insertMethod,
+        (injectionTarget.prop('tagName') || '').toUpperCase(),
+        'text:',
+        injectionTarget.text().trim().slice(0, 60)
+      );
     }
+  } else if (h2s.length === 1) {
+    // Fallback: only one <h2>; place near it (keeps current behavior reasonable)
+    const firstH2 = h2s.eq(0);
+    firstH2.before('<div id="viator-tours-injection-point"></div>');
   } else {
-    // Fallback: if no H2 found, inject after the first meaningful paragraph
+    // Fallback: no <h2>; place after a substantial paragraph, else after the first paragraph
     const paragraphs = $('p');
     let injected = false;
-    
-    // Find the first paragraph with substantial content
-    paragraphs.each(function() {
+
+    paragraphs.each(function () {
       const $p = $(this);
       if ($p.text().trim().length > MIN_SUBSTANTIAL_PARAGRAPH_LENGTH && !injected) {
         $p.after('<div id="viator-tours-injection-point"></div>');
         injected = true;
-        if (typeof window === "undefined") {
-          console.log('🎯 Viator injection fallback: After paragraph with text:', $p.text().trim().substring(0, 50));
+        if (typeof window === 'undefined') {
+          console.log('🎯 Viator injection fallback: after substantial paragraph');
         }
-        return false; // break the loop
+        return false; // break
       }
     });
-    
+
     if (!injected && paragraphs.length > 0) {
-      // Last resort: after first paragraph
-      const firstParagraph = paragraphs.eq(0);
-      firstParagraph.after('<div id="viator-tours-injection-point"></div>');
-      if (typeof window === "undefined") {
-        console.log('🎯 Viator injection last resort: After first paragraph');
+      paragraphs.eq(0).after('<div id="viator-tours-injection-point"></div>');
+      if (typeof window === 'undefined') {
+        console.log('🎯 Viator injection last resort: after first paragraph');
       }
     }
   }
-  
-  // Return just the body content to avoid nested HTML structures
-  return $("body").html() || htmlContent;
+
+  return $('body').html() || htmlContent;
 }
+
 
 export default function ViatorGenPost({ post, viatorTours = [], city, viatorMetadata = {} }) {
   console.log("********* ViatorGenPost RENDERED *********");
