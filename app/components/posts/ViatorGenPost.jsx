@@ -312,7 +312,7 @@ function injectViatorToursBeforeSecondHeading(htmlContent, _viatorToursComponent
 
     // Default: insert right before the 2nd <h2>
     let injectionTarget = targetH2;
-    let insertMethod: 'before' | 'after' = 'before';
+    let insertMethod = 'before';
 
     // Try to place AFTER the last meaningful element immediately preceding the 2nd <h2>,
     // but don't cross another heading boundary.
