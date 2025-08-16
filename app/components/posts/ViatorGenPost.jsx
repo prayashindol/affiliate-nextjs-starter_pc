@@ -388,6 +388,98 @@ function injectViatorToursBeforeSecondHeading(htmlContent, _viatorToursComponent
   return $('body').html() || htmlContent;
 }
 
+function injectViatorToursBeforeThirdHeading(htmlContent, _viatorToursComponent) {
+  if (!htmlContent) return htmlContent;
+
+  const $ = load(htmlContent);
+
+  // Prevent duplicates
+  $('#viator-tours-injection-point').remove();
+
+  const h2s = $('h2');
+
+  if (h2s.length >= 3) {
+    // 🎯 target the 3rd <h2>
+    const targetH2 = h2s.eq(2);
+
+    // Default: insert right before the 3rd <h2>
+    let injectionTarget = targetH2;
+    let insertMethod = 'before';
+
+    // Try to place AFTER the last meaningful element immediately preceding the 3rd <h2>,
+    // but don't cross another heading boundary.
+    const meaningfulBefore = [];
+    let cursor = targetH2.prev();
+
+    while (cursor.length) {
+      if (/^h[1-6]$/i.test(cursor.prop('tagName') || '')) break;
+      meaningfulBefore.unshift(cursor[0]);
+      cursor = cursor.prev();
+    }
+
+    if (meaningfulBefore.length > 0) {
+      for (let i = meaningfulBefore.length - 1; i >= 0; i--) {
+        const el = $(meaningfulBefore[i]);
+        const isMeaningful =
+          el.is('p, ul, ol, div, blockquote, figure') &&
+          el.text().trim().length > MIN_MEANINGFUL_CONTENT_LENGTH;
+
+        if (isMeaningful) {
+          injectionTarget = el;
+          insertMethod = 'after';
+          break;
+        }
+      }
+    }
+
+    if (insertMethod === 'after') {
+      injectionTarget.after('<div id="viator-tours-injection-point"></div>');
+    } else {
+      injectionTarget.before('<div id="viator-tours-injection-point"></div>');
+    }
+
+    if (typeof window === 'undefined') {
+      console.log(
+        '🎯 Viator injection @ 3rd <h2> — placed',
+        insertMethod,
+        (injectionTarget.prop('tagName') || '').toUpperCase(),
+        'text:',
+        injectionTarget.text().trim().slice(0, 60)
+      );
+    }
+  } else if (h2s.length === 2) {
+    // Fallback: only two <h2>s; place near the 2nd to keep position late in intro
+    h2s.eq(1).before('<div id="viator-tours-injection-point"></div>');
+  } else if (h2s.length === 1) {
+    // Fallback: only one <h2>; place near it
+    h2s.eq(0).before('<div id="viator-tours-injection-point"></div>');
+  } else {
+    // Fallback: no <h2>; place after a substantial paragraph, else after the first paragraph
+    const paragraphs = $('p');
+    let injected = false;
+
+    paragraphs.each(function () {
+      const $p = $(this);
+      if ($p.text().trim().length > MIN_SUBSTANTIAL_PARAGRAPH_LENGTH && !injected) {
+        $p.after('<div id="viator-tours-injection-point"></div>');
+        injected = true;
+        if (typeof window === 'undefined') {
+          console.log('🎯 Viator injection fallback: after substantial paragraph');
+        }
+        return false;
+      }
+    });
+
+    if (!injected && paragraphs.length > 0) {
+      paragraphs.eq(0).after('<div id="viator-tours-injection-point"></div>');
+      if (typeof window === 'undefined') {
+        console.log('🎯 Viator injection last resort: after first paragraph');
+      }
+    }
+  }
+
+  return $('body').html() || htmlContent;
+}
 
 export default function ViatorGenPost({ post, viatorTours = [], city, viatorMetadata = {} }) {
   console.log("********* ViatorGenPost RENDERED *********");
@@ -441,7 +533,10 @@ export default function ViatorGenPost({ post, viatorTours = [], city, viatorMeta
     
     // If viatorTours are provided, inject tours before the first H2 (second heading)
     if (viatorTours.length > 0) {
-      cleanedHtml = injectViatorToursBeforeSecondHeading(cleanedHtml, true);
+     // was: cleanedHtml = injectViatorToursBeforeSecondHeading(cleanedHtml, true);
+    cleanedHtml = injectViatorToursBeforeThirdHeading(cleanedHtml, true);
+
+// cleanedHtml = injectViatorToursBeforeSecondHeading(cleanedHtml, true);
     }
     
     if (typeof window === "undefined") {
