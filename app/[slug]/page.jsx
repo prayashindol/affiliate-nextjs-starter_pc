@@ -1,9 +1,15 @@
 /**
  * Dynamic post page with enriched Viator tour rendering.
+ * - No auth blocking: tours load even if user is logged out.
+ * - On-demand rendering (no huge prebuild).
+ * - Fixed generateMetadata params usage.
+ * - Caches page for 1 hour.
  */
-import { sanityClient } from '../../lib/sanity'
-import { fetchViatorTours } from '../../lib/viator'
-import ViatorGenPost from '../components/posts/ViatorGenPost'
+export const revalidate = 3600;
+
+import { sanityClient } from '../../lib/sanity';
+import { fetchViatorTours } from '../../lib/viator';
+import ViatorGenPost from '../components/posts/ViatorGenPost';
 
 async function getSeoGenPost(slug) {
   try {
@@ -29,42 +35,42 @@ async function getSeoGenPost(slug) {
       author,
       location,
       permalink
-    }`
-    return await sanityClient.fetch(query, { slug })
+    }`;
+    return await sanityClient.fetch(query, { slug });
   } catch (error) {
-    console.error('Error fetching post:', error.message)
-    return null
+    console.error('Error fetching post:', error?.message || error);
+    return null;
   }
 }
 
 function isViatorByCategories(categories) {
-  if (!Array.isArray(categories)) return false
-  return categories.some(c => {
-    const s = c?.slug?.current || c?.slug
-    return s === 'airbnb-gen-viator'
-  })
+  if (!Array.isArray(categories)) return false;
+  return categories.some((c) => {
+    const s = c?.slug?.current || c?.slug;
+    return s === 'airbnb-gen-viator';
+  });
 }
 
+// ⚡ Do not prebuild all slugs; render on-demand.
 export async function generateStaticParams() {
-  const query = `*[_type in ["seoGenPost","seoGenPostViator"] && defined(slug.current)][0..10]{ "slug": slug.current }`
-  const posts = await sanityClient.fetch(query);
-  return posts.map((post) => ({ slug: post.slug }));
+  return [];
 }
-
 
 export async function generateMetadata({ params }) {
-  const { slug } = await params
-  const post = await getSeoGenPost(slug)
-  if (!post) return {}
-  const ogImages = []
+  const { slug } = params; // ✅ params is a plain object, not a promise
+  const post = await getSeoGenPost(slug);
+  if (!post) return {};
+
+  const ogImages = [];
   if (post.mainImageAsset?.asset?.url) {
     ogImages.push({
       url: post.mainImageAsset.asset.url,
       width: 1200,
       height: 630,
-      alt: post.mainImageAsset.alt || post.title
-    })
+      alt: post.mainImageAsset.alt || post.title,
+    });
   }
+
   return {
     title: post.title,
     description: post.description || post.excerpt || '',
@@ -73,14 +79,14 @@ export async function generateMetadata({ params }) {
       description: post.description || post.excerpt || '',
       images: ogImages,
       type: 'article',
-      url: `/${slug}`
-    }
-  }
+      url: `/${slug}`,
+    },
+  };
 }
 
 export default async function SeoGenPostPage({ params }) {
-  const { slug } = await params
-  const post = await getSeoGenPost(slug)
+  const { slug } = params;
+  const post = await getSeoGenPost(slug);
 
   if (!post) {
     return (
@@ -88,38 +94,43 @@ export default async function SeoGenPostPage({ params }) {
         <h2 className="text-3xl font-bold mb-6">Post not found</h2>
         <p className="text-lg">The post you are looking for does not exist.</p>
       </div>
-    )
+    );
   }
 
   const viatorByStringCategory =
-    Array.isArray(post?.category) && post.category.includes('airbnb-gen-viator')
+    Array.isArray(post?.category) && post.category.includes('airbnb-gen-viator');
 
   const viator =
     post?._type === 'seoGenPostViator' ||
     isViatorByCategories(post?.categories) ||
-    viatorByStringCategory
+    viatorByStringCategory;
 
-  let viatorProducts = []
-  let viatorMeta = null
+  let viatorProducts = [];
+  let viatorMeta = null;
+
   if (viator && post?.city) {
-    const result = await fetchViatorTours({ city: post.city, count: 9 })
-    viatorProducts = result.products
-    viatorMeta = result
+    try {
+      const result = await fetchViatorTours({ city: post.city, count: 9 });
+      viatorProducts = result.products || [];
+      viatorMeta = result;
+    } catch (e) {
+      console.error('fetchViatorTours failed:', e?.message || e);
+      viatorProducts = [];
+      viatorMeta = { apiStatus: 'exception', apiError: e?.message || String(e) };
+    }
   }
 
-  // If this is a Viator post and has contentHtml, use the ViatorGenPost component
   if (viator && post.contentHtml) {
     return (
-      <ViatorGenPost 
-        post={post} 
-        viatorTours={viatorProducts} 
-        city={post.city} 
+      <ViatorGenPost
+        post={post}
+        viatorTours={viatorProducts}
+        city={post.city}
         viatorMetadata={viatorMeta}
       />
-    )
+    );
   }
 
-  // Fallback to simple layout for non-Viator posts or posts without contentHtml
   return (
     <article className="prose max-w-3xl mx-auto py-10">
       <header>
@@ -147,7 +158,7 @@ export default async function SeoGenPostPage({ params }) {
             <div>
               <h2 className="text-xl font-semibold mb-4">Popular Tours</h2>
               <div className="grid gap-6 md:grid-cols-3">
-                {viatorProducts.map(p => (
+                {viatorProducts.map((p) => (
                   <a
                     key={p.productCode}
                     href={p.link || '#'}
@@ -179,15 +190,21 @@ export default async function SeoGenPostPage({ params }) {
             </div>
           ) : (
             <div className="text-sm text-gray-500">
-              {viatorMeta?.apiStatus === 'error' && 'Tours temporarily unavailable (API error).'}
-              {viatorMeta?.apiStatus === 'no-destination' && 'No destination mapping for this city.'}
-              {viatorMeta?.apiStatus === 'mock' && 'Showing mock tours (test or missing API key).'}
-              {viatorMeta?.apiStatus === 'exception' && 'Unexpected error loading tours.'}
-              {viatorMeta?.apiStatus === 'success' && viatorProducts.length === 0 && 'No tours returned for this destination.'}
+              {viatorMeta?.apiStatus === 'error' &&
+                'Tours temporarily unavailable (API error).'}
+              {viatorMeta?.apiStatus === 'no-destination' &&
+                'No destination mapping for this city.'}
+              {viatorMeta?.apiStatus === 'mock' &&
+                'Showing mock tours (test or missing API key).'}
+              {viatorMeta?.apiStatus === 'exception' &&
+                'Unexpected error loading tours.'}
+              {viatorMeta?.apiStatus === 'success' &&
+                viatorProducts.length === 0 &&
+                'No tours returned for this destination.'}
             </div>
           )}
         </div>
       )}
     </article>
-  )
+  );
 }
