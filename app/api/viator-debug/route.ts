@@ -25,10 +25,14 @@ async function getSeoGenPost(slug: string) {
 }
 
 export async function GET(req: Request) {
+  // ✅ Read the slug from the query string (?slug=...)
   const url = new URL(req.url);
   const slug = url.searchParams.get('slug') || '';
   if (!slug) {
-    return new Response(JSON.stringify({ error: 'missing ?slug=' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'missing ?slug=' }), {
+      status: 400,
+      headers: { 'content-type': 'application/json' },
+    });
   }
 
   const post = await getSeoGenPost(slug);
@@ -63,12 +67,11 @@ export async function GET(req: Request) {
       products: [],
     }))) as ViatorOk | ViatorErr;
 
-    // ✅ Type-safe access using the guard
     if (isViatorOk(res)) {
       viatorMeta = {
         apiStatus: res.apiStatus,
         apiError: res.apiError,
-        destinationId: res.destinationId ?? null,
+        destinationId: res.destinationId ?? dest ?? null,
         tried: res.rawMeta?.tried ?? [],
       };
       count = Array.isArray(res.products) ? res.products.length : 0;
