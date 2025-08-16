@@ -47,7 +47,7 @@ export default function ViatorTours({
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {tours.map((t) => (
-          <TourCard key={t.productCode || t.title} tour={t} />
+          <TourCard key={t.productCode || t.title} tour={t} city={city} />
         ))}
       </div>
 
@@ -58,63 +58,84 @@ export default function ViatorTours({
   )
 }
 
-function getThumb(t) {
-  // Try several known Viator shapes
-  return (
-    t.thumbnail ||
-    t.imageUrl ||
-    (Array.isArray(t.images) && (
-      t.images[0]?.url ||
-      t.images[0]?.urls?.[0] ||
-      t.images[0]?.variants?.[0]?.url
-    )) ||
-    t.primaryPhoto?.small?.url ||
-    null
+/* ---------------- helpers ---------------- */
+
+function pickBestVariant(variants) {
+  if (!Array.isArray(variants) || variants.length === 0) return null
+  // Try to pick a “large/medium” style variant first
+  const preferred = variants.find(v =>
+    /large|xlarge|xl|big|1024|1200|1600/i.test(v.type || '') ||
+    /1024|1200|1600|2048/.test(String(v.width || ''))
   )
+  if (preferred?.url) return preferred.url
+  // Otherwise pick the widest available
+  const sorted = [...variants].sort((a, b) => (b.width || 0) - (a.width || 0))
+  return sorted[0]?.url || null
+}
+
+function getThumb(t, city) {
+  // 1) explicit thumbnail / imageUrl
+  if (t.thumbnail) return t.thumbnail
+  if (t.imageUrl) return t.imageUrl
+
+  // 2) known viator shapes
+  if (Array.isArray(t.images) && t.images.length) {
+    const first = t.images[0]
+    // new API often has variants or urls array
+    const byVariant = pickBestVariant(first.variants)
+    if (byVariant) return byVariant
+    if (Array.isArray(first.urls) && first.urls[0]) return first.urls[0]
+    if (first.url) return first.url
+  }
+  if (t.primaryPhoto?.large?.url) return t.primaryPhoto.large.url
+  if (t.primaryPhoto?.medium?.url) return t.primaryPhoto.medium.url
+  if (t.primaryPhoto?.small?.url) return t.primaryPhoto.small.url
+
+  // 3) pleasant fallback
+  const q = encodeURIComponent(city || t.title || 'travel')
+  return `https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60&sig=${q}`
 }
 
 function getPrice(t) {
   // Prefer preformatted; otherwise try to build from amount/currency
-  if (t.price) return t.price
+  if (typeof t.price === 'string' && t.price) return t.price
   const amt =
     t.price?.fromPrice?.amount ??
+    t.price?.amount ??
     t.fromPrice?.amount ??
     t.amount
   const cur =
     t.price?.fromPrice?.currencyCode ??
+    t.price?.currencyCode ??
     t.fromPrice?.currencyCode ??
     t.currencyCode
-  return amt && cur ? `${amt} ${cur}` : null
+  return amt != null && cur ? `${amt} ${cur}` : null
 }
 
 function getLink(t) {
-  // Use deep link if present; fallback to a Viator search with the title
   if (t.link) return t.link
   const q = encodeURIComponent(t.title || t.productCode || 'tour')
   return `https://www.viator.com/searchResults/all?keyword=${q}`
 }
 
-function TourCard({ tour }) {
+/* ---------------- card ---------------- */
+
+function TourCard({ tour, city }) {
   const href = getLink(tour)
-  const thumb = getThumb(tour)
+  const thumb = getThumb(tour, city)
   const price = getPrice(tour)
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md focus-within:ring-2 focus-within:ring-indigo-500">
       <div className="relative aspect-[4/3] w-full bg-gray-50">
-        {thumb ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={thumb}
-            alt={tour.title || 'Tour image'}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div className="absolute inset-0 grid place-items-center text-sm text-gray-400">
-            No image
-          </div>
-        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={thumb}
+          alt={tour.title || 'Tour image'}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          referrerPolicy="no-referrer"
+        />
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -148,6 +169,17 @@ function TourCard({ tour }) {
             >
               <path d="M12.293 3.293a1 1 0 0 1 1.414 0l4.999 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 1 1-1.414-1.414L15.586 11H2a1 1 0 1 1 0-2h13.586l-3.293-3.293a1 1 0 0 1 0-1.414z" />
             </svg>
+          </a>
+        </div>
+
+        <div className="mt-2">
+          <a
+            href={href}
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          >
+            Read more on Viator →
           </a>
         </div>
       </div>
