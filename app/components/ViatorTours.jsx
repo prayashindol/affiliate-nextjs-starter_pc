@@ -73,28 +73,21 @@ function pickBestVariant(variants) {
   return sorted[0]?.url || null
 }
 
-function getThumb(t, city) {
-  // 1) explicit thumbnail / imageUrl
-  if (t.thumbnail) return t.thumbnail
-  if (t.imageUrl) return t.imageUrl
-
-  // 2) known viator shapes
-  if (Array.isArray(t.images) && t.images.length) {
-    const first = t.images[0]
-    // new API often has variants or urls array
-    const byVariant = pickBestVariant(first.variants)
-    if (byVariant) return byVariant
-    if (Array.isArray(first.urls) && first.urls[0]) return first.urls[0]
-    if (first.url) return first.url
-  }
-  if (t.primaryPhoto?.large?.url) return t.primaryPhoto.large.url
-  if (t.primaryPhoto?.medium?.url) return t.primaryPhoto.medium.url
-  if (t.primaryPhoto?.small?.url) return t.primaryPhoto.small.url
-
-  // 3) pleasant fallback
-  const q = encodeURIComponent(city || t.title || 'travel')
-  return `https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60&sig=${q}`
+function getThumb(t) {
+  return (
+    t.thumbnail ||
+    t.imageUrl ||
+    (Array.isArray(t.images) && (
+      t.images[0]?.url ||
+      t.images[0]?.urls?.[0] ||
+      t.images[0]?.variants?.find(v => v.width >= 800)?.url
+    )) ||
+    t.primaryPhoto?.medium?.url ||
+    t.primaryPhoto?.large?.url ||
+    null
+  )
 }
+
 
 function getPrice(t) {
   // Prefer preformatted; otherwise try to build from amount/currency
