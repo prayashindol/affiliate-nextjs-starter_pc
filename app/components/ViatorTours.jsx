@@ -1,216 +1,117 @@
+// app/components/ViatorTours.jsx
 'use client'
+import React from 'react'
 
-import React, { useState, Suspense } from 'react'
-import ViatorToursClientDebug from './ViatorToursClientDebug'
+/**
+ * Polished Viator tours grid.
+ * Props:
+ *  - tours: [{ productCode, title, shortDescription, price, thumbnail, link }]
+ *  - city?: string
+ *  - destinationId?: string
+ *  - apiStatus?: 'success' | 'error' | 'no-destination' | 'mock' | 'exception'
+ *  - apiError?: string | null
+ *  - rawMeta?: any
+ */
+export default function ViatorTours({
+  tours = [],
+  city,
+  destinationId,
+  apiStatus,
+  apiError,
+  rawMeta,
+}) {
+  // If there’s an API state to communicate and no tours, show a soft message
+  if (!tours?.length) {
+    let msg = null
+    if (apiStatus === 'no-destination') msg = 'No destination mapping for this city.'
+    else if (apiStatus === 'mock') msg = 'Showing mock tours (test or missing API key).'
+    else if (apiStatus === 'error') msg = 'Tours temporarily unavailable (API error).'
+    else if (apiStatus === 'exception') msg = 'Unexpected error loading tours.'
+    else if (apiStatus === 'success') msg = 'No tours returned for this destination.'
 
-// Simple HTML escaping function
-function escapeHtml(unsafe) {
-  if (!unsafe) return '';
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-// Helper function to determine if the error message should be shown
-function shouldShowErrorMessage(tours, apiStatus) {
-  return (
-    !tours?.length &&
-    apiStatus &&
-    apiStatus !== 'success' &&
-    apiStatus !== 'no_products'
-  );
-}
-
-export default function ViatorTours({ city, tours, destinationId, apiStatus, apiError, rawMeta }) {
-  // Show error message only if there was an API issue (not just no tours found)
-  if (shouldShowErrorMessage(tours, apiStatus)) {
     return (
-      <section className="my-12">
-        <Suspense fallback={null}>
-          <ViatorToursClientDebug 
-            city={city}
-            tours={tours || []}
-            destinationId={destinationId}
-            apiStatus={apiStatus}
-            apiError={apiError}
-            rawMeta={rawMeta}
-          />
-        </Suspense>
-        
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-700 mb-2">Tours Temporarily Unavailable</h2>
-          <p className="text-gray-600">
-            We&apos;re currently unable to load tours for {escapeHtml(city)}. Please check back later.
-          </p>
-          {process.env.NODE_ENV === 'development' && apiError && (
-            <p className="mt-2 text-sm text-red-600 font-mono">
-              Debug: {apiError}
-            </p>
-          )}
+      <div className="not-prose my-8 rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-600 shadow-sm">
+        <div className="font-semibold text-gray-900">
+          {city ? `Tours in ${city}` : 'Tours'}
         </div>
-      </section>
+        <div className="mt-2">{msg || 'No tours to show right now.'}</div>
+        {apiError && (
+          <details className="mt-3 text-xs text-red-600">
+            <summary>Error details</summary>
+            <pre className="mt-1 whitespace-pre-wrap">{apiError}</pre>
+          </details>
+        )}
+      </div>
     )
   }
-  
-  // If no tours but no error, just return null (might be intentionally no tours for this city)
-  if (!tours?.length) return null
-  
-  // Match the heading logic from PHP code
-  const tour_count = tours.length
-  const heading = tour_count > 1
-    ? `${tour_count} Highest Rated Sight-Seeing Tours to Take in ${city}`
-    : `Highest Rated Sight-Seeing Tour to Take in ${city}`
 
   return (
-    <section className="my-12">
-      {/* Debug component - only shows when ?debugViator=1 */}
-      <Suspense fallback={null}>
-        <ViatorToursClientDebug 
-          city={city}
-          tours={tours}
-          destinationId={destinationId}
-          apiStatus={apiStatus}
-          apiError={apiError}
-          rawMeta={rawMeta}
-        />
-      </Suspense>
-      
-      <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{heading}</h2>
+    <section className="not-prose my-10">
+      <h2 className="mb-5 text-xl font-semibold">
+        {city ? `9 Highest Rated Sight-Seeing Tours to Take in ${city}` : 'Popular Tours'}
+      </h2>
 
-      <div className="viator-tours grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {tours.map((tour, idx) => (
-          <article 
-            key={tour.productCode || idx} 
-            className="tour-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full"
-          >
-            {/* Tour Image - matches PHP: tour.images[0].variants[3].url */}
-            {tour?.images?.[0]?.variants?.[3]?.url && (
-              <div className="relative">
-                <img
-                  src={tour.images[0].variants[3].url}
-                  alt={tour.title || 'Tour'}
-                  className="w-full h-48 object-cover"
-                  loading="lazy"
-                />
-              </div>
-            )}
-
-            <div className="px-4 pb-4 pt-2 flex flex-col flex-grow">
-              {/* Tour Title - matches PHP: tour.title */}
-              {tour?.title && (
-                <h3
-                  className="font-bold text-lg leading-tight text-gray-900 mb-3"
-                  style={{
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                  }}
-                >
-                  {tour.title}
-                </h3>
-              )}
-
-              {/* Rating and Reviews - matches PHP logic exactly */}
-              {tour?.reviews?.totalReviews && tour?.reviews?.combinedAverageRating && tour?.productUrl ? (
-                <div className="reviews mb-2">
-                  <a 
-                    href={tour.productUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 no-underline flex items-center text-sm"
-                  >
-                    {/* SVG stars - exactly matching PHP logic */}
-                    <div className="flex items-center mr-2">
-                      {[1,2,3,4,5].map(i => {
-                        const stars = Math.round(tour.reviews.combinedAverageRating)
-                        return i <= stars ? (
-                          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="gold" width="16" height="16" viewBox="0 0 24 24" className="mr-0.5">
-                            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
-                          </svg>
-                        ) : (
-                          <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="lightgray" width="16" height="16" viewBox="0 0 24 24" className="mr-0.5">
-                            <path d="M12 .587l3.668 7.431 8.167 1.182-5.916 5.811 1.397 8.143L12 18.896l-7.316 3.858 1.397-8.143L.165 9.2l8.167-1.182z"/>
-                          </svg>
-                        )
-                      })}
-                    </div>
-                    <span>{tour.reviews.totalReviews.toLocaleString()} reviews</span>
-                  </a>
-                </div>
-              ) : null}
-
-              {/* Duration - matches PHP: tour.duration.fixedDurationInMinutes */}
-              {tour?.duration?.fixedDurationInMinutes ? (
-                <div className="duration flex items-center gap-2 mb-3 text-sm text-gray-600">
-                  <span className="clock-icon mr-1">🕒</span>
-                  <span>{Math.floor(tour.duration.fixedDurationInMinutes / 60)} hrs</span>
-                </div>
-              ) : null}
-
-              {/* Description - matches PHP: tour.description with truncation */}
-              {tour?.description && (
-                <div className="description mb-3 flex-grow">
-                  <ExpandableDescription text={tour.description} />
-                </div>
-              )}
-
-              {/* Price and Button Container - pushes button to bottom */}
-              <div className="mt-auto">
-                {/* Price - matches PHP: tour.pricing.summary.fromPrice */}
-                {tour?.pricing?.summary?.fromPrice ? (
-                  <p className="price mb-3">
-                    <strong>From: ${tour.pricing.summary.fromPrice}</strong>
-                  </p>
-                ) : null}
-
-                {/* Book Now Button - matches PHP: tour.productUrl */}
-                {tour?.productUrl ? (
-                  <a 
-                    className="book-now inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg transition-colors duration-200 w-full text-center"
-                    href={tour.productUrl} 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Book Now
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          </article>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {tours.map((t) => (
+          <TourCard key={t.productCode || t.title} tour={t} />
         ))}
       </div>
+
+      <p className="mt-4 text-xs text-gray-500">
+        Some links may be affiliate links that help support our site at no extra cost to you.
+      </p>
     </section>
   )
 }
 
-// Component for expandable description matching PHP JavaScript logic
-function ExpandableDescription({ text, truncateAt = 250 }) {
-  const [expanded, setExpanded] = useState(false)
-  
-  if (!text) return null
-  
-  const shouldTruncate = text.length > truncateAt
-  const displayText = shouldTruncate && !expanded 
-    ? text.substring(0, truncateAt) + '...' 
-    : text
+function TourCard({ tour }) {
+  const href = tour.link || '#'
 
   return (
-    <div>
-      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-        {displayText}
-        {shouldTruncate && (
-          <span 
-            className="more-link ml-1 font-bold text-blue-600 hover:text-blue-800 cursor-pointer"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? 'Less' : 'More'}
-          </span>
+    <a
+      href={href}
+      target={tour.link ? '_blank' : undefined}
+      rel={tour.link ? 'nofollow noopener noreferrer' : undefined}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+    >
+      <div className="relative aspect-[4/3] w-full bg-gray-50">
+        {tour.thumbnail ? (
+          // using plain <img> to avoid remotePatterns config friction
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={tour.thumbnail}
+            alt={tour.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="absolute inset-0 grid place-items-center text-sm text-gray-400">
+            No image
+          </div>
         )}
-      </p>
-    </div>
+
+        {tour.price && (
+          <div className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold shadow">
+            {tour.price}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-gray-900 group-hover:text-indigo-600">
+          {tour.title}
+        </h3>
+
+        {tour.shortDescription && (
+          <p className="mt-2 line-clamp-3 text-xs text-gray-600">{tour.shortDescription}</p>
+        )}
+
+        <div className="mt-4">
+          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700">
+            View details
+          </span>
+        </div>
+      </div>
+    </a>
   )
 }
